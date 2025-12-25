@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picture Dictionary</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&family=Fredoka+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --text-color: #2d3436;
+            --primary: #00cec9;
+            --accent-pink: #ff7675;
+            --accent-blue: #74b9ff;
+            --accent-yellow: #ffeaa7;
+            --accent-purple: #a29bfe;
+            --bank-color: #fdcb6e;
+            --shadow: 0 4px 10px rgba(0,0,0,0.1);
+            --shadow-hover: 0 10px 25px rgba(0,0,0,0.15);
+            --grade5-color: #ff4757;
+            --grade6-color: #2e86de;
+        }
+
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(#ffffff 20%, transparent 20%),
+                radial-gradient(#ffffff 20%, transparent 20%);
+            background-position: 0 0, 20px 20px;
+            background-size: 40px 40px;
+            color: var(--text-color); margin: 0; min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255,255,255,0.95); padding: 10px 20px; position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); backdrop-filter: blur(8px);
+            height: 60px;
+        }
+        .logo { font-size: 1.4rem; font-weight: 800; letter-spacing: 1px; } .logo span { color: var(--primary); }
+        
+        .nav-group { display: flex; gap: 10px; }
+        .nav-btn {
+            background: #636e72; color:white; border: none; padding: 8px 15px; border-radius: 50px;
+            font-weight: bold; cursor: pointer; transition:0.2s; box-shadow: var(--shadow); font-size: 0.9rem;
+        }
+        .nav-btn:hover { background: var(--primary); transform: translateY(-2px); }
+        .btn-back { background: #b2bec3; color: #2d3436; }
+        
+        /* Big Replay Button for Quiz */
+        .large-replay {
+            font-size: 1.3rem !important;
+            padding: 12px 30px !important;
+            background: var(--accent-blue) !important;
+            box-shadow: 0 6px 15px rgba(116, 185, 255, 0.4) !important;
+        }
+        .large-replay:hover {
+            background: #0984e3 !important;
+            transform: translateY(-4px) !important;
+        }
+
+        #main-container { max-width: 1200px; margin: 0 auto; padding: 20px; box-sizing: border-box; position: relative; min-height: 80vh; }
+
+        /* --- Grade & Bank Selection --- */
+        .grade-select-container {
+            display: flex; justify-content: center; align-items: center; gap: 30px;
+            min-height: 50vh; flex-wrap: wrap; margin-bottom: 30px;
+        }
+        .grade-btn {
+            width: 260px; height: 260px;
+            background: white; border-radius: 35px;
+            display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+            box-shadow: var(--shadow); cursor: pointer; transition: all 0.3s;
+            border: 8px solid transparent; overflow: hidden; position: relative;
+        }
+        .grade-btn:hover { transform: translateY(-5px) scale(1.03); box-shadow: var(--shadow-hover); }
+        .grade-btn.g5 { border-color: var(--grade5-color); }
+        .grade-btn.g6 { border-color: var(--grade6-color); }
+        .grade-bg-img { position: absolute; top: 0; left: 0; width: 100%; height: 70%; object-fit: cover; border-bottom: 4px solid #eee; background-color: #f9f9f9; }
+        .grade-info { height: 30%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; width: 100%; background: white; }
+        .grade-label { font-size: 1.8rem; font-weight: 800; color: var(--text-color); margin-bottom: 2px; }
+        .grade-sub { font-size: 1rem; color: #b2bec3; font-family: 'Fredoka One', cursive; letter-spacing: 1px; }
+
+        .bank-entry-btn {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            width: 100%; max-width: 550px; margin: 0 auto; padding: 20px;
+            border-radius: 25px; cursor: pointer; box-shadow: var(--shadow);
+            display: flex; align-items: center; justify-content: center; gap: 20px;
+            transition: transform 0.2s; border: 4px solid white;
+        }
+        .bank-entry-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+        .bank-icon { font-size: 3rem; }
+        .bank-text { text-align: left; }
+        .bank-title { font-size: 1.8rem; font-weight: 800; color: #d35400; line-height: 1; }
+        .bank-sub { font-size: 1rem; font-weight: bold; color: #e67e22; }
+
+        /* --- Tabs --- */
+        .mode-tabs { display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+        .tab-btn {
+            width: 220px; height: 70px; border-radius: 20px; background: white; border: 3px solid transparent;
+            font-weight: 800; cursor: pointer; color: #b2bec3; box-shadow: var(--shadow);
+            display: flex; align-items: center; justify-content: center; gap: 15px; transition: 0.2s; font-size: 1.2rem;
+        }
+        .tab-btn img { width: 40px; height: 40px; object-fit: contain; }
+        .tab-btn div { text-align: center; line-height: 1.1; }
+        .tab-btn small { display: block; font-size: 0.75rem; }
+        
+        #t-study.active { background: var(--primary); color: white !important; transform: scale(1.05); box-shadow: var(--shadow-hover); border-color: var(--primary); }
+        #t-study.active small { color: rgba(255,255,255,0.9); }
+        #t-practice.active { background: var(--accent-pink); color: white !important; transform: scale(1.05); box-shadow: var(--shadow-hover); border-color: var(--accent-pink); }
+        #t-practice.active small { color: rgba(255,255,255,0.9); }
+        #t-game.active { background: var(--accent-purple); color: white !important; transform: scale(1.05); box-shadow: var(--shadow-hover); border-color: var(--accent-purple); }
+        #t-game.active small { color: rgba(255,255,255,0.9); }
+
+        /* --- Bank Menu --- */
+        .bank-menu-grid { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 30px; }
+        .bank-action-btn {
+            width: 200px; height: 200px; border-radius: 30px; background: white;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; box-shadow: var(--shadow); border: 6px solid transparent; transition: 0.2s;
+            position: relative; overflow: hidden;
+        }
+        .bank-action-btn:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+        .bank-action-btn.check { border-color: var(--accent-blue); }
+        .bank-action-btn.organize { border-color: var(--accent-pink); }
+        .bank-action-btn.flash { border-color: var(--bank-color); background: #fffbe7; }
+        
+        .bank-btn-img { position: absolute; top: 0; left: 0; width: 100%; height: 70%; object-fit: cover; border-bottom: 4px solid #eee; background: #f9f9f9; }
+        .bank-btn-info { position: absolute; bottom: 0; left: 0; width: 100%; height: 30%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: white; z-index: 10; }
+        .action-label { font-size: 1.2rem; font-weight: 800; color: var(--text-color); }
+        .action-sub { font-size: 0.9rem; color: #aaa; font-weight: bold; }
+
+        /* --- Grid & Cards --- */
+        .grid { display: grid; gap: 15px; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); width: 100%; padding-bottom: 50px; }
+
+        .cat-card {
+            background: white; border-radius: 15px; padding: 10px; text-align: center;
+            cursor: pointer; transition: all 0.3s; border-bottom: 5px solid transparent; box-shadow: var(--shadow);
+            position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 180px;
+        }
+        .cat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+        .cat-icon-img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 8px; }
+        .cat-title-jp { font-size: 0.95rem; font-weight: 800; margin-bottom: 2px; line-height: 1.2; }
+        .cat-title-en { font-size: 0.85rem; color: #7f8c8d; font-family: 'Fredoka One', sans-serif; margin-bottom: 5px; }
+        .cat-count { font-size: 0.7rem; color: #dfe6e9; font-weight: bold; background:#636e72; padding:2px 8px; border-radius:10px; }
+        .grp-1 { border-bottom-color: var(--accent-pink); } .grp-2 { border-bottom-color: var(--accent-blue); } .grp-3 { border-bottom-color: var(--accent-yellow); } .grp-4 { border-bottom-color: var(--accent-purple); } .grp-5 { border-bottom-color: var(--primary); }
+
+        /* --- Quiz Layout --- */
+        #quiz-level-select {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: var(--bg-color); z-index: 50;
+        }
+        .quiz-stage {
+            display: grid; gap: 20px; width: 100%; box-sizing: border-box;
+            height: calc(100vh - 200px); padding: 10px; max-width: 900px; margin: 0 auto;
+        }
+        .quiz-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+        .quiz-6 { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; }
+        @media (max-width: 600px) {
+            .quiz-6 { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); }
+            .quiz-stage { gap: 10px; height: calc(100vh - 180px); }
+        }
+        .quiz-card {
+            background: white; border-radius: 25px; cursor: pointer; transition: 0.2s;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08); border: 4px solid transparent;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; width: 100%; height: 100%;
+        }
+        .quiz-card:active { transform: scale(0.95); background: #f1f2f6; }
+        .quiz-card img { width: 85%; height: 85%; object-fit: contain; pointer-events: none; }
+
+        /* --- Common Card Style --- */
+        .card-common {
+            background: white; border-radius: 12px; cursor: pointer; transition: 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05); border: 2px solid transparent;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            aspect-ratio: 4 / 3; position: relative; overflow: hidden;
+        }
+        .card-common:active { transform: scale(0.95); background: #f1f2f6; }
+        .card-img { width: 90%; height: 90%; object-fit: contain; pointer-events: none; }
+
+        .heart-btn {
+            position: absolute; top: 5px; right: 5px; width: 35px; height: 35px;
+            background: white; border-radius: 50%; border: 2px solid #eee;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.2rem; cursor: pointer; z-index: 10; transition: 0.2s; color: #ddd;
+        }
+        .heart-btn:active { transform: scale(0.8); }
+        .heart-btn.saved { color: #ff4757; border-color: #ff4757; background: #fff0f0; }
+
+        .rec-btn-mini {
+            position: absolute; top: 5px; left: 5px; width: 35px; height: 35px;
+            background: white; border-radius: 50%; border: 2px solid #eee;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.2rem; cursor: pointer; z-index: 10; transition: 0.2s; color: #2d3436;
+        }
+        .rec-btn-mini:hover { background: #e0f7fa; border-color: var(--primary); color: var(--primary); }
+
+        .remove-btn {
+            position: absolute; top: 5px; right: 5px; width: 35px; height: 35px;
+            background: #ff4757; border-radius: 50%; color: white;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.2rem; cursor: pointer; z-index: 10;
+        }
+
+        .empty-msg {
+            grid-column: 1 / -1; text-align: center; width: 100%;
+            font-size: 2rem; font-weight: 800; color: #b2bec3; padding: 50px 0;
+        }
+
+        /* --- Karuta Result & Ranking --- */
+        #karuta-result-view {
+            text-align: center; padding: 20px; animation: popIn 0.5s;
+        }
+        .result-box {
+            background: white; border-radius: 20px; padding: 30px; margin: 20px auto;
+            max-width: 500px; box-shadow: var(--shadow-hover); border: 5px solid var(--accent-purple);
+        }
+        .result-time-label { font-size: 1.2rem; color: #888; font-weight: bold; }
+        .result-time-val { font-size: 4rem; font-family: monospace; color: var(--accent-purple); font-weight: 800; line-height: 1.2; }
+        
+        .ranking-table {
+            width: 100%; max-width: 600px; margin: 30px auto;
+            border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .ranking-table th { background: #636e72; color: white; padding: 10px; }
+        .ranking-table td { padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; }
+        .rank-1 { color: #f1c40f; font-size: 1.2rem; } 
+        .new-record { display: inline-block; background: #e84393; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; margin-left: 5px; animation: pulse 1s infinite; }
+
+        /* --- Speaking Modal --- */
+        #speaking-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 300;
+            display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .speaking-content {
+            background: white; width: 90%; max-width: 500px; border-radius: 30px;
+            padding: 30px; text-align: center; position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .speak-img { width: 250px; height: 180px; object-fit: contain; margin-bottom: 20px; }
+        .speak-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .speak-btn {
+            padding: 15px; border-radius: 15px; border: none; font-weight: 800; font-size: 1.1rem;
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px;
+            transition: 0.2s; box-shadow: var(--shadow); color: white;
+        }
+        .speak-btn:active { transform: translateY(3px); }
+        .btn-listen { background: var(--primary); grid-column: 1 / -1; }
+        .btn-record { background: var(--accent-pink); }
+        .btn-record.recording { background: #d63031; animation: pulse 1s infinite; }
+        .btn-play-my { background: var(--accent-blue); }
+        .btn-play-my:disabled { background: #b2bec3; cursor: not-allowed; opacity: 0.7; }
+        
+        .close-modal-btn {
+            position: absolute; top: 15px; right: 15px; background: #dfe6e9;
+            border: none; width: 40px; height: 40px; border-radius: 50%;
+            font-weight: bold; font-size: 1.2rem; cursor: pointer; color: #636e72;
+        }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* --- Game Setup --- */
+        .selection-area { text-align: center; padding: 20px 10px; }
+        .big-option-btn {
+            display: inline-block; width: 200px; height: 220px; margin: 10px;
+            border-radius: 25px; background: white; cursor: pointer; border: 6px solid transparent;
+            box-shadow: var(--shadow); transition: 0.2s; font-size: 1.2rem; font-weight: 800; color: var(--text-color);
+            position: relative; overflow: hidden; vertical-align: top;
+        }
+        .big-option-btn:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); border-color: var(--primary); }
+        .game-btn-img { position: absolute; top: 0; left: 0; width: 100%; height: 70%; object-fit: cover; border-bottom: 4px solid #eee; background: #f9f9f9; }
+        .game-btn-info { position: absolute; bottom: 0; left: 0; width: 100%; height: 30%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: white; z-index: 10; }
+
+        .player-select-wrapper { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; margin-top: 20px; }
+        .player-btn {
+            width: auto; min-width: 140px; padding: 20px; border-radius: 20px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: white; border: 4px solid transparent; box-shadow: var(--shadow); cursor: pointer; transition: 0.2s;
+        }
+        .player-btn:hover { transform: translateY(-3px); border-color: var(--accent-purple); }
+        .player-btn .emoji { font-size: 2.5rem; margin-bottom: 10px; }
+        .player-btn span { font-weight: 800; font-size: 1.2rem; }
+
+        /* --- Memory Game (Fit to Screen) --- */
+        .memory-container {
+            width: 100%; height: calc(100vh - 180px);
+            display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(5, 1fr);
+            gap: 10px; padding: 5px; box-sizing: border-box;
+        }
+        .memory-card {
+            background-color: white; border-radius: 8px; border: 2px solid #eee;
+            width: 100%; height: 100%; aspect-ratio: auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative;
+        }
+        .card-face {
+            position: absolute; top:0; left:0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center; border-radius: 6px; transition: opacity 0.3s;
+        }
+        .card-front { background: white; opacity: 0; pointer-events: none; padding: 5px; }
+        .card-front img { width: 100%; height: 100%; object-fit: contain; }
+        .card-back {
+            background-color: var(--accent-blue);
+            background-image: radial-gradient(white 15%, transparent 16%), radial-gradient(white 15%, transparent 16%);
+            background-size: 15px 15px; background-position: 0 0, 7.5px 7.5px; border: 3px solid white; box-sizing: border-box; opacity: 1;
+        }
+        .memory-card.flipped .card-front { opacity: 1; z-index: 2; }
+        .memory-card.flipped .card-back { opacity: 0; z-index: 1; }
+        .memory-card.matched { opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+
+        /* --- Spelling Game --- */
+        .spelling-container { width: 100%; max-width: 800px; margin: 0 auto; text-align: center; }
+        
+        .spell-controls-top { display: flex; justify-content: space-between; align-items: center; max-width: 300px; margin: 0 auto 10px; }
+        .spell-progress { font-weight: 800; font-size: 1.2rem; color: #636e72; background:white; padding:5px 15px; border-radius:20px; box-shadow:var(--shadow); }
+
+        .spell-img-wrapper {
+            position: relative; width: 300px; height: 200px; margin: 0 auto 20px;
+            background: white; border-radius: 20px; box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .spell-target-img {
+            width: 100%; height: 100%; object-fit: contain; padding: 10px; box-sizing: border-box;
+        }
+        .spell-hint-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #dfe6e9; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10;
+            transition: opacity 0.3s;
+        }
+        .spell-hint-overlay.hidden { opacity: 0; pointer-events: none; }
+        
+        .btn-hint-reveal {
+            background: var(--accent-yellow); color: #d35400; border: none;
+            padding: 10px 20px; border-radius: 50px; font-weight: 800; font-size: 1.1rem;
+            cursor: pointer; box-shadow: var(--shadow); margin-top: 10px;
+        }
+        .btn-hint-reveal:hover { transform: scale(1.05); }
+        .btn-spell-audio {
+            background: white; border: 2px solid var(--primary); color: var(--primary);
+            padding: 8px 20px; border-radius: 50px; font-weight: bold; cursor: pointer;
+            margin-bottom: 20px; display: inline-block;
+        }
+        .btn-spell-reset {
+            background: #dfe6e9; color: #636e72; border: none;
+            padding: 8px 15px; border-radius: 50px; font-weight: bold; cursor: pointer;
+            display: inline-block; margin-left: 10px;
+        }
+        .btn-spell-reset:hover { background: #b2bec3; }
+
+        .spell-slots-area { display: flex; justify-content: center; gap: 8px; margin-bottom: 40px; flex-wrap: wrap; min-height: 70px; }
+        
+        .spell-slot {
+            width: 50px; height: 60px; border-bottom: 4px solid #b2bec3;
+            font-size: 2.5rem; font-weight: 800; text-align: center; color: var(--primary); cursor: pointer;
+            font-family: "UD Digi Kyokasho N-R", "UD Digi Kyokasho", "BIZ UDPGothic", "Comic Sans MS", "Chalkboard SE", sans-serif;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .spell-slot:hover { border-color: var(--primary); background: rgba(0,206,201,0.1); border-radius: 5px 5px 0 0; }
+        
+        .spell-pool-area { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .spell-char {
+            width: 60px; height: 60px; background: white; border-radius: 15px;
+            box-shadow: var(--shadow); display: flex; justify-content: center; align-items: center;
+            font-size: 2rem; font-weight: 800; color: var(--text-color); cursor: pointer;
+            transition: 0.2s; border: 2px solid #eee;
+            font-family: "UD Digi Kyokasho N-R", "UD Digi Kyokasho", "BIZ UDPGothic", "Comic Sans MS", "Chalkboard SE", sans-serif;
+        }
+        .spell-char:hover { transform: translateY(-3px); }
+        .spell-char:active { transform: scale(0.9); }
+        .spell-char.used { opacity: 0; pointer-events: none; transform: scale(0); }
+
+        /* --- Flashcard Mode --- */
+        .flash-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; width: 100%; max-width: 600px; margin: 0 auto; }
+        .flash-card-large {
+            width: 100%; height: 100%; background: white; border-radius: 30px;
+            box-shadow: var(--shadow-hover); border: 5px solid var(--bank-color);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: relative; margin-bottom: 20px; overflow: hidden; padding-top: 40px;
+        }
+        .flash-header {
+            position: absolute; top: 0; left: 0; width: 100%; height: 60px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 25px; box-sizing: border-box; background: rgba(255,255,255,0.9); z-index: 5;
+        }
+        .flash-title { font-weight: 800; color: #d35400; font-size: 1.2rem; font-family: 'Fredoka One', cursive; }
+        .flash-count-badge { background: #636e72; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
+        .flash-img { width: 80%; height: 60%; object-fit: contain; margin-bottom: 20px; z-index: 1; }
+        .flash-controls { display: flex; gap: 20px; width: 100%; justify-content: center; }
+        .flash-btn {
+            flex: 1; padding: 20px; border-radius: 20px; border: none;
+            font-size: 1.2rem; font-weight: 800; cursor: pointer; color: white;
+            box-shadow: var(--shadow); transition: 0.2s;
+        }
+        .flash-btn:active { transform: translateY(3px); }
+        .btn-ok { background: var(--primary); }
+        .btn-ng { background: var(--accent-pink); }
+        
+        .btn-play {
+            background: white; border: 3px solid var(--bank-color); color: var(--text-color);
+            width: 80px; height: 80px; border-radius: 50%; font-size: 2rem;
+            display: flex; justify-content: center; align-items: center; margin-bottom: 10px;
+            padding: 0; flex-grow: 0; flex-shrink: 0; z-index: 1;
+        }
+
+        /* Result List */
+        .result-row { display: flex; align-items: center; background: white; padding: 10px 20px; margin-bottom: 10px; border-radius: 15px; box-shadow: var(--shadow); }
+        .result-mark { font-size: 1.5rem; margin-right: 15px; }
+        .result-img { width: 50px; height: 50px; object-fit: contain; margin-right: 15px; }
+
+        /* Scoreboard */
+        .scoreboard { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; z-index: 90; }
+        .player-score { background: white; padding: 5px 15px; border-radius: 50px; font-weight: bold; box-shadow: var(--shadow); opacity: 0.6; transition: 0.3s; border: 3px solid transparent; font-size: 0.9rem; }
+        .player-score.active { opacity: 1; transform: scale(1.1); border-color: var(--primary); background: #e0f7fa; color: var(--primary); }
+
+        /* Utilities */
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        #rand-btn {
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7); color: white;
+            text-align: center; padding: 15px; border-radius: 15px; cursor: pointer;
+            margin-bottom: 25px; font-weight: 800; font-size: 1.1rem; box-shadow: var(--shadow);
+            transition: transform 0.2s; max-width: 500px; margin-left: auto; margin-right: auto;
+        }
+        #rand-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+
+        #overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+            display: flex; justify-content: center; align-items: center; z-index: 200;
+            opacity: 0; transition: opacity 0.3s; background: rgba(255,255,255,0.7); backdrop-filter: blur(5px);
+        }
+        .mark { font-size: 10rem; text-shadow: 0 5px 30px rgba(0,0,0,0.15); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { from{transform:scale(0);} to{transform:scale(1);} }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">Picture<span>Dictionary</span></div>
+    <div class="nav-group">
+        <button id="back-btn" class="nav-btn btn-back hidden" onclick="handleBack()">◀ もどる</button>
+        <button id="top-btn" class="nav-btn hidden" onclick="goTop()">TOP</button>
+    </div>
+</header>
+
+<div id="main-container">
+
+    <div id="grade-select-view" class="fade-in">
+        <h2 style="text-align:center; margin-bottom:40px; color:#b2bec3; font-size:1.3rem;">学年をえらんでね / Select Grade</h2>
+        <div class="grade-select-container">
+            <div class="grade-btn g5" onclick="selectGrade('grade5')">
+                <img src="images/grade5.jpg" class="grade-bg-img" onerror="this.style.display='none';this.parentNode.innerHTML='<div style=\'font-size:5rem;height:70%;display:flex;justify-content:center;align-items:center;\'>🎒</div>' + this.parentNode.innerHTML">
+                <div class="grade-info"><div class="grade-label">5年生</div><div class="grade-sub">Grade 5</div></div>
+            </div>
+            <div class="grade-btn g6" onclick="selectGrade('grade6')">
+                <img src="images/grade6.jpg" class="grade-bg-img" onerror="this.style.display='none';this.parentNode.innerHTML='<div style=\'font-size:5rem;height:70%;display:flex;justify-content:center;align-items:center;\'>🏫</div>' + this.parentNode.innerHTML">
+                <div class="grade-info"><div class="grade-label">6年生</div><div class="grade-sub">Grade 6</div></div>
+            </div>
+        </div>
+        <div class="bank-entry-btn" onclick="openBankMenu()">
+            <div class="bank-icon">📒</div>
+            <div class="bank-text"><div class="bank-title">My Word Bank</div><div class="bank-sub">自分だけの単語帳</div></div>
+        </div>
+    </div>
+
+    <div id="home-view" class="hidden fade-in">
+        <h2 id="grade-title" style="text-align:center; color:var(--primary); margin-top:0; font-family:'Fredoka One', cursive; margin-bottom:20px;">Grade</h2>
+        <div class="mode-tabs">
+            <button id="t-study" class="tab-btn active" onclick="switchMode('study')"><img src="images/mode_study.jpg" onerror="this.style.display='none'"><div>Study<small>学ぶ</small></div></button>
+            <button id="t-practice" class="tab-btn" onclick="switchMode('quiz')"><img src="images/mode_practice.jpg" onerror="this.style.display='none'"><div>Practice<small>練習</small></div></button>
+            <button id="t-game" class="tab-btn" onclick="switchMode('game')"><img src="images/mode_game.jpg" onerror="this.style.display='none'"><div>Game<small>ゲーム</small></div></button>
+        </div>
+        <div style="text-align:center; margin-bottom:25px; font-weight:bold; color:#b2bec3; font-size:0.9rem;"><span id="mode-desc">カテゴリーをえらんでね！</span></div>
+        <div id="game-random-area" class="hidden">
+            <div id="rand-btn" onclick="prepareGame(null)">⚡ ぜんぶランダム 🎲<br><small>ALL Random Challenge!</small></div>
+            <p style="text-align:center; color:#888; font-weight:bold; margin-bottom:20px;">または カテゴリーをえらぶ:</p>
+        </div>
+        <div id="category-list" class="grid"></div>
+    </div>
+
+    <div id="game-setup-view" class="hidden fade-in selection-area">
+        <h2 style="color:var(--text-color); font-size:1.8rem;">どのゲームであそぶ？</h2>
+        <div id="game-type-select">
+            <div class="big-option-btn" onclick="showPlayerSelect('karuta')">
+                <img src="images/game_karuta.jpg" class="game-btn-img" onerror="this.style.display='none'">
+                <div class="game-btn-info"><div style="font-size:1.5rem; font-weight:800;">Karuta</div><div style="font-size:0.9rem; color:#888;">かるた</div></div>
+            </div>
+            <div class="big-option-btn" onclick="showPlayerSelect('memory')">
+                <img src="images/game_memory.jpg" class="game-btn-img" onerror="this.style.display='none'">
+                <div class="game-btn-info"><div style="font-size:1.5rem; font-weight:800;">Memory</div><div style="font-size:0.9rem; color:#888;">神経衰弱</div></div>
+            </div>
+            <div class="big-option-btn" onclick="startGame('spelling', 1)">
+                <img src="images/game_spelling.jpg" class="game-btn-img" onerror="this.style.display='none'">
+                <div class="game-btn-info"><div style="font-size:1.5rem; font-weight:800;">Spelling</div><div style="font-size:0.9rem; color:#888;">スペル</div></div>
+            </div>
+        </div>
+        <div id="player-select" class="hidden">
+            <h3 style="color:#b2bec3; font-size:1.2rem;">なんにんであそぶ？</h3>
+            <div class="player-select-wrapper">
+                <div class="player-btn" onclick="startGame('memory', 2)"><div class="emoji">🐱🐶</div><span>2人</span></div>
+                <div class="player-btn" onclick="startGame('memory', 3)"><div class="emoji">🐭🐹🐼</div><span>3人</span></div>
+                <div class="player-btn" onclick="startGame('memory', 4)"><div class="emoji">🐻🦊🦁🐯</div><span>4人</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="bank-menu-view" class="hidden fade-in">
+        <h2 style="text-align:center; color:#d35400;">My Word Bank</h2>
+        <div class="bank-menu-grid">
+            <div class="bank-action-btn check" onclick="showBankList('check')">
+                <img src="images/bank_check.jpg" class="bank-btn-img" onerror="this.style.display='none';this.parentNode.innerHTML='<div style=\'font-size:4rem;height:70%;display:flex;justify-content:center;align-items:center;\'>📒</div>'+this.parentNode.innerHTML">
+                <div class="bank-btn-info"><div class="action-label">Check</div><div class="action-sub">かくにん</div></div>
+            </div>
+            <div class="bank-action-btn organize" onclick="showBankList('organize')">
+                <img src="images/bank_organize.jpg" class="bank-btn-img" onerror="this.style.display='none';this.parentNode.innerHTML='<div style=\'font-size:4rem;height:70%;display:flex;justify-content:center;align-items:center;\'>🗑️</div>'+this.parentNode.innerHTML">
+                <div class="bank-btn-info"><div class="action-label">Organize</div><div class="action-sub">せいり</div></div>
+            </div>
+            <div class="bank-action-btn flash" onclick="startFlashcards()">
+                <img src="images/bank_flash.jpg" class="bank-btn-img" onerror="this.style.display='none';this.parentNode.innerHTML='<div style=\'font-size:4rem;height:70%;display:flex;justify-content:center;align-items:center;\'>⚡</div>'+this.parentNode.innerHTML">
+                <div class="bank-btn-info"><div class="action-label">Flashcards</div><div class="action-sub">特訓 (20問)</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-view" class="hidden">
+        <div id="header-area" style="text-align:center; margin-bottom:10px;">
+            <h2 id="view-title" style="margin:0; font-size:1.5rem;">Title</h2>
+            <button id="replay-btn" class="nav-btn hidden" style="margin-top:15px;" onclick="replayAudio()">🔊 もういちど聞く</button>
+        </div>
+        <div id="karuta-bar" class="scoreboard hidden">
+            <div style="background:white; padding:8px 25px; border-radius:30px; font-weight:bold; box-shadow:var(--shadow);">のこり: <span id="k-left" style="color:var(--accent-purple); font-size:1.1rem;">0</span></div>
+            <div style="background:white; padding:8px 25px; border-radius:30px; font-weight:bold; box-shadow:var(--shadow);">じかん: <span id="k-timer" style="color:#636e72; font-size:1.1rem; font-family:monospace;">0.0s</span></div>
+        </div>
+        <div id="memory-bar" class="scoreboard hidden"></div>
+        <div id="card-area" class="grid"></div>
+        
+        <div id="quiz-level-select" class="hidden fade-in" style="text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:60vh;">
+            <h3 style="color:#b2bec3; font-size:1.5rem; margin-bottom:30px;">Choose Level</h3>
+            <div style="display:flex; justify-content:center; gap:30px; flex-wrap:wrap;">
+                <div class="big-option-btn" onclick="startQuizGame(4)">
+                    <img src="images/mode_easy.jpg" class="game-btn-img" onerror="this.style.display='none';this.parentNode.innerHTML='<div style=\'font-size:4rem;height:70%;display:flex;justify-content:center;align-items:center;\'>🐣</div>'+this.parentNode.innerHTML">
+                    <div class="game-btn-info"><div style="font-size:1.5rem; font-weight:800; color:#00cec9;">Easy</div><div style="font-weight:bold; color:#888;">4 Choices</div></div>
+                </div>
+                <div class="big-option-btn" onclick="startQuizGame(6)">
+                    <img src="images/mode_hard.jpg" class="game-btn-img" onerror="this.style.display='none';this.parentNode.innerHTML='<div style=\'font-size:4rem;height:70%;display:flex;justify-content:center;align-items:center;\'>🦁</div>'+this.parentNode.innerHTML">
+                    <div class="game-btn-info"><div style="font-size:1.5rem; font-weight:800; color:#e17055;">Hard</div><div style="font-weight:bold; color:#888;">6 Choices</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="flash-view" class="hidden fade-in">
+        <div class="flash-container">
+            <div class="flash-card-large">
+                <div class="flash-header">
+                    <div class="flash-title">Flashcards</div>
+                    <div id="flash-counter" class="flash-count-badge">1 / 20</div>
+                </div>
+                <img id="flash-img" class="flash-img" src="">
+                <button class="flash-btn btn-play" onclick="playFlashAudio()">🔊</button>
+            </div>
+            <div class="flash-controls">
+                <button class="flash-btn btn-ok" onclick="answerFlash(true)">⭕ 覚えた！<br><small>Got it!</small></button>
+                <button class="flash-btn btn-ng" onclick="answerFlash(false)">🔺 もう少し<br><small>Not yet</small></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="flash-result-view" class="hidden fade-in">
+        <h2 style="text-align:center;">Result</h2>
+        <div id="flash-result-list" style="max-width:600px; margin:0 auto;"></div>
+    </div>
+
+    <div id="spelling-view" class="hidden fade-in">
+        <h2 style="text-align:center; color:#d35400;">Spelling Game</h2>
+        <div class="spelling-container">
+            <div class="spell-controls-top">
+                <div id="spell-counter" class="spell-progress">1 / 10</div>
+            </div>
+            
+            <button class="btn-spell-audio" onclick="playSpellingAudio()">🔊 もういちど聞く</button>
+            <button class="btn-spell-reset" onclick="resetSpelling()">🔄 リセット</button>
+            
+            <div class="spell-img-wrapper">
+                <img id="spell-img" class="spell-target-img" src="">
+                <div id="spell-hint-overlay" class="spell-hint-overlay">
+                    <div style="font-size:3rem;">❓</div>
+                    <button class="btn-hint-reveal" onclick="revealHint()">💡 ヒントを見る</button>
+                </div>
+            </div>
+            
+            <div id="spell-slots" class="spell-slots-area"></div>
+            <div id="spell-pool" class="spell-pool-area"></div>
+        </div>
+    </div>
+
+    <div id="karuta-result-view" class="hidden">
+        <h2 style="color:var(--accent-purple); font-size:2rem; margin-bottom:10px;">Karuta Finish!</h2>
+        <div class="result-box">
+            <div id="res-cat-name" style="font-weight:bold; color:#636e72; margin-bottom:10px;">Category Name</div>
+            <div class="result-time-label">Time</div>
+            <div id="res-time-val" class="result-time-val">0.0s</div>
+        </div>
+        
+        <h3 style="color:#2d3436;">🏆 Ranking (Top 5)</h3>
+        <table class="ranking-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody id="ranking-body"></tbody>
+        </table>
+        
+        <button class="nav-btn" style="padding:15px 30px; font-size:1.2rem; background:var(--primary);" onclick="handleBack()">OK</button>
+    </div>
+
+    <div id="speaking-modal" class="hidden">
+        <div class="speaking-content">
+            <button class="close-modal-btn" onclick="closeSpeakingModal()">✕</button>
+            <h2 style="color:var(--primary); margin-top:0;">Speaking Practice</h2>
+            <img id="speak-img" class="speak-img" src="">
+            <div class="speak-controls">
+                <button class="speak-btn btn-listen" onclick="speak(currentSpeakingWord)">🔊 お手本 (Listen)</button>
+                <button class="speak-btn btn-record" id="btn-record" onclick="toggleRecording()">● ろくおん (Record)</button>
+                <button class="speak-btn btn-play-my" id="btn-play-my" onclick="playMyVoice()" disabled>▶ じぶんの声 (Play)</button>
+            </div>
+            <p style="font-size:0.8rem; color:#888;">※マイク許可が必要です / Mic required</p>
+        </div>
+    </div>
+
+</div>
+
+<div id="overlay">
+    <div style="text-align:center">
+        <div id="overlay-mark" class="mark"></div>
+        <div id="overlay-msg" style="font-size:2.5rem; background:white; padding:15px 40px; border-radius:30px; font-weight:bold; color:var(--text-color); box-shadow:var(--shadow-hover);"></div>
+    </div>
+</div>
+
+<script>
+    // --- Data Definitions ---
+    const grade5Data = {
+        c01: { label_jp: "1. 気持ちなど", label_en: "Feelings", icon: "cat_feelings.jpg", group: "grp-1", items: ["fine", "happy", "good", "great", "sleepy", "tired", "hungry", "thirsty", "sad", "angry", "excited", "nervous"] },
+        c02: { label_jp: "2. 天気", label_en: "Weather", icon: "cat_weather.jpg", group: "grp-2", items: ["sunny", "rainy", "cloudy", "snowy", "hot", "cold", "warm", "cool=cool_weather"] },
+        c03: { label_jp: "3. 色、形", label_en: "Color, Shape", icon: "cat_color.jpg", group: "grp-5", items: ["red", "blue", "green", "yellow", "pink", "white", "orange=orange_color", "purple", "black", "brown", "gray", "circle", "triangle", "cross", "heart", "square", "rectangle", "star", "diamond"] },
+        c04: { label_jp: "4. スポーツ", label_en: "Sport", icon: "cat_sport.jpg", group: "grp-5", items: ["baseball", "basketball", "dodgeball", "volleyball", "soccer", "swimming", "table tennis", "tennis", "badminton", "dancing", "skiing"] },
+        c05: { label_jp: "5. 動物", label_en: "Animal", icon: "cat_animal.jpg", group: "grp-2", items: ["cat", "dog", "rabbit", "hamster", "tiger", "bear", "horse"] },
+        c06: { label_jp: "6. 果物、野菜", label_en: "Fruit, Vegetable", icon: "cat_fruit.jpg", group: "grp-3", items: ["apple", "banana", "strawberry", "grapes", "peach", "melon", "pineapple", "persimmon", "watermelon", "Japanese pear", "potato", "carrot", "onion", "cabbage", "tomato", "mushroom", "green pepper", "cucumber", "corn", "spinach", "eggplant", "orange=orange_fruit"] },
+        c07: { label_jp: "7. さまざまな食材", label_en: "Ingredients", icon: "cat_ingredients.jpg", group: "grp-3", items: ["beef", "pork", "chicken", "egg", "octopus", "crab", "squid", "seaweed", "cheese", "bacon", "shrimp", "salmon"] },
+        c08: { label_jp: "8. 食べ物", label_en: "Food", icon: "cat_food.jpg", group: "grp-3", items: ["pizza", "steak", "hamburger", "spaghetti", "sandwich", "French fries", "omelet", "rice", "rice ball", "curry and rice", "rice cake", "fried rice", "fried chicken", "grilled fish", "miso soup", "noodles", "soup", "salad", "bread", "sausage", "ramen", "hot pot"] },
+        c09: { label_jp: "9. 飲み物、デザート", label_en: "Drink, Dessert", icon: "cat_drink.jpg", group: "grp-3", items: ["milk", "orange juice", "soda", "tea", "green tea", "coffee", "water", "cake", "ice cream", "pudding", "yogurt"] },
+        c10: { label_jp: "10. 味、食感", label_en: "Taste, Texture", icon: "cat_taste.jpg", group: "grp-3", items: ["delicious", "sweet", "bitter", "sour", "salty", "spicy", "soft", "hard"] },
+        c11: { label_jp: "11. 月、日にち", label_en: "Months", icon: "cat_months.jpg", group: "grp-1", items: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] },
+        c12: { label_jp: "12. 身の回りのもの", label_en: "Personal Items", icon: "cat_items.jpg", group: "grp-4", items: ["pen", "pencil", "eraser", "pencil case", "computer", "tablet", "glue", "ruler", "scissors", "notebook", "card", "cup", "clock", "watch=watch_item", "ball", "racket", "bed", "desk", "chair", "cap", "hat", "shoes", "pants", "glasses", "bag", "T-shirt", "sweater", "smartphone", "calendar", "balloon", "P.E.=PE"] },
+        c13: { label_jp: "13. 曜日", label_en: "Days", icon: "cat_days.jpg", group: "grp-1", items: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] },
+        c14: { label_jp: "14. 教科", label_en: "Subject", icon: "cat_subject.jpg", group: "grp-4", items: ["Japanese", "English", "math", "science", "social studies", "music", "P.E.=PE", "calligraphy", "arts and crafts", "home economics", "moral education", "the period for integrated study=integrated_study"] },
+        c15: { label_jp: "15. できること", label_en: "Abilities / Actions", icon: "cat_actions.jpg", group: "grp-5", items: ["sing well", "cook", "swim", "run fast", "dance", "jump rope", "do kendama", "play soccer", "play basketball", "play baseball", "play volleyball", "play table tennis", "play dodgeball", "play badminton", "play the piano", "play the recorder", "play the guitar", "draw pictures", "ride a unicycle"] },
+        c16: { label_jp: "16. 人", label_en: "People", icon: "cat_people.jpg", group: "grp-4", items: ["grandmother", "grandfather", "mother", "father", "brother", "sister", "me", "friend", "neighbor"] },
+        c17: { label_jp: "17. 職業", label_en: "Job", icon: "cat_job.jpg", group: "grp-4", items: ["actor", "comedian", "singer", "artist", "athlete", "baseball player", "tennis player", "figure skater", "chef", "baker", "farmer", "florist", "teacher", "journalist", "designer", "robot creator", "vet", "dentist", "nurse", "doctor", "astronaut", "firefighter", "zookeeper"] },
+        c18: { label_jp: "18. 性格、人柄", label_en: "Personality", icon: "cat_personality.jpg", group: "grp-1", items: ["active", "brave", "cool", "famous", "friendly", "kind", "strong", "cheerful", "funny", "smart", "shy"] },
+        c19: { label_jp: "19. 町", label_en: "Town", icon: "cat_town.jpg", group: "grp-4", items: ["house", "school", "bookstore", "station", "library", "post office", "fire station", "police station", "hospital", "city hall", "restaurant", "flower shop", "supermarket", "bus stop", "park", "stadium", "gym", "zoo", "aquarium", "museum", "temple", "shrine", "castle", "garden", "convenience store", "amusement park"] },
+        c20: { label_jp: "20. 自然", label_en: "Nature", icon: "cat_nature.jpg", group: "grp-2", items: ["sea", "beach", "river", "mountain", "lake", "pond", "forest", "island", "waterfall", "tree", "flower", "cherry blossoms", "sun", "sunrise", "sunset", "rainbow", "stars", "hot spring", "autumn leaves"] },
+        c21: { label_jp: "21. 道案内", label_en: "Directions", icon: "cat_directions.jpg", group: "grp-5", items: ["on", "in", "under", "by", "go straight", "turn right", "turn left", "stop", "corner", "block"] },
+        c22: { label_jp: "22. 動作など", label_en: "Actions", icon: "cat_verbs.jpg", group: "grp-5", items: ["enjoy", "see", "eat", "visit"] },
+        c23: { label_jp: "23. 様子など", label_en: "State", icon: "cat_state.jpg", group: "grp-1", items: ["big", "small", "old", "new", "long", "short", "cool=cool_nice", "beautiful", "cute", "popular", "fresh"] },
+        c24: { label_jp: "24. 感想など", label_en: "Impressions", icon: "cat_impressions.jpg", group: "grp-1", items: ["nice", "good", "great", "wonderful", "fun", "exciting", "interesting"] },
+        c25: { label_jp: "25. 数字", label_en: "Number", icon: "cat_numbers.jpg", group: "grp-5", items: ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety", "one hundred"] }
+    };
+
+    const grade6Data = {
+        g01: { label_jp: "1. 国", label_en: "Country", icon: "cat_country.jpg", group: "grp-5", items: ["Australia", "Azerbaijan", "Brazil", "Canada", "Chile", "China", "Egypt", "Finland", "France", "Germany", "India", "Italy", "Japan", "Kenya", "Korea", "New Zealand", "Norway", "Peru", "Russia", "Saudi Arabia", "South Africa", "Thailand", "the Maldives", "the Philippines", "the U.K.=the_UK", "the U.S.=the_US"] },
+        g02: { label_jp: "2. 得意なこと", label_en: "Things you are good at", icon: "cat_skills.jpg", group: "grp-1", items: ["singing", "cooking", "swimming", "running", "dancing", "fishing", "sports", "kendama", "sewing", "jumping rope", "riding a unicycle", "drawing pictures", "making sweets", "playing the piano", "playing the recorder", "playing video games"] },
+        g03: { label_jp: "3. 季節", label_en: "Season", icon: "cat_season.jpg", group: "grp-2", items: ["spring", "summer", "fall", "winter"] },
+        g04: { label_jp: "4. 月、日にち", label_en: "Month, Date", icon: "cat_months.jpg", group: "grp-1", items: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] },
+        g05: { label_jp: "5. 季節の行事", label_en: "Seasonal Events", icon: "cat_events.jpg", group: "grp-1", items: ["hanami", "the Doll Festival", "Children's Day", "the Star Festival", "a summer festival", "a fireworks festival", "tsukimi", "momijigari", "shichi-go-san", "oshogatsu", "setsubun", "a snow festival", "Japanese food", "Japanese sweets", "matcha", "hot spring"] },
+        g06: { label_jp: "6. 動作・過去", label_en: "Actions (Past)", icon: "cat_past.jpg", group: "grp-5", items: ["see", "saw", "eat", "ate", "go", "went", "enjoy", "enjoyed", "visit", "visited", "make", "made", "talk", "talked", "sing", "sang", "cook", "cooked", "watch=watch_action", "watched", "play", "played", "practice", "practiced"] },
+        g06b: { label_jp: "6-2. 動作・一般", label_en: "Actions (Verbs)", icon: "cat_actions_g6.jpg", group: "grp-5", items: ["like", "love", "have", "want", "buy", "clean", "climb", "dance", "draw", "drink", "fly", "help", "jump", "listen", "read", "run", "stand up", "sit down", "speak", "study", "swim", "walk", "write"] },
+        g07: { label_jp: "7. いつ、どのくらい", label_en: "Time, Frequency", icon: "cat_frequency.jpg", group: "grp-3", items: ["morning", "afternoon", "evening", "night", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "at 5:00=at_5_00", "at 10:30=at_10_30", "always", "usually", "sometimes", "never"] },
+        g08: { label_jp: "8. 1日の生活", label_en: "Daily Routine", icon: "cat_routine.jpg", group: "grp-3", items: ["get up", "eat breakfast", "brush my teeth", "take out the garbage", "leave my house", "go to school", "eat lunch", "go home", "clean my room", "do my homework", "play with my friends", "watch TV", "walk the dog", "cook dinner", "set the table", "eat dinner", "clear the table", "wash the dishes", "clean the bath", "take a bath", "go to bed"] },
+        g09: { label_jp: "9. 町", label_en: "Town", icon: "cat_town_g6.jpg", group: "grp-4", items: ["house", "school", "bookstore", "station", "library", "hospital", "fire station", "police station", "supermarket", "flower shop", "shrine", "temple", "restaurant", "park", "stadium", "gym", "zoo", "aquarium", "museum", "castle", "junior high school", "swimming pool", "department store", "amusement park"] },
+        g10: { label_jp: "10. 自然", label_en: "Nature", icon: "cat_nature_g6.jpg", group: "grp-2", items: ["sea", "beach", "mountain", "forest", "rain forest", "desert", "savanna", "lake", "pond", "river", "waterfall", "hot spring", "sky", "sun", "stars", "tree", "nuts", "leaves", "grass", "flower", "fruits", "bugs", "seaweed", "water"] },
+        g11: { label_jp: "11. 生き物", label_en: "Living Things", icon: "cat_living.jpg", group: "grp-2", items: ["bear", "cat", "chimpanzee", "cow", "dog", "elephant", "giraffe", "gorilla", "hamster", "hippo", "horse", "kangaroo", "koala", "lion", "monkey", "mouse", "orangutan", "panda", "pig", "polar bear", "rabbit", "red panda", "tiger", "zebra", "bird", "eagle", "owl", "penguin", "caterpillar", "grasshopper", "frog", "dolphin", "dugong", "fish", "jellyfish", "sea turtle", "seal", "shark", "whale"] },
+        g12: { label_jp: "12. 体", label_en: "Body", icon: "cat_body.jpg", group: "grp-4", items: ["head", "neck", "shoulder", "hand", "leg", "eye", "nose", "mouth", "ear", "tail", "fur", "wing", "feather", "shell", "horn"] },
+        g13: { label_jp: "13. 部活動", label_en: "Club Activity", icon: "cat_club.jpg", group: "grp-4", items: ["baseball team", "basketball team", "volleyball team", "soccer team", "tennis team", "track team", "art club", "computer club", "drama club", "dance club", "kendo club", "newspaper club", "science club", "brass band", "chorus"] },
+        g14: { label_jp: "14. 教科", label_en: "Subject", icon: "cat_subject.jpg", group: "grp-4", items: ["Japanese", "English", "math", "science", "social studies", "music", "P.E.=PE", "calligraphy", "arts and crafts", "home economics", "moral education"] },
+        g15: { label_jp: "15. 職業", label_en: "Job", icon: "cat_job.jpg", group: "grp-4", items: ["actor", "voice actor", "artist", "manga artist", "baseball player", "soccer player", "teacher", "nursery teacher", "journalist", "chef", "farmer", "florist", "hair stylist", "designer", "robot creator", "pharmacist", "vet", "dentist", "nurse", "doctor", "astronaut", "firefighter", "zookeeper"] },
+        g16: { label_jp: "16. 学校行事", label_en: "School Events", icon: "cat_school_events.jpg", group: "grp-1", items: ["entrance ceremony", "art festival", "drama festival", "music festival", "sports day", "volunteer day", "camping trip", "field trip", "school trip", "swimming meet", "graduation ceremony"] },
+        g17: { label_jp: "17. 様子など", label_en: "State", icon: "cat_state.jpg", group: "grp-1", items: ["big", "small", "old", "new", "long", "short", "cool", "beautiful", "cute", "popular", "fresh"] },
+        g18: { label_jp: "18. 感想など", label_en: "Impressions", icon: "cat_impressions.jpg", group: "grp-1", items: ["nice", "good", "great", "wonderful", "fun", "exciting", "interesting"] },
+        g19: { label_jp: "19. 数字", label_en: "Number", icon: "cat_numbers.jpg", group: "grp-5", items: ["zero", "one", "two", "twenty", "twenty-one", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety", "one hundred", "one hundred and one", "two hundred"] }
+    };
+
+    const allData = { grade5: grade5Data, grade6: grade6Data };
+
+    function parseItem(itemStr) {
+        if(itemStr.includes('=')) {
+            const parts = itemStr.split('=');
+            return { word: parts[0], img: `images/${parts[1]}.jpg` };
+        } else {
+            return { word: itemStr, img: `images/${itemStr}.jpg` };
+        }
+    }
+
+    // --- State ---
+    let currentGrade = null;
+    let dictionary = {};
+    let mode = 'study';
+    let selectedCatKey = null;
+    let targetItems = [];
+    let currentTarget = null;
+    let timer = null;
+    let startTime = 0;
+
+    let memoryPlayers = 2;
+    let memoryTurn = 0;
+    let memoryScores = [0, 0, 0, 0];
+    let flippedCards = [];
+    let isProcessing = false;
+    const playerIcons = ["🐶", "🐱", "🐭", "🐹"];
+
+    let flashItems = [];
+    let flashIndex = 0;
+    let flashResults = [];
+
+    // Spelling
+    let spellingWord = null;
+    let spellingChars = [];
+    let filledSlots = [];
+    let isHintUsed = false; 
+    let spellingTotal = 10;
+    let spellingCurrent = 0;
+
+    // Quiz Level
+    let quizDifficulty = 4; // Default to Easy
+
+    // Speaking
+    let mediaRecorder;
+    let audioChunks = [];
+    let recordedAudioUrl = null;
+    let currentSpeakingWord = null;
+
+    const BANK_KEY = 'myWordBank';
+    function getBank() { return JSON.parse(localStorage.getItem(BANK_KEY) || '[]'); }
+    function setBank(arr) { localStorage.setItem(BANK_KEY, JSON.stringify(arr)); }
+    function addToBank(itemStr) {
+        let bank = getBank();
+        if(!bank.includes(itemStr)) { bank.push(itemStr); setBank(bank); }
+    }
+    function removeFromBank(itemStr) {
+        let bank = getBank();
+        bank = bank.filter(i => i !== itemStr);
+        setBank(bank);
+    }
+    function isInBank(itemStr) { return getBank().includes(itemStr); }
+
+    // ===================================
+    // Logic
+    // ===================================
+    
+    function selectGrade(grade) {
+        currentGrade = grade;
+        dictionary = allData[grade];
+        document.getElementById('grade-select-view').classList.add('hidden');
+        document.getElementById('home-view').classList.remove('hidden');
+        updateNavButtons();
+        const title = grade === 'grade5' ? "5年生 (Grade 5)" : "6年生 (Grade 6)";
+        document.getElementById('grade-title').innerText = title;
+        renderCategories();
+        window.scrollTo(0, 0); 
+    }
+
+    function openBankMenu() {
+        document.getElementById('grade-select-view').classList.add('hidden');
+        document.getElementById('bank-menu-view').classList.remove('hidden');
+        updateNavButtons();
+        window.scrollTo(0, 0); 
+    }
+
+    function updateNavButtons() {
+        const isGradeSelect = !document.getElementById('grade-select-view').classList.contains('hidden');
+        const backBtn = document.getElementById('back-btn');
+        const topBtn = document.getElementById('top-btn');
+
+        if(isGradeSelect) {
+            backBtn.classList.add('hidden');
+            topBtn.classList.add('hidden');
+        } else {
+            backBtn.classList.remove('hidden');
+            topBtn.classList.remove('hidden');
+        }
+    }
+
+    function goTop() {
+        ['app-view', 'game-setup-view', 'bank-menu-view', 'flash-view', 'flash-result-view', 'home-view', 'spelling-view', 'quiz-level-select', 'karuta-result-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        document.getElementById('grade-select-view').classList.remove('hidden');
+        updateNavButtons();
+        if(timer) clearInterval(timer);
+        speechSynthesis.cancel();
+        window.scrollTo(0, 0); 
+    }
+
+    function handleBack() {
+        const views = ['app-view', 'game-setup-view', 'bank-menu-view', 'flash-view', 'flash-result-view', 'spelling-view', 'quiz-level-select', 'karuta-result-view'];
+        let active = views.find(v => !document.getElementById(v).classList.contains('hidden'));
+        
+        if (active === 'flash-view' || active === 'flash-result-view') {
+            openBankMenu();
+        } else if (active === 'app-view' || active === 'spelling-view') {
+            if (mode.startsWith('bank_')) openBankMenu();
+            else goHome();
+        } else if (active === 'game-setup-view') {
+            goHome();
+        } else if (active === 'quiz-level-select') {
+            goHome();
+        } else if (active === 'karuta-result-view') {
+            document.getElementById('karuta-result-view').classList.add('hidden');
+            document.getElementById('game-setup-view').classList.remove('hidden');
+        } else if (active === 'bank-menu-view' || !document.getElementById('home-view').classList.contains('hidden')) {
+            goTop();
+        }
+        window.scrollTo(0, 0); 
+    }
+
+    function goHome() {
+        ['app-view', 'game-setup-view', 'bank-menu-view', 'flash-view', 'flash-result-view', 'spelling-view', 'quiz-level-select', 'karuta-result-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        document.getElementById('home-view').classList.remove('hidden');
+        updateNavButtons();
+        if(timer) clearInterval(timer);
+        speechSynthesis.cancel();
+        window.scrollTo(0, 0); 
+    }
+
+    function renderCategories() {
+        const grid = document.getElementById('category-list');
+        grid.innerHTML = '';
+        Object.keys(dictionary).forEach(key => {
+            const d = dictionary[key];
+            const div = document.createElement('div');
+            div.className = `cat-card ${d.group}`;
+            div.innerHTML = `
+                <img src="images/${d.icon}" class="cat-icon-img" onerror="this.style.display='none'">
+                <div class="cat-title-jp">${d.label_jp}</div>
+                <div class="cat-title-en">${d.label_en}</div>
+                <div class="cat-count">${d.items.length} words</div>
+            `;
+            div.onclick = () => handleCatSelect(key);
+            grid.appendChild(div);
+        });
+    }
+
+    function switchMode(m) {
+        mode = m;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        if(m === 'quiz') document.getElementById('t-practice').classList.add('active'); 
+        else document.getElementById(`t-${m}`).classList.add('active');
+        
+        const desc = document.getElementById('mode-desc');
+        const randArea = document.getElementById('game-random-area');
+        if(m === 'study') { desc.innerText = "カテゴリーを選んで学ぼう！"; randArea.classList.add('hidden'); }
+        else if(m === 'quiz') { desc.innerText = "カテゴリーを選んで練習！"; randArea.classList.add('hidden'); }
+        else if(m === 'game') { desc.innerText = "カテゴリーを選んでゲーム！"; randArea.classList.remove('hidden'); }
+    }
+
+    function handleCatSelect(key) {
+        selectedCatKey = key;
+        if(mode === 'study') startStudy(key);
+        else if(mode === 'quiz') showQuizLevelSelection(key);
+        else if(mode === 'game') prepareGame(key);
+    }
+
+    function prepareGame(key) {
+        selectedCatKey = key;
+        document.getElementById('home-view').classList.add('hidden');
+        document.getElementById('game-setup-view').classList.remove('hidden');
+        document.getElementById('game-type-select').classList.remove('hidden');
+        document.getElementById('player-select').classList.add('hidden');
+        updateNavButtons();
+        window.scrollTo(0, 0); 
+    }
+
+    function showPlayerSelect(type) {
+        if(type === 'karuta') startGame('karuta', 1);
+        else {
+            document.getElementById('game-type-select').classList.add('hidden');
+            document.getElementById('player-select').classList.remove('hidden');
+        }
+    }
+
+    function startAppView() {
+        ['home-view', 'game-setup-view', 'bank-menu-view', 'quiz-level-select', 'karuta-result-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        document.getElementById('app-view').classList.remove('hidden');
+        document.getElementById('karuta-bar').classList.add('hidden');
+        document.getElementById('memory-bar').classList.add('hidden');
+        document.getElementById('replay-btn').classList.add('hidden');
+        document.getElementById('replay-btn').classList.remove('large-replay'); // Reset style
+        document.getElementById('card-area').className = 'grid'; 
+        document.getElementById('card-area').innerHTML = '';
+        updateNavButtons();
+        window.scrollTo(0, 0); 
+    }
+
+    function speak(txt) {
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(txt);
+        u.lang = 'en-US';
+        speechSynthesis.speak(u);
+    }
+    function replayAudio() { if(currentTarget) speak(currentTarget.word); }
+
+    // --- Study & Quiz & Bank ---
+    function startStudy(key) {
+        startAppView();
+        const data = dictionary[key];
+        document.getElementById('view-title').innerText = data.label_en;
+        data.items.forEach(itemStr => {
+            const item = parseItem(itemStr);
+            const card = document.createElement('div');
+            card.className = 'card-common word-card';
+            const inBank = isInBank(itemStr);
+            const heartClass = inBank ? 'heart-btn saved' : 'heart-btn';
+            
+            card.innerHTML = `
+                <div class="rec-btn-mini" onclick="openSpeakingModal('${itemStr}')">🎤</div>
+                <div class="${heartClass}" onclick="toggleHeart(event, '${itemStr}', this)">♥</div>
+                <img src="${item.img}" class="card-img" onerror="this.style.display='none'">
+            `;
+            card.onclick = (e) => { 
+                if(e.target.classList.contains('heart-btn') || e.target.classList.contains('rec-btn-mini')) return;
+                speak(item.word); card.animate([{transform:'scale(1)'},{transform:'scale(0.95)'},{transform:'scale(1)'}], 200); 
+            };
+            document.getElementById('card-area').appendChild(card);
+        });
+    }
+
+    function toggleHeart(e, itemStr, el) {
+        e.stopPropagation();
+        if(isInBank(itemStr)) {
+            removeFromBank(itemStr);
+            el.classList.remove('saved');
+        } else {
+            addToBank(itemStr);
+            el.classList.add('saved');
+        }
+    }
+
+    function showBankList(action) {
+        mode = 'bank_' + action;
+        startAppView();
+        document.getElementById('view-title').innerText = action === 'check' ? "Check Word Bank" : "Organize Bank";
+        const bank = getBank();
+        
+        if(bank.length === 0) {
+            document.getElementById('card-area').innerHTML = "<div class='empty-msg'>Empty<br><span style='font-size:1rem'>中身はなにもありません</span></div>";
+            return;
+        }
+
+        bank.forEach(itemStr => {
+            const item = parseItem(itemStr);
+            const card = document.createElement('div');
+            card.className = 'card-common word-card';
+            if(action === 'organize') {
+                card.innerHTML = `<div class="remove-btn" onclick="removeItemFromBank(event, '${itemStr}', this.parentNode)">🗑️</div><img src="${item.img}" class="card-img">`;
+            } else {
+                card.innerHTML = `<img src="${item.img}" class="card-img">`;
+                card.onclick = () => { speak(item.word); card.animate([{transform:'scale(1)'},{transform:'scale(0.95)'}], 200); };
+            }
+            document.getElementById('card-area').appendChild(card);
+        });
+    }
+
+    function removeItemFromBank(e, itemStr, cardEl) {
+        e.stopPropagation();
+        removeFromBank(itemStr);
+        cardEl.style.opacity = '0';
+        setTimeout(() => {
+            cardEl.remove();
+            if(getBank().length === 0) {
+                document.getElementById('card-area').innerHTML = "<div class='empty-msg'>Empty<br><span style='font-size:1rem'>中身はなにもありません</span></div>";
+            }
+        }, 300);
+    }
+
+    // --- Speaking Modal Logic ---
+    function openSpeakingModal(itemStr) {
+        const item = parseItem(itemStr);
+        currentSpeakingWord = item.word;
+        document.getElementById('speak-img').src = item.img;
+        recordedAudioUrl = null;
+        document.getElementById('btn-play-my').disabled = true;
+        document.getElementById('speaking-modal').classList.remove('hidden');
+    }
+
+    function closeSpeakingModal() {
+        document.getElementById('speaking-modal').classList.add('hidden');
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+        }
+    }
+
+    function toggleRecording() {
+        const btn = document.getElementById('btn-record');
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            btn.classList.remove('recording');
+            btn.innerHTML = "● ろくおん (Record)";
+        } else {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    mediaRecorder.ondataavailable = event => { audioChunks.push(event.data); };
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        recordedAudioUrl = URL.createObjectURL(audioBlob);
+                        document.getElementById('btn-play-my').disabled = false;
+                    };
+                    mediaRecorder.start();
+                    btn.classList.add('recording');
+                    btn.innerHTML = "■ とめる (Stop)";
+                })
+                .catch(err => { alert("マイクが使えません / Mic Error: " + err); });
+        }
+    }
+
+    function playMyVoice() {
+        if (recordedAudioUrl) {
+            const audio = new Audio(recordedAudioUrl);
+            audio.play();
+        }
+    }
+
+    // --- Flashcards ---
+    function startFlashcards() {
+        const bank = getBank();
+        if(bank.length === 0) { alert("Word Bank is empty!"); return; }
+        const list = bank.sort(()=>0.5-Math.random()).slice(0,20);
+        flashItems = list.map(parseItem);
+        flashIndex = 0;
+        flashResults = [];
+        document.getElementById('bank-menu-view').classList.add('hidden');
+        document.getElementById('flash-view').classList.remove('hidden');
+        updateNavButtons();
+        showFlashcard();
+    }
+
+    function showFlashcard() {
+        if(flashIndex >= flashItems.length) { finishFlashcards(); return; }
+        const item = flashItems[flashIndex];
+        document.getElementById('flash-counter').innerText = `${flashIndex+1} / ${flashItems.length}`;
+        document.getElementById('flash-img').src = item.img;
+        currentTarget = item;
+    }
+
+    function playFlashAudio() { if(flashItems[flashIndex]) speak(flashItems[flashIndex].word); }
+
+    function answerFlash(isOk) {
+        const item = flashItems[flashIndex];
+        flashResults.push({ item: item, ok: isOk });
+        flashIndex++;
+        showFlashcard();
+    }
+
+    function finishFlashcards() {
+        document.getElementById('flash-view').classList.add('hidden');
+        document.getElementById('flash-result-view').classList.remove('hidden');
+        updateNavButtons();
+        const list = document.getElementById('flash-result-list');
+        list.innerHTML = '';
+        flashResults.forEach(res => {
+            const div = document.createElement('div');
+            div.className = 'result-row';
+            div.innerHTML = `<span class="result-mark">${res.ok ? '⭕' : '🔺'}</span><img src="${res.item.img}" class="result-img"><span style="font-weight:bold; font-size:1.2rem;">${res.item.word}</span>`;
+            list.appendChild(div);
+        });
+    }
+
+    // --- Practice Quiz (Strict Category) ---
+    function showQuizLevelSelection(key) {
+        selectedCatKey = key;
+        document.getElementById('home-view').classList.add('hidden');
+        document.getElementById('app-view').classList.remove('hidden');
+        document.getElementById('header-area').classList.add('hidden');
+        document.getElementById('card-area').innerHTML = '';
+        document.getElementById('replay-btn').classList.add('hidden');
+        document.getElementById('quiz-level-select').classList.remove('hidden');
+        updateNavButtons();
+        window.scrollTo(0, 0); 
+    }
+
+    function startQuizGame(level) {
+        quizDifficulty = level;
+        document.getElementById('quiz-level-select').classList.add('hidden');
+        document.getElementById('header-area').classList.remove('hidden');
+        
+        startAppView();
+        document.getElementById('view-title').innerText = "What is this?";
+        document.getElementById('replay-btn').classList.remove('hidden');
+        document.getElementById('replay-btn').classList.add('large-replay');
+        
+        if(selectedCatKey) {
+            targetItems = dictionary[selectedCatKey].items.map(parseItem);
+        } else {
+            targetItems = Object.values(dictionary).flatMap(d => d.items).map(parseItem);
+        }
+        
+        nextQuizQuestion();
+    }
+
+    function nextQuizQuestion() {
+        currentTarget = targetItems[Math.floor(Math.random() * targetItems.length)];
+        let choices = [currentTarget];
+        let sourcePool = targetItems;
+        let others = sourcePool.filter(w => w.word !== currentTarget.word);
+        
+        if (others.length < quizDifficulty - 1) {
+             let allOtherWords = Object.values(dictionary).flatMap(d => d.items).map(parseItem)
+                                .filter(w => w.word !== currentTarget.word && !others.some(o => o.word === w.word));
+             others = [...others, ...allOtherWords]; 
+        }
+
+        others.sort(() => Math.random() - 0.5);
+        choices = [...choices, ...others.slice(0, quizDifficulty - 1)];
+        choices.sort(() => Math.random() - 0.5);
+        
+        const grid = document.getElementById('card-area');
+        grid.className = `quiz-stage quiz-${quizDifficulty}`; 
+        grid.innerHTML = '';
+        
+        choices.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'quiz-card';
+            card.innerHTML = `<img src="${item.img}" onerror="this.style.display='none'">`;
+            card.onclick = () => {
+                if(item.word === currentTarget.word) { showOverlay("⭕", "Good!"); speak("Good job!"); setTimeout(nextQuizQuestion, 1200); }
+                else { showOverlay("❌", "Try again"); speak("Try again"); }
+            };
+            grid.appendChild(card);
+        });
+        setTimeout(() => speak(currentTarget.word), 600);
+    }
+
+    // --- Games ---
+    function startGame(type, players) {
+        if(type === 'spelling') {
+            startSpelling();
+            return;
+        }
+        startAppView();
+        let rawItems = selectedCatKey === null ? Object.values(dictionary).flatMap(d => d.items) : dictionary[selectedCatKey].items;
+        let items = rawItems.map(parseItem);
+        if(type === 'karuta') initKaruta(items);
+        else initMemory(items, players);
+    }
+
+    function initKaruta(items) {
+        document.getElementById('view-title').innerText = "Speed Karuta";
+        document.getElementById('karuta-bar').classList.remove('hidden');
+        document.getElementById('replay-btn').classList.remove('hidden');
+        targetItems = items.sort(() => Math.random() - 0.5).slice(0, 24);
+        const grid = document.getElementById('card-area');
+        targetItems.forEach((item, idx) => {
+            const card = document.createElement('div');
+            card.className = 'card-common game-card';
+            card.id = `k-${idx}`;
+            card.innerHTML = `<img src="${item.img}" class="card-img" onerror="this.style.display='none'">`;
+            card.onclick = () => checkKaruta(item, idx);
+            grid.appendChild(card);
+        });
+        startTime = Date.now();
+        document.getElementById('k-left').innerText = targetItems.length;
+        timer = setInterval(() => { document.getElementById('k-timer').innerText = ((Date.now() - startTime)/1000).toFixed(1) + 's'; }, 100);
+        speak("Ready? Go!");
+        setTimeout(nextKarutaTurn, 1000);
+    }
+
+    function nextKarutaTurn() {
+        const rem = targetItems.filter((_, i) => !document.getElementById(`k-${i}`).classList.contains('taken'));
+        if(rem.length === 0) { 
+            clearInterval(timer); 
+            finishKarutaGame(document.getElementById('k-timer').innerText);
+            return; 
+        }
+        currentTarget = rem[Math.floor(Math.random() * rem.length)];
+        speak(currentTarget.word);
+    }
+
+    function finishKarutaGame(timeStr) {
+        speak("Finish!");
+        document.getElementById('app-view').classList.add('hidden');
+        document.getElementById('karuta-result-view').classList.remove('hidden');
+        
+        // Populate Result
+        const catName = selectedCatKey ? dictionary[selectedCatKey].label_en : "All Random";
+        document.getElementById('res-cat-name').innerText = catName;
+        document.getElementById('res-time-val').innerText = timeStr;
+        
+        // LocalStorage Logic
+        const timeVal = parseFloat(timeStr);
+        const dateStr = new Date().toLocaleDateString();
+        let scores = JSON.parse(localStorage.getItem('karutaScores') || '[]');
+        
+        const newScore = { date: dateStr, cat: catName, time: timeVal };
+        scores.push(newScore);
+        scores.sort((a,b) => a.time - b.time); // Sort by time ascending
+        scores = scores.slice(0, 5); // Keep top 5
+        localStorage.setItem('karutaScores', JSON.stringify(scores));
+        
+        // Render Ranking
+        const tbody = document.getElementById('ranking-body');
+        tbody.innerHTML = '';
+        scores.forEach((s, i) => {
+            const isNew = (s.time === timeVal && s.date === dateStr && s.cat === catName);
+            const rankIcon = i===0 ? '🥇' : (i===1 ? '🥈' : (i===2 ? '🥉' : i+1));
+            const row = `<tr>
+                <td class="rank-${i+1}">${rankIcon}</td>
+                <td style="font-size:0.8rem; color:#888;">${s.date}</td>
+                <td style="font-size:0.9rem;">${s.cat}</td>
+                <td>${s.time}s ${isNew ? '<span class="new-record">New!</span>' : ''}</td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function checkKaruta(item, idx) {
+        if(!currentTarget) return;
+        const el = document.getElementById(`k-${idx}`);
+        if(el.classList.contains('taken')) return;
+        if(item.word === currentTarget.word) {
+            el.classList.add('taken');
+            el.innerHTML = "✨";
+            speak("Yes!");
+            document.getElementById('k-left').innerText = document.querySelectorAll('.game-card:not(.taken)').length;
+            setTimeout(nextKarutaTurn, 600);
+        }
+    }
+
+    function initMemory(items, players) {
+        document.getElementById('view-title').innerText = "Memory Game";
+        document.getElementById('memory-bar').classList.remove('hidden');
+        document.getElementById('card-area').className = 'memory-container'; 
+        memoryPlayers = players;
+        memoryTurn = 0;
+        memoryScores = new Array(players).fill(0);
+        flippedCards = [];
+        isProcessing = false;
+        updateScoreboard();
+        const maxPairs = 15;
+        const selection = items.sort(() => Math.random() - 0.5).slice(0, maxPairs);
+        let deck = [...selection, ...selection].sort(() => Math.random() - 0.5);
+        const grid = document.getElementById('card-area');
+        deck.forEach((item, idx) => {
+            const card = document.createElement('div');
+            card.className = 'memory-card';
+            card.dataset.word = item.word;
+            card.innerHTML = `<div class="card-face card-front"><img src="${item.img}"></div><div class="card-face card-back"></div>`;
+            card.onclick = () => handleMemoryClick(card, item.word);
+            grid.appendChild(card);
+        });
+    }
+
+    function updateScoreboard() {
+        const board = document.getElementById('memory-bar');
+        board.innerHTML = '';
+        for(let i=0; i<memoryPlayers; i++) {
+            const div = document.createElement('div');
+            div.className = `player-score ${i === memoryTurn ? 'active' : ''}`;
+            div.innerText = `${playerIcons[i]} : ${memoryScores[i]}`;
+            board.appendChild(div);
+        }
+    }
+
+    function handleMemoryClick(card, word) {
+        if(isProcessing || card.classList.contains('flipped') || card.classList.contains('matched') || flippedCards.length >= 2) return;
+        speak(word);
+        card.classList.add('flipped');
+        flippedCards.push({el: card, word: word});
+        if(flippedCards.length === 2) { isProcessing = true; setTimeout(checkMemoryMatch, 2200); }
+    }
+
+    function checkMemoryMatch() {
+        const [c1, c2] = flippedCards;
+        if(c1.word === c2.word) {
+            speak("Yes!");
+            c1.el.classList.add('matched'); c2.el.classList.add('matched');
+            memoryScores[memoryTurn]++;
+            if(memoryScores.reduce((a,b)=>a+b, 0) === document.querySelectorAll('.memory-card').length / 2) finishMemoryGame();
+            updateScoreboard();
+            flippedCards = [];
+            isProcessing = false;
+        } else {
+            speak("No...");
+            setTimeout(() => {
+                c1.el.classList.remove('flipped'); c2.el.classList.remove('flipped');
+                memoryTurn = (memoryTurn + 1) % memoryPlayers;
+                updateScoreboard();
+                flippedCards = [];
+                isProcessing = false;
+            }, 1000);
+        }
+    }
+
+    function finishMemoryGame() {
+        let max = -1, winners = [];
+        memoryScores.forEach((s, i) => { if(s>max){max=s;winners=[i];} else if(s===max)winners.push(i); });
+        showOverlay("🏆", winners.length === 1 ? `${playerIcons[winners[0]]} Wins!` : "Draw!");
+        speak("Finish!");
+        updateScoreboard();
+    }
+
+    // --- Spelling Game Logic (10 Questions Limit) ---
+    function startSpelling() {
+        document.getElementById('game-setup-view').classList.add('hidden');
+        document.getElementById('spelling-view').classList.remove('hidden');
+        updateNavButtons();
+        
+        let rawItems = selectedCatKey === null ? Object.values(dictionary).flatMap(d => d.items) : dictionary[selectedCatKey].items;
+        // Shuffle first
+        let shuffled = rawItems.map(parseItem).sort(() => Math.random() - 0.5);
+        
+        // Limit to 10
+        spellingTotal = Math.min(10, shuffled.length);
+        targetItems = shuffled.slice(0, spellingTotal);
+        spellingCurrent = 0;
+        
+        nextSpellingTurn();
+    }
+
+    function nextSpellingTurn() {
+        if(targetItems.length === 0) { showOverlay("🏆", "Good Job!"); return; }
+        
+        spellingCurrent++;
+        document.getElementById('spell-counter').innerText = `${spellingCurrent} / ${spellingTotal}`;
+        
+        const item = targetItems.pop();
+        spellingWord = item.word;
+        isHintUsed = false;
+        
+        // Setup Image
+        document.getElementById('spell-img').src = item.img;
+        document.getElementById('spell-hint-overlay').classList.remove('hidden'); // Hide image initially
+        
+        // Setup logic (remove spaces for simplicity in checking)
+        const checkWord = item.word.replace(/\s+/g, '').toLowerCase();
+        spellingChars = checkWord.split('').sort(() => Math.random() - 0.5);
+        filledSlots = new Array(checkWord.length).fill(null);
+        
+        // Render Slots
+        renderSpellingSlots(checkWord.length);
+        
+        // Render Pool
+        renderSpellingPool();
+
+        // Auto play audio
+        speak(spellingWord);
+    }
+
+    function renderSpellingSlots(len) {
+        const slotsArea = document.getElementById('spell-slots');
+        slotsArea.innerHTML = '';
+        for(let i=0; i<len; i++) {
+            const slot = document.createElement('div');
+            slot.className = 'spell-slot';
+            slot.dataset.idx = i;
+            slot.onclick = () => returnCharToPool(i);
+            
+            // Check if filled (for redraw after reset)
+            if(filledSlots[i]) {
+                slot.innerText = filledSlots[i].char;
+            }
+            
+            slotsArea.appendChild(slot);
+        }
+    }
+
+    function renderSpellingPool() {
+        const poolArea = document.getElementById('spell-pool');
+        poolArea.innerHTML = '';
+        spellingChars.forEach((char, idx) => {
+            const btn = document.createElement('div');
+            btn.className = 'spell-char';
+            btn.innerText = char;
+            btn.dataset.poolIdx = idx;
+            
+            // Check if used
+            if(filledSlots.some(s => s && s.poolIdx === idx)) {
+                btn.classList.add('used');
+            }
+            
+            btn.onclick = () => moveCharToSlot(char, idx, btn);
+            poolArea.appendChild(btn);
+        });
+    }
+
+    function resetSpelling() {
+        filledSlots = new Array(filledSlots.length).fill(null);
+        renderSpellingSlots(filledSlots.length);
+        renderSpellingPool();
+    }
+
+    function revealHint() {
+        document.getElementById('spell-hint-overlay').classList.add('hidden'); // Show Image
+        isHintUsed = true;
+    }
+
+    function playSpellingAudio() {
+        if(spellingWord) speak(spellingWord);
+    }
+
+    function moveCharToSlot(char, poolIdx, btnEl) {
+        // Find first empty slot
+        const emptyIdx = filledSlots.indexOf(null);
+        if(emptyIdx === -1) return; // Full
+        
+        filledSlots[emptyIdx] = { char: char, poolIdx: poolIdx };
+        btnEl.classList.add('used');
+        
+        const slotEl = document.getElementById('spell-slots').children[emptyIdx];
+        slotEl.innerText = char;
+        
+        checkSpellingWin();
+    }
+
+    function returnCharToPool(slotIdx) {
+        const data = filledSlots[slotIdx];
+        if(!data) return;
+        
+        // Free the pool button logic is handled by re-rendering or direct DOM manip
+        // Simple direct DOM:
+        const poolBtns = document.querySelectorAll('.spell-char');
+        poolBtns.forEach(btn => {
+            if(parseInt(btn.dataset.poolIdx) === data.poolIdx) {
+                btn.classList.remove('used');
+            }
+        });
+        
+        filledSlots[slotIdx] = null;
+        document.getElementById('spell-slots').children[slotIdx].innerText = '';
+    }
+
+    function checkSpellingWin() {
+        if(filledSlots.includes(null)) return; // Not full yet
+        
+        const currentStr = filledSlots.map(d => d.char).join('');
+        const correctStr = spellingWord.replace(/\s+/g, '').toLowerCase();
+        
+        if(currentStr === correctStr) {
+            speak("Yes!");
+            const msg = isHintUsed ? "Good! 👍" : "Perfect!! 🌈";
+            showOverlay("⭕", msg);
+            setTimeout(nextSpellingTurn, 2000);
+        } else {
+            speak("No...");
+            const slots = document.getElementById('spell-slots');
+            slots.animate([{transform:'translateX(-10px)'}, {transform:'translateX(10px)'}, {transform:'translateX(0)'}], 200);
+        }
+    }
+
+    function showOverlay(icon, text) {
+        const ol = document.getElementById('overlay');
+        document.getElementById('overlay-mark').innerText = icon;
+        document.getElementById('overlay-msg').innerText = text;
+        ol.style.opacity = 1;
+        setTimeout(() => ol.style.opacity = 0, 2000);
+    }
+</script>
+</body>
+</html>
