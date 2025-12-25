@@ -96,7 +96,7 @@
         .bank-title { font-size: 1.8rem; font-weight: 800; color: #d35400; line-height: 1; }
         .bank-sub { font-size: 1rem; font-weight: bold; color: #e67e22; }
 
-        /* --- Tabs --- */
+        /* --- Tabs (Colors & Active State) --- */
         .mode-tabs { display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
         .tab-btn {
             width: 220px; height: 70px; border-radius: 20px; background: white; border: 3px solid transparent;
@@ -109,8 +109,10 @@
         
         #t-study.active { background: var(--primary); color: white !important; transform: scale(1.05); box-shadow: var(--shadow-hover); border-color: var(--primary); }
         #t-study.active small { color: rgba(255,255,255,0.9); }
+
         #t-practice.active { background: var(--accent-pink); color: white !important; transform: scale(1.05); box-shadow: var(--shadow-hover); border-color: var(--accent-pink); }
         #t-practice.active small { color: rgba(255,255,255,0.9); }
+
         #t-game.active { background: var(--accent-purple); color: white !important; transform: scale(1.05); box-shadow: var(--shadow-hover); border-color: var(--accent-purple); }
         #t-game.active small { color: rgba(255,255,255,0.9); }
 
@@ -147,7 +149,7 @@
         .cat-count { font-size: 0.7rem; color: #dfe6e9; font-weight: bold; background:#636e72; padding:2px 8px; border-radius:10px; }
         .grp-1 { border-bottom-color: var(--accent-pink); } .grp-2 { border-bottom-color: var(--accent-blue); } .grp-3 { border-bottom-color: var(--accent-yellow); } .grp-4 { border-bottom-color: var(--accent-purple); } .grp-5 { border-bottom-color: var(--primary); }
 
-        /* --- Quiz Layout --- */
+        /* --- Quiz Layout (Practice Mode) --- */
         #quiz-level-select {
             position: absolute; top:0; left:0; width:100%; height:100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -750,6 +752,7 @@
     let audioChunks = [];
     let recordedAudioUrl = null;
     let currentSpeakingWord = null;
+    let recorderMimeType = ''; // MimeType store
 
     const BANK_KEY = 'myWordBank';
     function getBank() { return JSON.parse(localStorage.getItem(BANK_KEY) || '[]'); }
@@ -992,7 +995,7 @@
         }, 300);
     }
 
-    // --- Speaking Modal Logic ---
+    // --- Speaking Modal Logic (SMARTPHONE FIX) ---
     function openSpeakingModal(itemStr) {
         const item = parseItem(itemStr);
         currentSpeakingWord = item.word;
@@ -1011,6 +1014,7 @@
 
     function toggleRecording() {
         const btn = document.getElementById('btn-record');
+        
         if (mediaRecorder && mediaRecorder.state === 'recording') {
             mediaRecorder.stop();
             btn.classList.remove('recording');
@@ -1018,19 +1022,42 @@
         } else {
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(stream => {
-                    mediaRecorder = new MediaRecorder(stream);
+                    // Check supported type
+                    if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                        recorderMimeType = 'audio/mp4'; 
+                    } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+                        recorderMimeType = 'audio/webm';
+                    } else {
+                        recorderMimeType = ''; // Default
+                    }
+
+                    const options = recorderMimeType ? { mimeType: recorderMimeType } : {};
+                    mediaRecorder = new MediaRecorder(stream, options);
+                    
                     audioChunks = [];
-                    mediaRecorder.ondataavailable = event => { audioChunks.push(event.data); };
+                    mediaRecorder.ondataavailable = event => {
+                        if (event.data.size > 0) {
+                            audioChunks.push(event.data);
+                        }
+                    };
+                    
                     mediaRecorder.onstop = () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const blobType = recorderMimeType || 'audio/webm';
+                        const audioBlob = new Blob(audioChunks, { type: blobType });
                         recordedAudioUrl = URL.createObjectURL(audioBlob);
                         document.getElementById('btn-play-my').disabled = false;
+                        
+                        // Stop all tracks to release microphone on mobile
+                        stream.getTracks().forEach(track => track.stop());
                     };
+                    
                     mediaRecorder.start();
                     btn.classList.add('recording');
                     btn.innerHTML = "■ とめる (Stop)";
                 })
-                .catch(err => { alert("マイクが使えません / Mic Error: " + err); });
+                .catch(err => { 
+                    alert("マイクが使えません。設定を確認してください。\nError: " + err); 
+                });
         }
     }
 
@@ -1201,23 +1228,20 @@
         document.getElementById('app-view').classList.add('hidden');
         document.getElementById('karuta-result-view').classList.remove('hidden');
         
-        // Populate Result
         const catName = selectedCatKey ? dictionary[selectedCatKey].label_en : "All Random";
         document.getElementById('res-cat-name').innerText = catName;
         document.getElementById('res-time-val').innerText = timeStr;
         
-        // LocalStorage Logic
         const timeVal = parseFloat(timeStr);
         const dateStr = new Date().toLocaleDateString();
         let scores = JSON.parse(localStorage.getItem('karutaScores') || '[]');
         
         const newScore = { date: dateStr, cat: catName, time: timeVal };
         scores.push(newScore);
-        scores.sort((a,b) => a.time - b.time); // Sort by time ascending
-        scores = scores.slice(0, 5); // Keep top 5
+        scores.sort((a,b) => a.time - b.time); 
+        scores = scores.slice(0, 5); 
         localStorage.setItem('karutaScores', JSON.stringify(scores));
         
-        // Render Ranking
         const tbody = document.getElementById('ranking-body');
         tbody.innerHTML = '';
         scores.forEach((s, i) => {
@@ -1326,10 +1350,7 @@
         updateNavButtons();
         
         let rawItems = selectedCatKey === null ? Object.values(dictionary).flatMap(d => d.items) : dictionary[selectedCatKey].items;
-        // Shuffle first
         let shuffled = rawItems.map(parseItem).sort(() => Math.random() - 0.5);
-        
-        // Limit to 10
         spellingTotal = Math.min(10, shuffled.length);
         targetItems = shuffled.slice(0, spellingTotal);
         spellingCurrent = 0;
@@ -1347,22 +1368,16 @@
         spellingWord = item.word;
         isHintUsed = false;
         
-        // Setup Image
         document.getElementById('spell-img').src = item.img;
-        document.getElementById('spell-hint-overlay').classList.remove('hidden'); // Hide image initially
+        document.getElementById('spell-hint-overlay').classList.remove('hidden');
         
-        // Setup logic (remove spaces for simplicity in checking)
         const checkWord = item.word.replace(/\s+/g, '').toLowerCase();
         spellingChars = checkWord.split('').sort(() => Math.random() - 0.5);
         filledSlots = new Array(checkWord.length).fill(null);
         
-        // Render Slots
         renderSpellingSlots(checkWord.length);
-        
-        // Render Pool
         renderSpellingPool();
 
-        // Auto play audio
         speak(spellingWord);
     }
 
@@ -1375,11 +1390,9 @@
             slot.dataset.idx = i;
             slot.onclick = () => returnCharToPool(i);
             
-            // Check if filled (for redraw after reset)
             if(filledSlots[i]) {
                 slot.innerText = filledSlots[i].char;
             }
-            
             slotsArea.appendChild(slot);
         }
     }
@@ -1393,11 +1406,9 @@
             btn.innerText = char;
             btn.dataset.poolIdx = idx;
             
-            // Check if used
             if(filledSlots.some(s => s && s.poolIdx === idx)) {
                 btn.classList.add('used');
             }
-            
             btn.onclick = () => moveCharToSlot(char, idx, btn);
             poolArea.appendChild(btn);
         });
@@ -1410,7 +1421,7 @@
     }
 
     function revealHint() {
-        document.getElementById('spell-hint-overlay').classList.add('hidden'); // Show Image
+        document.getElementById('spell-hint-overlay').classList.add('hidden'); 
         isHintUsed = true;
     }
 
@@ -1419,9 +1430,8 @@
     }
 
     function moveCharToSlot(char, poolIdx, btnEl) {
-        // Find first empty slot
         const emptyIdx = filledSlots.indexOf(null);
-        if(emptyIdx === -1) return; // Full
+        if(emptyIdx === -1) return; 
         
         filledSlots[emptyIdx] = { char: char, poolIdx: poolIdx };
         btnEl.classList.add('used');
@@ -1436,8 +1446,6 @@
         const data = filledSlots[slotIdx];
         if(!data) return;
         
-        // Free the pool button logic is handled by re-rendering or direct DOM manip
-        // Simple direct DOM:
         const poolBtns = document.querySelectorAll('.spell-char');
         poolBtns.forEach(btn => {
             if(parseInt(btn.dataset.poolIdx) === data.poolIdx) {
@@ -1450,7 +1458,7 @@
     }
 
     function checkSpellingWin() {
-        if(filledSlots.includes(null)) return; // Not full yet
+        if(filledSlots.includes(null)) return; 
         
         const currentStr = filledSlots.map(d => d.char).join('');
         const correctStr = spellingWord.replace(/\s+/g, '').toLowerCase();
