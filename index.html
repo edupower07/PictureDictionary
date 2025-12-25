@@ -149,7 +149,7 @@
         .cat-count { font-size: 0.7rem; color: #dfe6e9; font-weight: bold; background:#636e72; padding:2px 8px; border-radius:10px; }
         .grp-1 { border-bottom-color: var(--accent-pink); } .grp-2 { border-bottom-color: var(--accent-blue); } .grp-3 { border-bottom-color: var(--accent-yellow); } .grp-4 { border-bottom-color: var(--accent-purple); } .grp-5 { border-bottom-color: var(--primary); }
 
-        /* --- Quiz Layout (Practice Mode) --- */
+        /* --- Quiz Layout --- */
         #quiz-level-select {
             position: absolute; top:0; left:0; width:100%; height:100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -316,7 +316,7 @@
         .memory-card.flipped .card-back { opacity: 0; z-index: 1; }
         .memory-card.matched { opacity: 0; pointer-events: none; transition: opacity 0.5s; }
 
-        /* --- Spelling Game --- */
+        /* --- Spelling Game (Textbook Font & Typing) --- */
         .spelling-container { width: 100%; max-width: 800px; margin: 0 auto; text-align: center; }
         
         .spell-controls-top { display: flex; justify-content: space-between; align-items: center; max-width: 300px; margin: 0 auto 10px; }
@@ -583,6 +583,7 @@
 
     <div id="spelling-view" class="hidden fade-in">
         <h2 style="text-align:center; color:#d35400;">Spelling Game</h2>
+        <p style="text-align:center; color:#636e72; margin-bottom:15px; font-weight:bold;">アルファベットを動かしたり<br>タイピングをしてならびかえよう！</p>
         <div class="spelling-container">
             <div class="spell-controls-top">
                 <div id="spell-counter" class="spell-progress">1 / 10</div>
@@ -1350,7 +1351,10 @@
         updateNavButtons();
         
         let rawItems = selectedCatKey === null ? Object.values(dictionary).flatMap(d => d.items) : dictionary[selectedCatKey].items;
+        // Shuffle first
         let shuffled = rawItems.map(parseItem).sort(() => Math.random() - 0.5);
+        
+        // Limit to 10
         spellingTotal = Math.min(10, shuffled.length);
         targetItems = shuffled.slice(0, spellingTotal);
         spellingCurrent = 0;
@@ -1409,6 +1413,7 @@
             if(filledSlots.some(s => s && s.poolIdx === idx)) {
                 btn.classList.add('used');
             }
+            
             btn.onclick = () => moveCharToSlot(char, idx, btn);
             poolArea.appendChild(btn);
         });
@@ -1474,6 +1479,30 @@
             slots.animate([{transform:'translateX(-10px)'}, {transform:'translateX(10px)'}, {transform:'translateX(0)'}], 200);
         }
     }
+
+    // --- Add Keyboard Support for Spelling ---
+    document.addEventListener('keydown', (e) => {
+        // Only active if Spelling View is visible
+        if(document.getElementById('spelling-view').classList.contains('hidden')) return;
+
+        if(e.key === 'Backspace') {
+            const lastFilledIdx = filledSlots.map(s => s !== null).lastIndexOf(true);
+            if(lastFilledIdx !== -1) returnCharToPool(lastFilledIdx);
+            return;
+        }
+
+        const char = e.key.toLowerCase();
+        if(!/^[a-z]$/.test(char)) return;
+
+        // Find unused pool button
+        const poolBtns = document.querySelectorAll('.spell-char:not(.used)');
+        for(let btn of poolBtns) {
+            if(btn.innerText.toLowerCase() === char) {
+                btn.click();
+                break;
+            }
+        }
+    });
 
     function showOverlay(icon, text) {
         const ol = document.getElementById('overlay');
