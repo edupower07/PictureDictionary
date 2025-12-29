@@ -915,12 +915,58 @@
         window.scrollTo(0, 0); 
     }
 
-    function speak(txt) {
-        speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(txt);
-        u.lang = 'en-US';
-        speechSynthesis.speak(u);
+    // ==========================================
+    //  音声読み上げ機能（iPhone/Android両対応版）
+    // ==========================================
+    let allVoices = [];
+
+    // 声のリストを読み込む関数
+    function loadVoices() {
+        allVoices = window.speechSynthesis.getVoices();
     }
+
+    // 読み込みタイミングがブラウザによって違うため、イベントでも発火させる
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function speak(txt) {
+        // 声のリストがまだ空なら再取得を試みる（iPhone対策）
+        if (allVoices.length === 0) {
+            loadVoices();
+        }
+
+        window.speechSynthesis.cancel(); // 前の音声をキャンセル
+        const u = new SpeechSynthesisUtterance(txt);
+        
+        // 【重要】最適な声を選ぶロジック
+        // 1. Google US English (Android/PC Chrome用)
+        // 2. en-US (iPhoneの英語など)
+        // 3. en系の何か (イギリス英語など)
+        let voice = allVoices.find(v => v.name === 'Google US English');
+        if (!voice) {
+            voice = allVoices.find(v => v.lang === 'en-US');
+        }
+        if (!voice) {
+            voice = allVoices.find(v => v.lang.startsWith('en'));
+        }
+
+        if (voice) {
+            u.voice = voice;
+        } else {
+            // 声が見つからなくても最低限の設定はする
+            u.lang = 'en-US';
+        }
+
+        // iPhoneでの不具合を防ぐため、パラメータを明示的に指定
+        u.rate = 1.0;   // 速さ
+        u.pitch = 1.0;  // 高さ
+        u.volume = 1.0; // 音量
+
+        window.speechSynthesis.speak(u);
+    }
+
     function replayAudio() { if(currentTarget) speak(currentTarget.word); }
 
     // --- Study & Quiz & Bank ---
