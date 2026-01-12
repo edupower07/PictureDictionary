@@ -34,6 +34,7 @@
             color: var(--text-color); margin: 0; min-height: 100vh;
             overflow-x: hidden;
             touch-action: manipulation;
+            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
         }
 
         /* Header */
@@ -923,7 +924,7 @@
     function checkSpellingWin(){ if(filledSlots.includes(null))return; const currentStr=filledSlots.map(d=>d.char).join(''); const correctStr=spellingWord.replace(/\s+/g,'').toLowerCase(); if(currentStr===correctStr){ speak("Yes!"); const msg=isHintUsed?"Good! 👍":"Perfect!! 🌈"; showOverlay("⭕",msg); setTimeout(nextSpellingTurn,2000); }else{ speak("No..."); const slots=document.getElementById('spell-slots'); slots.animate([{transform:'translateX(-10px)'},{transform:'translateX(10px)'},{transform:'translateX(0)'}],200); } }
     document.addEventListener('keydown',(e)=>{ if(document.getElementById('spelling-view').classList.contains('hidden'))return; if(e.key==='Backspace'){ const lastFilledIdx=filledSlots.map(s=>s!==null).lastIndexOf(true); if(lastFilledIdx!==-1)returnCharToPool(lastFilledIdx); return; } const char=e.key.toLowerCase(); if(!/^[a-z]$/.test(char))return; const poolBtns=document.querySelectorAll('.spell-char:not(.used)'); for(let btn of poolBtns){ if(btn.innerText.toLowerCase()===char){btn.click();break;} } });
 
-    // --- BINGO LOGIC (Ver 5.2: Lightweight) ---
+    // --- BINGO LOGIC (Ver 5.3: Stars Added) ---
     function startBingoSetup(size) {
         bingoSize = size;
         isBingoPlaying = false;
@@ -977,7 +978,11 @@
             };
             
             if (bingoSetupGrid[i]) {
-                cell.innerHTML = `<img src="${bingoSetupGrid[i].img}" onerror="this.style.display='none'">`;
+                if(bingoSetupGrid[i].isStar) {
+                    cell.innerHTML = `<div style="font-size:3rem; color:#f1c40f;">★</div>`;
+                } else {
+                    cell.innerHTML = `<img src="${bingoSetupGrid[i].img}" onerror="this.style.display='none'">`;
+                }
             } else {
                 cell.innerHTML = `<span style="color:#ddd; font-size:2rem;">+</span>`;
             }
@@ -992,6 +997,15 @@
         let rawItems = selectedCatKey === null ? Object.values(dictionary).flatMap(d => d.items) : dictionary[selectedCatKey].items;
         let pool = [...new Set(rawItems)].map(parseItem); 
         
+        // Add Star cards if needed
+        const totalSlots = bingoSize * bingoSize;
+        if (pool.length < totalSlots) {
+            const starCount = totalSlots - pool.length;
+            for(let i=0; i<starCount; i++) {
+                pool.push({ word: "Free Space", img: null, isStar: true, id: `star_${i}` });
+            }
+        }
+        
         const poolArea = document.getElementById('bingo-pool');
         poolArea.innerHTML = '';
         
@@ -999,9 +1013,22 @@
             const div = document.createElement('div');
             div.className = 'pool-card';
             div.draggable = true;
-            div.innerHTML = `<img src="${item.img}" onerror="this.style.display='none'">`;
             
-            if (bingoSetupGrid.some(x => x && x.word === item.word)) {
+            if(item.isStar) {
+                div.innerHTML = `<div style="font-size:2rem; color:#f1c40f;">★</div>`;
+            } else {
+                div.innerHTML = `<img src="${item.img}" onerror="this.style.display='none'">`;
+            }
+            
+            // Check usage (by word for normal, by id for stars)
+            let isUsed = false;
+            if(item.isStar) {
+                isUsed = bingoSetupGrid.some(x => x && x.id === item.id);
+            } else {
+                isUsed = bingoSetupGrid.some(x => x && x.word === item.word);
+            }
+
+            if (isUsed) {
                 div.classList.add('used');
                 div.draggable = false;
             }
@@ -1013,7 +1040,7 @@
             div.onclick = () => {
                 if (div.classList.contains('used')) return;
                 speak(item.word);
-                if (selectedPoolItem && selectedPoolItem.word === item.word) {
+                if (selectedPoolItem && ( (item.isStar && selectedPoolItem.id === item.id) || (!item.isStar && selectedPoolItem.word === item.word) ) ) {
                     selectedPoolItem = null;
                     div.classList.remove('selected-tap');
                 } else {
@@ -1029,7 +1056,15 @@
 
     function placeBingoItem(idx, item) {
         if (isBingoPlaying) return;
-        const existingIdx = bingoSetupGrid.findIndex(x => x && x.word === item.word);
+        
+        // Remove from old pos if exists
+        let existingIdx = -1;
+        if(item.isStar) {
+            existingIdx = bingoSetupGrid.findIndex(x => x && x.id === item.id);
+        } else {
+            existingIdx = bingoSetupGrid.findIndex(x => x && x.word === item.word);
+        }
+
         if (existingIdx !== -1 && existingIdx !== idx) {
             bingoSetupGrid[existingIdx] = null;
         }
@@ -1061,7 +1096,13 @@
         bingoSetupGrid.forEach((item, i) => {
             const cell = document.createElement('div');
             cell.className = 'bingo-cell';
-            cell.innerHTML = `<img src="${item.img}" onerror="this.style.display='none'">`;
+            
+            if(item.isStar) {
+                cell.innerHTML = `<div style="font-size:3rem; color:#f1c40f;">★</div>`;
+                cell.classList.add('stamped'); // Auto stamp stars
+            } else {
+                cell.innerHTML = `<img src="${item.img}" onerror="this.style.display='none'">`;
+            }
             
             let lastTap = 0;
             cell.onclick = (e) => {
