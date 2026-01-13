@@ -446,6 +446,62 @@
         }
         #rand-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
 
+        /* Speaking Modal */
+        #speaking-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 2000; /* 高いZ-Index */
+            display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .speaking-content {
+            background: white; width: 90%; max-width: 400px; border-radius: 25px;
+            padding: 25px; text-align: center; position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            max-height: 90vh; overflow-y: auto; /* 小さい画面対策 */
+        }
+        .speak-img { width: 200px; height: 150px; object-fit: contain; margin-bottom: 20px; }
+        .speak-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .speak-btn {
+            padding: 12px; border-radius: 15px; border: none; font-weight: 800; font-size: 1rem;
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px;
+            transition: 0.2s; box-shadow: var(--shadow); color: white;
+        }
+        .speak-btn:active { transform: translateY(2px); }
+        .btn-listen { background: var(--primary); grid-column: 1 / -1; }
+        .btn-record { background: var(--accent-pink); }
+        .btn-record.recording { background: #d63031; animation: pulse 1s infinite; }
+        .btn-play-my { background: var(--accent-blue); }
+        .btn-play-my:disabled { background: #b2bec3; cursor: not-allowed; opacity: 0.7; }
+        .close-modal-btn {
+            position: absolute; top: 10px; right: 10px; background: #dfe6e9;
+            border: none; width: 35px; height: 35px; border-radius: 50%;
+            font-weight: bold; font-size: 1.2rem; cursor: pointer; color: #636e72;
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        
+        /* Karuta Result */
+        #karuta-result-view {
+            text-align: center; padding: 20px; animation: popIn 0.5s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .result-box {
+            background: white; border-radius: 20px; padding: 30px; margin: 20px auto;
+            width: 100%; max-width: 500px; box-shadow: var(--shadow-hover); border: 5px solid var(--accent-purple);
+        }
+        .result-time-label { font-size: 1.2rem; color: #888; font-weight: bold; }
+        .result-time-val { font-size: 4rem; font-family: monospace; color: var(--accent-purple); font-weight: 800; line-height: 1.2; }
+        
+        .ranking-table {
+            width: 100%; max-width: 600px; margin: 30px auto;
+            border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .ranking-table th { background: #636e72; color: white; padding: 10px; }
+        .ranking-table td { padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; }
+        .rank-1 { color: #f1c40f; font-size: 1.2rem; } 
+        .new-record { display: inline-block; background: #e84393; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; margin-left: 5px; animation: pulse 1s infinite; }
+
+
         /* Media Query for Mobile (Stack vertical if narrow) */
         @media (max-width: 700px) {
             .bingo-main-area { flex-direction: column; }
@@ -642,8 +698,43 @@
         </div>
     </div>
 
-    <div id="karuta-result-view" class="hidden"><h2 style="color:var(--accent-purple);">Karuta Finish!</h2><div class="result-box"><div id="res-time-val" class="result-time-val">0.0s</div></div><table class="ranking-table"><tbody id="ranking-body"></tbody></table><button class="nav-btn" onclick="handleBack()">OK</button></div>
-    <div id="speaking-modal" class="hidden"><div class="speaking-content"><button class="close-modal-btn" onclick="closeSpeakingModal()">✕</button><img id="speak-img" class="speak-img" src=""><div class="speak-controls"><button class="speak-btn btn-listen" onclick="speak(currentSpeakingWord)">🔊</button><button class="speak-btn btn-record" id="btn-record" onclick="toggleRecording()">●</button><button class="speak-btn btn-play-my" id="btn-play-my" onclick="playMyVoice()" disabled>▶</button></div></div></div>
+    <div id="karuta-result-view" class="hidden">
+        <h2 style="color:var(--accent-purple); font-size:2rem; margin-bottom:10px;">Karuta Finish!</h2>
+        <div class="result-box">
+            <div id="res-cat-name" style="font-weight:bold; color:#636e72; margin-bottom:10px;">Category Name</div>
+            <div class="result-time-label">Time</div>
+            <div id="res-time-val" class="result-time-val">0.0s</div>
+        </div>
+        
+        <h3 style="color:#2d3436;">🏆 Ranking (Top 5)</h3>
+        <table class="ranking-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody id="ranking-body"></tbody>
+        </table>
+        
+        <button class="nav-btn" style="padding:15px 30px; font-size:1.2rem; background:var(--primary);" onclick="handleBack()">OK</button>
+    </div>
+
+    <div id="speaking-modal" class="hidden">
+        <div class="speaking-content">
+            <button class="close-modal-btn" onclick="closeSpeakingModal()">✕</button>
+            <h2 style="color:var(--primary); margin-top:0;">Speaking Practice</h2>
+            <img id="speak-img" class="speak-img" src="">
+            <div class="speak-controls">
+                <button class="speak-btn btn-listen" onclick="speak(currentSpeakingWord)">🔊 お手本 (Listen)</button>
+                <button class="speak-btn btn-record" id="btn-record" onclick="toggleRecording()">● ろくおん (Record)</button>
+                <button class="speak-btn btn-play-my" id="btn-play-my" onclick="playMyVoice()" disabled>▶ じぶんの声 (Play)</button>
+            </div>
+            <p style="font-size:0.8rem; color:#888;">※マイク許可が必要です / Mic required</p>
+        </div>
+    </div>
 
 </div>
 <div id="overlay"><div style="text-align:center"><div id="overlay-mark" class="mark"></div><div id="overlay-msg" style="font-size:2.5rem; background:white; padding:15px 40px; border-radius:30px; font-weight:bold; color:var(--text-color); box-shadow:var(--shadow-hover);"></div></div></div>
@@ -675,6 +766,9 @@
     let currentTarget = null;
     let timer = null;
     let startTime = 0;
+    
+    // Karuta Time Tracker
+    let currentKarutaTime = 0;
 
     let memoryPlayers = 2;
     let memoryTurn = 0;
@@ -930,10 +1024,64 @@
     function toggleHeart(e, itemStr, el){ e.stopPropagation(); if(isInBank(itemStr)){ removeFromBank(itemStr); el.classList.remove('saved'); }else{ addToBank(itemStr); el.classList.add('saved'); } }
     function showBankList(action){ mode='bank_'+action; startAppView(); document.getElementById('view-title').innerText=action==='check'?"Check Word Bank":"Organize Bank"; const bank=getBank(); if(bank.length===0){ document.getElementById('card-area').innerHTML="<div class='empty-msg'>Empty<br><span style='font-size:1rem'>中身はなにもありません</span></div>"; return; } bank.forEach(itemStr=>{ const item=parseItem(itemStr); const card=document.createElement('div'); card.className='card-common word-card'; if(action==='organize'){ card.innerHTML=`<div class="remove-btn" onclick="removeItemFromBank(event, '${itemStr}', this.parentNode)">🗑️</div><img src="${item.img}" class="card-img">`; }else{ card.innerHTML=`<img src="${item.img}" class="card-img">`; card.onclick=()=>{speak(item.word); card.animate([{transform:'scale(1)'},{transform:'scale(0.95)'}], 200);}; } document.getElementById('card-area').appendChild(card); }); }
     function removeItemFromBank(e, itemStr, cardEl){ e.stopPropagation(); removeFromBank(itemStr); cardEl.style.opacity='0'; setTimeout(()=>{ cardEl.remove(); if(getBank().length===0){ document.getElementById('card-area').innerHTML="<div class='empty-msg'>Empty<br><span style='font-size:1rem'>中身はなにもありません</span></div>"; } }, 300); }
-    function openSpeakingModal(itemStr){ const item=parseItem(itemStr); currentSpeakingWord=item.word; document.getElementById('speak-img').src=item.img; recordedAudioUrl=null; document.getElementById('btn-play-my').disabled=true; document.getElementById('speaking-modal').classList.remove('hidden'); }
-    function closeSpeakingModal(){ document.getElementById('speaking-modal').classList.add('hidden'); if(mediaRecorder&&mediaRecorder.state==='recording'){ mediaRecorder.stop(); } }
-    function toggleRecording(){ const btn=document.getElementById('btn-record'); if(mediaRecorder&&mediaRecorder.state==='recording'){ mediaRecorder.stop(); btn.classList.remove('recording'); btn.innerHTML="● ろくおん (Record)"; }else{ navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{ if(MediaRecorder.isTypeSupported('audio/mp4')){recorderMimeType='audio/mp4';}else if(MediaRecorder.isTypeSupported('audio/webm')){recorderMimeType='audio/webm';}else{recorderMimeType='';} const options=recorderMimeType?{mimeType:recorderMimeType}:{}; mediaRecorder=new MediaRecorder(stream, options); audioChunks=[]; mediaRecorder.ondataavailable=event=>{if(event.data.size>0){audioChunks.push(event.data);}}; mediaRecorder.onstop=()=>{const blobType=recorderMimeType||'audio/webm'; const audioBlob=new Blob(audioChunks,{type:blobType}); recordedAudioUrl=URL.createObjectURL(audioBlob); document.getElementById('btn-play-my').disabled=false; stream.getTracks().forEach(track=>track.stop());}; mediaRecorder.start(); btn.classList.add('recording'); btn.innerHTML="■ とめる (Stop)"; }).catch(err=>{alert("マイクが使えません。\nError: "+err);}); } }
-    function playMyVoice(){ if(recordedAudioUrl){ const audio=new Audio(recordedAudioUrl); audio.play(); } }
+    
+    // --- Recording Fix ---
+    function openSpeakingModal(itemStr){ 
+        const item=parseItem(itemStr); 
+        currentSpeakingWord=item.word; 
+        document.getElementById('speak-img').src=item.img; 
+        recordedAudioUrl=null; 
+        
+        // Reset
+        audioChunks = [];
+        const btnRecord = document.getElementById('btn-record');
+        btnRecord.classList.remove('recording');
+        btnRecord.innerHTML = "● ろくおん (Record)";
+        
+        document.getElementById('btn-play-my').disabled=true; 
+        document.getElementById('speaking-modal').classList.remove('hidden'); 
+    }
+    
+    function closeSpeakingModal(){ 
+        document.getElementById('speaking-modal').classList.add('hidden'); 
+        if(mediaRecorder&&mediaRecorder.state==='recording'){ mediaRecorder.stop(); } 
+    }
+    
+    function toggleRecording(){ 
+        const btn=document.getElementById('btn-record'); 
+        if(mediaRecorder&&mediaRecorder.state==='recording'){ 
+            mediaRecorder.stop(); 
+            btn.classList.remove('recording'); 
+            btn.innerHTML="● ろくおん (Record)"; 
+        }else{ 
+            navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{ 
+                if(MediaRecorder.isTypeSupported('audio/mp4')){recorderMimeType='audio/mp4';}
+                else if(MediaRecorder.isTypeSupported('audio/webm')){recorderMimeType='audio/webm';}
+                else{recorderMimeType='';} 
+                
+                const options=recorderMimeType?{mimeType:recorderMimeType}:{}; 
+                mediaRecorder=new MediaRecorder(stream, options); 
+                audioChunks=[]; 
+                
+                mediaRecorder.ondataavailable=event=>{if(event.data.size>0){audioChunks.push(event.data);}}; 
+                mediaRecorder.onstop=()=>{
+                    const blobType=recorderMimeType||'audio/webm'; 
+                    const audioBlob=new Blob(audioChunks,{type:blobType}); 
+                    recordedAudioUrl=URL.createObjectURL(audioBlob); 
+                    document.getElementById('btn-play-my').disabled=false; 
+                    stream.getTracks().forEach(track=>track.stop());
+                }; 
+                mediaRecorder.start(); 
+                btn.classList.add('recording'); 
+                btn.innerHTML="■ とめる (Stop)"; 
+            }).catch(err=>{alert("マイクが使えません。\nError: "+err);}); 
+        } 
+    }
+    
+    function playMyVoice(){ 
+        if(recordedAudioUrl){ const audio=new Audio(recordedAudioUrl); audio.play(); } 
+    }
+
     function startFlashcards(){ const bank=getBank(); if(bank.length===0){alert("Word Bank is empty!");return;} const list=bank.sort(()=>0.5-Math.random()).slice(0,20); flashItems=list.map(parseItem); flashIndex=0; flashResults=[]; document.getElementById('bank-menu-view').classList.add('hidden'); document.getElementById('flash-view').classList.remove('hidden'); updateNavButtons(); showFlashcard(); }
     function showFlashcard(){ if(flashIndex>=flashItems.length){finishFlashcards();return;} const item=flashItems[flashIndex]; document.getElementById('flash-counter').innerText=`${flashIndex+1} / ${flashItems.length}`; document.getElementById('flash-img').src=item.img; currentTarget=item; }
     function playFlashAudio(){ if(flashItems[flashIndex])speak(flashItems[flashIndex].word); }
@@ -942,10 +1090,61 @@
     function showQuizLevelSelection(key){ selectedCatKey=key; document.getElementById('home-view').classList.add('hidden'); document.getElementById('app-view').classList.remove('hidden'); document.getElementById('header-area').classList.add('hidden'); document.getElementById('card-area').innerHTML=''; document.getElementById('replay-btn').classList.add('hidden'); document.getElementById('quiz-level-select').classList.remove('hidden'); updateNavButtons(); window.scrollTo(0,0); }
     function startQuizGame(level){ quizDifficulty=level; document.getElementById('quiz-level-select').classList.add('hidden'); document.getElementById('header-area').classList.remove('hidden'); startAppView(); document.getElementById('view-title').innerText="What is this?"; document.getElementById('replay-btn').classList.remove('hidden'); document.getElementById('replay-btn').classList.add('large-replay'); if(selectedCatKey){ targetItems=dictionary[selectedCatKey].items.map(parseItem); }else{ targetItems=Object.values(dictionary).flatMap(d=>d.items).map(parseItem); } nextQuizQuestion(); }
     function nextQuizQuestion(){ currentTarget=targetItems[Math.floor(Math.random()*targetItems.length)]; let choices=[currentTarget]; let sourcePool=targetItems; let others=sourcePool.filter(w=>w.word!==currentTarget.word); if(others.length<quizDifficulty-1){ let allOtherWords=Object.values(dictionary).flatMap(d=>d.items).map(parseItem).filter(w=>w.word!==currentTarget.word&&!others.some(o=>o.word===w.word)); others=[...others,...allOtherWords]; } others.sort(()=>Math.random()-0.5); choices=[...choices,...others.slice(0,quizDifficulty-1)]; choices.sort(()=>Math.random()-0.5); const grid=document.getElementById('card-area'); grid.className=`quiz-stage quiz-${quizDifficulty}`; grid.innerHTML=''; choices.forEach(item=>{ const card=document.createElement('div'); card.className='quiz-card'; card.innerHTML=`<img src="${item.img}" onerror="this.style.display='none'">`; card.onclick=()=>{ if(item.word===currentTarget.word){showOverlay("⭕","Good!"); speak("Good job!"); setTimeout(nextQuizQuestion,1200);}else{showOverlay("❌","Try again"); speak("Try again");} }; grid.appendChild(card); }); setTimeout(()=>speak(currentTarget.word),600); }
+    
     function startGame(type, players){ if(type==='spelling'){startSpelling();return;} startAppView(); let rawItems=selectedCatKey===null?Object.values(dictionary).flatMap(d=>d.items):dictionary[selectedCatKey].items; let items=rawItems.map(parseItem); if(type==='karuta')initKaruta(items); else initMemory(items, players); }
-    function initKaruta(items){ document.getElementById('view-title').innerText="Speed Karuta"; document.getElementById('karuta-bar').classList.remove('hidden'); document.getElementById('replay-btn').classList.remove('hidden'); targetItems=items.sort(()=>Math.random()-0.5).slice(0,24); const grid=document.getElementById('card-area'); targetItems.forEach((item,idx)=>{ const card=document.createElement('div'); card.className='card-common game-card'; card.id=`k-${idx}`; card.innerHTML=`<img src="${item.img}" class="card-img" onerror="this.style.display='none'">`; card.onclick=()=>checkKaruta(item,idx); grid.appendChild(card); }); startTime=Date.now(); document.getElementById('k-left').innerText=targetItems.length; timer=setInterval(()=>{document.getElementById('k-timer').innerText=((Date.now()-startTime)/1000).toFixed(1)+'s';},100); speak("Ready? Go!"); setTimeout(nextKarutaTurn,1000); }
-    function nextKarutaTurn(){ const rem=targetItems.filter((_,i)=>!document.getElementById(`k-${i}`).classList.contains('taken')); if(rem.length===0){ clearInterval(timer); finishKarutaGame(document.getElementById('k-timer').innerText); return; } currentTarget=rem[Math.floor(Math.random()*rem.length)]; speak(currentTarget.word); }
-    function finishKarutaGame(timeStr){ speak("Finish!"); document.getElementById('app-view').classList.add('hidden'); document.getElementById('karuta-result-view').classList.remove('hidden'); const catName=selectedCatKey?dictionary[selectedCatKey].label_en:"All Random"; document.getElementById('res-cat-name').innerText=catName; document.getElementById('res-time-val').innerText=timeStr; const timeVal=parseFloat(timeStr); const dateStr=new Date().toLocaleDateString(); let scores=JSON.parse(localStorage.getItem('karutaScores')||'[]'); const newScore={date:dateStr,cat:catName,time:timeVal}; scores.push(newScore); scores.sort((a,b)=>a.time-b.time); scores=scores.slice(0,5); localStorage.setItem('karutaScores',JSON.stringify(scores)); const tbody=document.getElementById('ranking-body'); tbody.innerHTML=''; scores.forEach((s,i)=>{ const isNew=(s.time===timeVal&&s.date===dateStr&&s.cat===catName); const rankIcon=i===0?'🥇':(i===1?'🥈':(i===2?'🥉':i+1)); const row=`<tr><td class="rank-${i+1}">${rankIcon}</td><td style="font-size:0.8rem; color:#888;">${s.date}</td><td style="font-size:0.9rem;">${s.cat}</td><td>${s.time}s ${isNew?'<span class="new-record">New!</span>':''}</td></tr>`; tbody.innerHTML+=row; }); }
+    
+    // --- Karuta Fix ---
+    function initKaruta(items){ 
+        document.getElementById('view-title').innerText="Speed Karuta"; 
+        document.getElementById('karuta-bar').classList.remove('hidden'); 
+        document.getElementById('replay-btn').classList.remove('hidden'); 
+        targetItems=items.sort(()=>Math.random()-0.5).slice(0,24); 
+        const grid=document.getElementById('card-area'); 
+        targetItems.forEach((item,idx)=>{ const card=document.createElement('div'); card.className='card-common game-card'; card.id=`k-${idx}`; card.innerHTML=`<img src="${item.img}" class="card-img" onerror="this.style.display='none'">`; card.onclick=()=>checkKaruta(item,idx); grid.appendChild(card); }); 
+        
+        startTime=Date.now(); 
+        currentKarutaTime = 0; // Reset
+        document.getElementById('k-left').innerText=targetItems.length; 
+        
+        timer=setInterval(()=>{
+            currentKarutaTime = (Date.now()-startTime)/1000;
+            document.getElementById('k-timer').innerText = currentKarutaTime.toFixed(1)+'s';
+        },100); 
+        
+        speak("Ready? Go!"); 
+        setTimeout(nextKarutaTurn,1000); 
+    }
+    
+    function nextKarutaTurn(){ const rem=targetItems.filter((_,i)=>!document.getElementById(`k-${i}`).classList.contains('taken')); if(rem.length===0){ clearInterval(timer); finishKarutaGame(currentKarutaTime); return; } currentTarget=rem[Math.floor(Math.random()*rem.length)]; speak(currentTarget.word); }
+    
+    function finishKarutaGame(timeVal){ 
+        speak("Finish!"); 
+        document.getElementById('app-view').classList.add('hidden'); 
+        document.getElementById('karuta-result-view').classList.remove('hidden'); 
+        
+        const catName=selectedCatKey?dictionary[selectedCatKey].label_en:"All Random"; 
+        document.getElementById('res-cat-name').innerText=catName; 
+        document.getElementById('res-time-val').innerText=timeVal.toFixed(1) + 's'; 
+        
+        const dateStr=new Date().toLocaleDateString(); 
+        let scores=JSON.parse(localStorage.getItem('karutaScores')||'[]'); 
+        const newScore={date:dateStr,cat:catName,time:timeVal}; 
+        scores.push(newScore); 
+        scores.sort((a,b)=>a.time-b.time); 
+        scores=scores.slice(0,5); 
+        localStorage.setItem('karutaScores',JSON.stringify(scores)); 
+        
+        const tbody=document.getElementById('ranking-body'); 
+        tbody.innerHTML=''; 
+        scores.forEach((s,i)=>{ 
+            // 0.1秒差以内なら同じ記録とみなす（浮動小数点対策）
+            const isNew = (Math.abs(s.time - timeVal) < 0.05 && s.date === dateStr && s.cat === catName); 
+            const rankIcon=i===0?'🥇':(i===1?'🥈':(i===2?'🥉':i+1)); 
+            const row=`<tr><td class="rank-${i+1}">${rankIcon}</td><td style="font-size:0.8rem; color:#888;">${s.date}</td><td style="font-size:0.9rem;">${s.cat}</td><td>${s.time.toFixed(1)}s ${isNew?'<span class="new-record">New!</span>':''}</td></tr>`; 
+            tbody.innerHTML+=row; 
+        }); 
+    }
+    
     function checkKaruta(item, idx){ if(!currentTarget)return; const el=document.getElementById(`k-${idx}`); if(el.classList.contains('taken'))return; if(item.word===currentTarget.word){ el.classList.add('taken'); el.innerHTML="✨"; speak("Yes!"); document.getElementById('k-left').innerText=document.querySelectorAll('.game-card:not(.taken)').length; setTimeout(nextKarutaTurn,600); } }
     function initMemory(items, players){ document.getElementById('view-title').innerText="Memory Game"; document.getElementById('memory-bar').classList.remove('hidden'); document.getElementById('card-area').className='memory-container'; memoryPlayers=players; memoryTurn=0; memoryScores=new Array(players).fill(0); flippedCards=[]; isProcessing=false; updateScoreboard(); const maxPairs=15; const selection=items.sort(()=>Math.random()-0.5).slice(0,maxPairs); let deck=[...selection,...selection].sort(()=>Math.random()-0.5); const grid=document.getElementById('card-area'); deck.forEach((item,idx)=>{ const card=document.createElement('div'); card.className='memory-card'; card.dataset.word=item.word; card.innerHTML=`<div class="card-face card-front"><img src="${item.img}"></div><div class="card-face card-back"></div>`; card.onclick=()=>handleMemoryClick(card,item.word); grid.appendChild(card); }); }
     function updateScoreboard(){ const board=document.getElementById('memory-bar'); board.innerHTML=''; for(let i=0;i<memoryPlayers;i++){ const div=document.createElement('div'); div.className=`player-score ${i===memoryTurn?'active':''}`; div.innerText=`${playerIcons[i]} : ${memoryScores[i]}`; board.appendChild(div); } }
