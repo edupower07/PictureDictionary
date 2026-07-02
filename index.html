@@ -353,6 +353,29 @@
         }
         .quiz-card:active { transform: scale(0.95); background: #f1f2f6; }
         .quiz-card img { width: 90%; height: 90%; object-fit: contain; pointer-events: none; }
+
+        /* --- Slow audio mini button on cards --- */
+        .slow-btn-mini { position: absolute; bottom: 5px; left: 5px; width: 30px; height: 30px; background: white; border-radius: 50%; border: 2px solid #eee; display: flex; justify-content: center; align-items: center; font-size: 1rem; cursor: pointer; z-index: 10; transition: 0.2s; }
+        .slow-btn-mini:hover { background: #e8f8f5; border-color: #00b894; }
+
+        /* --- Quiz Result --- */
+        .quiz-result-box {
+            grid-column: 1 / -1; background: white; border-radius: 25px; padding: 30px 20px;
+            text-align: center; box-shadow: var(--shadow-hover); border: 5px solid var(--accent-pink);
+            max-width: 420px; margin: 20px auto; width: 100%;
+        }
+        .quiz-result-stars { font-size: 3rem; margin-bottom: 5px; }
+        .quiz-result-score { font-size: 2.2rem; font-weight: 800; color: var(--accent-pink); font-family: monospace; }
+        .quiz-result-msg { font-size: 1.1rem; font-weight: 800; color: #636e72; margin: 10px 0 20px; }
+        .quiz-result-btns { display: flex; gap: 10px; justify-content: center; }
+
+        /* --- Slow (turtle) audio --- */
+        .btn-listen-slow { background: #00b894; }
+        .flash-audio-row { display: flex; gap: 15px; align-items: center; }
+        .flash-slow-btn { border-color: #55efc4; }
+
+        /* --- Flash retry --- */
+        .btn-flash-retry { background: var(--flash-red); color: white; }
     </style>
 </head>
 <body>
@@ -392,6 +415,7 @@
             <button id="t-practice" class="tab-btn" onclick="switchMode('quiz')"><img src="images/mode_practice.jpg" onerror="this.style.display='none'"><div>Practice<small>練習</small></div></button>
             <button id="t-game" class="tab-btn" onclick="switchMode('game')"><img src="images/mode_game.jpg" onerror="this.style.display='none'"><div>Game<small>ゲーム</small></div></button>
         </div>
+        <p id="mode-desc" style="text-align:center; color:#888; font-weight:bold; margin:0 0 15px;">カテゴリーを選んで学ぼう！</p>
         <div id="game-random-area" class="hidden">
             <div id="rand-btn" onclick="prepareGame(null)">⚡ ぜんぶランダム 🎲<br><small>ALL Random Challenge!</small></div>
             <p style="text-align:center; color:#888; font-weight:bold; margin-bottom:20px;">または カテゴリーをえらぶ:</p>
@@ -461,8 +485,11 @@
             
             <img id="flash-img" class="flash-img-large" src="" onerror="this.style.display='none'">
             
-            <button class="flash-speaker-btn" onclick="playFlashAudio()">🔊</button>
-            <div style="font-size:0.8rem; color:#888; margin-top:5px;">Tap speaker to listen</div>
+            <div class="flash-audio-row">
+                <button class="flash-speaker-btn" onclick="playFlashAudio()">🔊</button>
+                <button class="flash-speaker-btn flash-slow-btn" onclick="playFlashAudio(true)">🐢</button>
+            </div>
+            <div style="font-size:0.8rem; color:#888; margin-top:5px;">🔊 きく / 🐢 ゆっくりきく</div>
         </div>
         <div class="flash-controls-big">
             <button class="btn-flash-action btn-got-it" onclick="answerFlash(true)">
@@ -482,7 +509,8 @@
     <div id="flash-result-view" class="hidden fade-in">
         <h2 style="text-align:center; color:#2d3436; font-size:2rem; margin-bottom:20px;">Result</h2>
         <div id="flash-result-list"></div>
-        <div style="text-align:center; margin-top:30px;">
+        <div id="flash-retry-area" style="text-align:center; margin-top:20px;"></div>
+        <div style="text-align:center; margin-top:15px;">
             <button class="nav-btn" onclick="handleBack()">OK</button>
         </div>
     </div>
@@ -494,6 +522,7 @@
             
             <div class="spell-btns-row">
                 <button class="btn-spell-audio" onclick="playSpellingAudio()">🔊</button>
+                <button class="btn-spell-audio" onclick="playSpellingAudio(true)">🐢</button>
                 <button class="btn-spell-reset" onclick="resetSpelling()">🔄</button>
             </div>
 
@@ -536,7 +565,8 @@
             <h2 style="color:var(--primary); margin-top:0;">Speaking Practice</h2>
             <img id="speak-img" class="speak-img" src="">
             <div class="speak-controls">
-                <button class="speak-btn btn-listen" onclick="speak(currentSpeakingWord)">🔊 お手本 (Listen)</button>
+                <button class="speak-btn btn-listen" style="grid-column:auto;" onclick="speak(currentSpeakingWord)">🔊 お手本 (Listen)</button>
+                <button class="speak-btn btn-listen-slow" onclick="speakSlow(currentSpeakingWord)">🐢 ゆっくり (Slow)</button>
                 <button class="speak-btn btn-record" id="btn-record" onclick="toggleRecording()">● ろくおん (Record)</button>
                 <button class="speak-btn btn-play-my" id="btn-play-my" onclick="playMyVoice()" disabled>▶ じぶんの声 (Play)</button>
             </div>
@@ -620,6 +650,7 @@
     let flashItems = [];
     let flashIndex = 0;
     let flashResults = [];
+    let flashRetryItems = [];
 
     let spellingWord = null;
     let spellingChars = [];
@@ -635,6 +666,11 @@
     let selectedPoolItem = null; 
 
     let quizDifficulty = 4;
+    let quizScore = 0;
+    let quizQNum = 0;
+    let quizTotal = 10;
+    let quizMissedThis = false;
+    let quizLocked = false;
 
     let mediaRecorder;
     let audioChunks = [];
@@ -670,15 +706,15 @@
     speechSynthesis.onvoiceschanged = loadVoices;
     loadVoices();
 
-    function speak(txt) {
+    function speak(txt, rate = 1.0) {
         speechSynthesis.cancel();
         let textToSpeak = txt;
         if (textToSpeak.length === 1 && /^[A-Z]$/.test(textToSpeak)) {
             textToSpeak = textToSpeak.toLowerCase();
         }
         const u = new SpeechSynthesisUtterance(textToSpeak);
-        u.lang = 'en-US'; 
-        u.rate = 1.0; 
+        u.lang = 'en-US';
+        u.rate = rate;
         u.pitch = 1.0;
         if (englishVoices.length > 0) {
             const preferredVoice = englishVoices.find(v => v.name.includes("Google US English")) || englishVoices.find(v => v.name.includes("Samantha")) || englishVoices[0];
@@ -686,7 +722,16 @@
         }
         speechSynthesis.speak(u);
     }
-    
+
+    function speakSlow(txt) { speak(txt, 0.55); }
+
+    // 同じ単語の重複を取り除く（「ぜんぶランダム」で複数カテゴリーに同じ単語がある場合の対策）
+    function dedupeByWord(items) {
+        const seen = new Map();
+        items.forEach(it => { if (!seen.has(it.word)) seen.set(it.word, it); });
+        return [...seen.values()];
+    }
+
     function selectGrade(grade) {
         currentGrade = grade;
         dictionary = allData[grade];
@@ -824,10 +869,11 @@
     function startAppView() {
         ['home-view', 'game-setup-view', 'bank-menu-view', 'quiz-level-select', 'karuta-result-view', 'bingo-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
         document.getElementById('app-view').classList.remove('hidden');
+        document.getElementById('header-area').classList.remove('hidden');
         document.getElementById('karuta-bar').classList.add('hidden');
         document.getElementById('memory-bar').classList.add('hidden');
         document.getElementById('replay-btn').classList.add('hidden');
-        document.getElementById('replay-btn').classList.remove('large-replay'); 
+        document.getElementById('replay-btn').classList.remove('large-replay');
         document.getElementById('card-area').className = 'grid'; 
         document.getElementById('card-area').innerHTML = '';
         updateNavButtons();
@@ -836,9 +882,43 @@
 
     function replayAudio() { if(currentTarget) speak(currentTarget.word); }
 
-    function startStudy(key){ startAppView(); const data=dictionary[key]; document.getElementById('view-title').innerText=data.label_en; data.items.forEach(itemStr=>{ const item=parseItem(itemStr); const card=document.createElement('div'); card.className='card-common word-card'; const inBank=isInBank(itemStr); const heartClass=inBank?'heart-btn saved':'heart-btn'; card.innerHTML=`<div class="rec-btn-mini" onclick="openSpeakingModal('${itemStr}')">🎤</div><div class="${heartClass}" onclick="toggleHeart(event, '${itemStr}', this)">♥</div><img src="${item.img}" class="card-img" onerror="this.style.display='none'">`; card.onclick=(e)=>{if(e.target.classList.contains('heart-btn')||e.target.classList.contains('rec-btn-mini'))return; speak(item.word); card.animate([{transform:'scale(1)'},{transform:'scale(0.95)'},{transform:'scale(1)'}], 200);}; document.getElementById('card-area').appendChild(card); }); }
+    // 単語カードを共通で作る（inline onclickだとアポストロフィ入り単語 (例: one o'clock) で壊れるためDOM APIで組み立てる）
+    function buildWordCard(itemStr, options){
+        const item=parseItem(itemStr);
+        const card=document.createElement('div');
+        card.className='card-common word-card';
+        if(options.mic){
+            const rec=document.createElement('div'); rec.className='rec-btn-mini'; rec.textContent='🎤';
+            rec.onclick=(e)=>{ e.stopPropagation(); openSpeakingModal(itemStr); };
+            card.appendChild(rec);
+        }
+        if(options.heart){
+            const heart=document.createElement('div'); heart.className=isInBank(itemStr)?'heart-btn saved':'heart-btn'; heart.innerHTML='♥';
+            heart.onclick=(e)=>toggleHeart(e, itemStr, heart);
+            card.appendChild(heart);
+        }
+        if(options.remove){
+            const rm=document.createElement('div'); rm.className='remove-btn'; rm.textContent='🗑️';
+            rm.onclick=(e)=>removeItemFromBank(e, itemStr, card);
+            card.appendChild(rm);
+        }
+        if(options.slow){
+            const slow=document.createElement('div'); slow.className='slow-btn-mini'; slow.textContent='🐢';
+            slow.onclick=(e)=>{ e.stopPropagation(); speakSlow(item.word); };
+            card.appendChild(slow);
+        }
+        const img=document.createElement('img'); img.src=item.img; img.className='card-img';
+        img.onerror=()=>{ img.style.display='none'; };
+        card.appendChild(img);
+        if(options.speakOnTap){
+            card.onclick=()=>{ speak(item.word); card.animate([{transform:'scale(1)'},{transform:'scale(0.95)'},{transform:'scale(1)'}], 200); };
+        }
+        return card;
+    }
+
+    function startStudy(key){ startAppView(); const data=dictionary[key]; document.getElementById('view-title').innerText=data.label_en; const area=document.getElementById('card-area'); data.items.forEach(itemStr=>{ area.appendChild(buildWordCard(itemStr, {mic:true, heart:true, slow:true, speakOnTap:true})); }); }
     function toggleHeart(e, itemStr, el){ e.stopPropagation(); if(isInBank(itemStr)){ removeFromBank(itemStr); el.classList.remove('saved'); }else{ addToBank(itemStr); el.classList.add('saved'); } }
-    function showBankList(action){ mode='bank_'+action; startAppView(); document.getElementById('view-title').innerText=action==='check'?"Check Word Bank":"Organize Bank"; const bank=getBank(); if(bank.length===0){ document.getElementById('card-area').innerHTML="<div class='empty-msg'>Empty<br><span style='font-size:1rem'>中身はなにもありません</span></div>"; return; } bank.forEach(itemStr=>{ const item=parseItem(itemStr); const card=document.createElement('div'); card.className='card-common word-card'; if(action==='organize'){ card.innerHTML=`<div class="remove-btn" onclick="removeItemFromBank(event, '${itemStr}', this.parentNode)">🗑️</div><img src="${item.img}" class="card-img">`; }else{ card.innerHTML=`<img src="${item.img}" class="card-img">`; card.onclick=()=>{speak(item.word); card.animate([{transform:'scale(1)'},{transform:'scale(0.95)'}], 200);}; } document.getElementById('card-area').appendChild(card); }); }
+    function showBankList(action){ mode='bank_'+action; startAppView(); document.getElementById('view-title').innerText=action==='check'?"Check Word Bank":"Organize Bank"; const bank=getBank(); if(bank.length===0){ document.getElementById('card-area').innerHTML="<div class='empty-msg'>Empty<br><span style='font-size:1rem'>中身はなにもありません</span></div>"; return; } const area=document.getElementById('card-area'); bank.forEach(itemStr=>{ const opts=action==='organize'?{remove:true}:{mic:true, slow:true, speakOnTap:true}; area.appendChild(buildWordCard(itemStr, opts)); }); }
     function removeItemFromBank(e, itemStr, cardEl){ e.stopPropagation(); removeFromBank(itemStr); cardEl.style.opacity='0'; setTimeout(()=>{ cardEl.remove(); if(getBank().length===0){ document.getElementById('card-area').innerHTML="<div class='empty-msg'>Empty<br><span style='font-size:1rem'>中身はなにもありません</span></div>"; } }, 300); }
     
     function openSpeakingModal(itemStr){ 
@@ -889,8 +969,8 @@
         currentTarget=item; 
     }
     
-    function playFlashAudio(){ 
-        if(flashItems[flashIndex]) speak(flashItems[flashIndex].word); 
+    function playFlashAudio(slow){
+        if(flashItems[flashIndex]) speak(flashItems[flashIndex].word, slow?0.55:1.0);
     }
     
     function answerFlash(isOk){ 
@@ -913,27 +993,69 @@
             const iconMark = res.ok ? '⭕' : '🔺';
             // Result shows text (answer)
             row.innerHTML=`<div class="${iconClass}">${iconMark}</div><img src="${res.item.img}" class="res-img-thumb" onerror="this.style.display='none'"><div class="res-word">${res.item.word}</div>`;
-            list.appendChild(row); 
-        }); 
+            list.appendChild(row);
+        });
+        // まちがえた単語だけもう一度チャレンジできるようにする
+        const retryArea=document.getElementById('flash-retry-area');
+        retryArea.innerHTML='';
+        flashRetryItems=flashResults.filter(r=>!r.ok).map(r=>r.item);
+        if(flashRetryItems.length>0){
+            const btn=document.createElement('button');
+            btn.className='nav-btn btn-flash-retry';
+            btn.style.cssText='padding:12px 25px; font-size:1rem;';
+            btn.innerText=`🔺のことば(${flashRetryItems.length}こ)だけ もういちど！`;
+            btn.onclick=retryFlashWrong;
+            retryArea.appendChild(btn);
+        }
+    }
+
+    function retryFlashWrong(){
+        if(flashRetryItems.length===0)return;
+        flashItems=[...flashRetryItems].sort(()=>Math.random()-0.5);
+        flashIndex=0; flashResults=[];
+        document.getElementById('flash-result-view').classList.add('hidden');
+        document.getElementById('flash-view').classList.remove('hidden');
+        updateNavButtons();
+        showFlashcard();
     }
 
     function showQuizLevelSelection(key){ selectedCatKey=key; document.getElementById('home-view').classList.add('hidden'); document.getElementById('app-view').classList.remove('hidden'); document.getElementById('header-area').classList.add('hidden'); document.getElementById('card-area').innerHTML=''; document.getElementById('replay-btn').classList.add('hidden'); document.getElementById('quiz-level-select').classList.remove('hidden'); updateNavButtons(); window.scrollTo(0,0); }
-    function startQuizGame(level){ quizDifficulty=level; document.getElementById('quiz-level-select').classList.add('hidden'); document.getElementById('header-area').classList.remove('hidden'); startAppView(); document.getElementById('view-title').innerText="What is this?"; document.getElementById('replay-btn').classList.remove('hidden'); document.getElementById('replay-btn').classList.add('large-replay'); if(selectedCatKey){ targetItems=dictionary[selectedCatKey].items.map(parseItem); }else{ targetItems=Object.values(dictionary).flatMap(d=>d.items).map(parseItem); } nextQuizQuestion(); }
-    function nextQuizQuestion(){ currentTarget=targetItems[Math.floor(Math.random()*targetItems.length)]; let choices=[currentTarget]; let sourcePool=targetItems; let others=sourcePool.filter(w=>w.word!==currentTarget.word); if(others.length<quizDifficulty-1){ let allOtherWords=Object.values(dictionary).flatMap(d=>d.items).map(parseItem).filter(w=>w.word!==currentTarget.word&&!others.some(o=>o.word===w.word)); others=[...others,...allOtherWords]; } others.sort(()=>Math.random()-0.5); choices=[...choices,...others.slice(0,quizDifficulty-1)]; choices.sort(()=>Math.random()-0.5); const grid=document.getElementById('card-area'); 
-        grid.className=`quiz-stage quiz-${quizDifficulty}`; 
-        grid.innerHTML=''; 
-        choices.forEach(item=>{ 
-            const card=document.createElement('div'); card.className='quiz-card'; 
-            card.innerHTML=`<img src="${item.img}" onerror="this.style.display='none'">`; 
-            card.onclick=()=>{ if(item.word===currentTarget.word){showOverlay("⭕","Good!"); speak("Good job!"); setTimeout(nextQuizQuestion,1200);}else{showOverlay("❌","Try again"); speak("Try again");} }; 
-            grid.appendChild(card); 
-        }); setTimeout(()=>speak(currentTarget.word),600); 
+    function startQuizGame(level){ quizDifficulty=level; document.getElementById('quiz-level-select').classList.add('hidden'); startAppView(); document.getElementById('replay-btn').classList.remove('hidden'); document.getElementById('replay-btn').classList.add('large-replay'); if(selectedCatKey){ targetItems=dedupeByWord(dictionary[selectedCatKey].items.map(parseItem)); }else{ targetItems=dedupeByWord(Object.values(dictionary).flatMap(d=>d.items).map(parseItem)); } quizScore=0; quizQNum=0; quizTotal=Math.min(10, Math.max(targetItems.length, 5)); quizLocked=false; nextQuizQuestion(); }
+    function nextQuizQuestion(){ if(quizQNum>=quizTotal){ showQuizResult(); return; } quizQNum++; quizMissedThis=false; quizLocked=false; document.getElementById('view-title').innerText=`Q${quizQNum} / ${quizTotal}  きいてえらぼう！`; currentTarget=targetItems[Math.floor(Math.random()*targetItems.length)]; let choices=[currentTarget]; let sourcePool=targetItems; let others=sourcePool.filter(w=>w.word!==currentTarget.word); if(others.length<quizDifficulty-1){ let allOtherWords=dedupeByWord(Object.values(dictionary).flatMap(d=>d.items).map(parseItem)).filter(w=>w.word!==currentTarget.word&&!others.some(o=>o.word===w.word)); others=[...others,...allOtherWords]; } others.sort(()=>Math.random()-0.5); choices=[...choices,...others.slice(0,quizDifficulty-1)]; choices.sort(()=>Math.random()-0.5); const grid=document.getElementById('card-area');
+        grid.className=`quiz-stage quiz-${quizDifficulty}`;
+        grid.innerHTML='';
+        choices.forEach(item=>{
+            const card=document.createElement('div'); card.className='quiz-card';
+            card.innerHTML=`<img src="${item.img}" onerror="this.style.display='none'">`;
+            card.onclick=()=>{ if(quizLocked)return; if(item.word===currentTarget.word){ quizLocked=true; if(!quizMissedThis)quizScore++; showOverlay("⭕","Good!"); speak("Good job!"); setTimeout(nextQuizQuestion,1200);}else{ quizMissedThis=true; showOverlay("❌","Try again"); speak("Try again");} };
+            grid.appendChild(card);
+        }); setTimeout(()=>speak(currentTarget.word),600);
+    }
+    function showQuizResult(){
+        const grid=document.getElementById('card-area');
+        grid.className='grid';
+        document.getElementById('view-title').innerText='Result';
+        document.getElementById('replay-btn').classList.add('hidden');
+        let stars, msg;
+        if(quizScore>=quizTotal*0.9){ stars='🌟🌟🌟'; msg='パーフェクト！すごい！'; speak("Perfect! Amazing!"); }
+        else if(quizScore>=quizTotal*0.6){ stars='🌟🌟'; msg='よくできました！'; speak("Great job!"); }
+        else if(quizScore>=quizTotal*0.3){ stars='🌟'; msg='いいちょうし！つぎはもっといけるよ！'; speak("Good try!"); }
+        else { stars='💪'; msg='れんしゅうすればできるよ！'; speak("Keep trying!"); }
+        grid.innerHTML=`<div class="quiz-result-box">
+            <div class="quiz-result-stars">${stars}</div>
+            <div class="quiz-result-score">${quizScore} / ${quizTotal}</div>
+            <div class="quiz-result-msg">${msg}</div>
+            <div class="quiz-result-btns">
+                <button class="nav-btn large-replay" onclick="startQuizGame(quizDifficulty)">🔁 もういちど</button>
+                <button class="nav-btn" style="background:#b2bec3;" onclick="goHome()">おわる</button>
+            </div>
+        </div>`;
     }
     
-    function startGame(type, players){ if(type==='spelling'){startSpelling();return;} startAppView(); let rawItems=selectedCatKey===null?Object.values(dictionary).flatMap(d=>d.items):dictionary[selectedCatKey].items; let items=rawItems.map(parseItem); if(type==='karuta')initKaruta(items); else initMemory(items, players); }
+    function startGame(type, players){ if(type==='spelling'){startSpelling();return;} startAppView(); let rawItems=selectedCatKey===null?Object.values(dictionary).flatMap(d=>d.items):dictionary[selectedCatKey].items; let items=dedupeByWord(rawItems.map(parseItem)); if(type==='karuta')initKaruta(items); else initMemory(items, players); }
     
     function initKaruta(items){ document.getElementById('view-title').innerText="Speed Karuta"; document.getElementById('karuta-bar').classList.remove('hidden'); document.getElementById('replay-btn').classList.remove('hidden'); targetItems=items.sort(()=>Math.random()-0.5).slice(0,24); const grid=document.getElementById('card-area'); targetItems.forEach((item,idx)=>{ const card=document.createElement('div'); card.className='card-common game-card'; card.id=`k-${idx}`; card.innerHTML=`<img src="${item.img}" class="card-img" onerror="this.style.display='none'">`; card.onclick=()=>checkKaruta(item,idx); grid.appendChild(card); }); startTime=Date.now(); currentKarutaTime = 0; document.getElementById('k-left').innerText=targetItems.length; timer=setInterval(()=>{currentKarutaTime = (Date.now()-startTime)/1000; document.getElementById('k-timer').innerText = currentKarutaTime.toFixed(1)+'s';},100); speak("Ready? Go!"); setTimeout(nextKarutaTurn,1000); }
-    function nextKarutaTurn(){ const rem=targetItems.filter((_,i)=>!document.getElementById(`k-${i}`).classList.contains('taken')); if(rem.length===0){ clearInterval(timer); finishKarutaGame(currentKarutaTime); return; } currentTarget=rem[Math.floor(Math.random()*rem.length)]; speak(currentTarget.word); }
+    function nextKarutaTurn(){ if(document.getElementById('app-view').classList.contains('hidden')||!document.getElementById('k-0'))return; const rem=targetItems.filter((_,i)=>!document.getElementById(`k-${i}`).classList.contains('taken')); if(rem.length===0){ clearInterval(timer); finishKarutaGame(currentKarutaTime); return; } currentTarget=rem[Math.floor(Math.random()*rem.length)]; speak(currentTarget.word); }
     function finishKarutaGame(timeVal){ speak("Finish!"); document.getElementById('app-view').classList.add('hidden'); document.getElementById('karuta-result-view').classList.remove('hidden'); const catName=selectedCatKey?dictionary[selectedCatKey].label_en:"All Random"; document.getElementById('res-cat-name').innerText=catName; document.getElementById('res-time-val').innerText=timeVal.toFixed(1) + 's'; const dateStr=new Date().toLocaleDateString(); let scores=JSON.parse(localStorage.getItem('karutaScores')||'[]'); const newScore={date:dateStr,cat:catName,time:timeVal}; scores.push(newScore); scores.sort((a,b)=>a.time-b.time); scores=scores.slice(0,5); localStorage.setItem('karutaScores',JSON.stringify(scores)); const tbody=document.getElementById('ranking-body'); tbody.innerHTML=''; scores.forEach((s,i)=>{ const isNew = (Math.abs(s.time - timeVal) < 0.05 && s.date === dateStr && s.cat === catName); const rankIcon=i===0?'🥇':(i===1?'🥈':(i===2?'🥉':i+1)); const row=`<tr><td class="rank-${i+1}">${rankIcon}</td><td style="font-size:0.8rem; color:#888;">${s.date}</td><td style="font-size:0.9rem;">${s.cat}</td><td>${s.time.toFixed(1)}s ${isNew?'<span class="new-record">New!</span>':''}</td></tr>`; tbody.innerHTML+=row; }); }
     function checkKaruta(item, idx){ if(!currentTarget)return; const el=document.getElementById(`k-${idx}`); if(el.classList.contains('taken'))return; if(item.word===currentTarget.word){ el.classList.add('taken'); el.innerHTML="✨"; speak("Yes!"); document.getElementById('k-left').innerText=document.querySelectorAll('.game-card:not(.taken)').length; setTimeout(nextKarutaTurn,600); } }
     
@@ -944,17 +1066,17 @@
     function checkMemoryMatch(){ const [c1,c2]=flippedCards; if(c1.word===c2.word){ speak("Yes!"); c1.el.classList.add('matched'); c2.el.classList.add('matched'); memoryScores[memoryTurn]++; if(memoryScores.reduce((a,b)=>a+b,0)===document.querySelectorAll('.memory-card').length/2)finishMemoryGame(); updateScoreboard(); flippedCards=[]; isProcessing=false; }else{ speak("No..."); setTimeout(()=>{ c1.el.classList.remove('flipped'); c2.el.classList.remove('flipped'); memoryTurn=(memoryTurn+1)%memoryPlayers; updateScoreboard(); flippedCards=[]; isProcessing=false; },1000); } }
     function finishMemoryGame(){ let max=-1,winners=[]; memoryScores.forEach((s,i)=>{if(s>max){max=s;winners=[i];}else if(s===max)winners.push(i);}); showOverlay("🏆",winners.length===1?`${playerIcons[winners[0]]} Wins!`:"Draw!"); speak("Finish!"); updateScoreboard(); }
     
-    function startSpelling(){ document.getElementById('game-setup-view').classList.add('hidden'); document.getElementById('spelling-view').classList.remove('hidden'); updateNavButtons(); let rawItems=selectedCatKey===null?Object.values(dictionary).flatMap(d=>d.items):dictionary[selectedCatKey].items; let shuffled=rawItems.map(parseItem).sort(()=>Math.random()-0.5); spellingTotal=Math.min(10,shuffled.length); targetItems=shuffled.slice(0,spellingTotal); spellingCurrent=0; nextSpellingTurn(); }
-    function nextSpellingTurn(){ if(targetItems.length===0){showOverlay("🏆","Good Job!");return;} spellingCurrent++; document.getElementById('spell-counter').innerText=`${spellingCurrent} / ${spellingTotal}`; const item=targetItems.pop(); spellingWord=item.word; isHintUsed=false; document.getElementById('spell-img').src=item.img; document.getElementById('spell-hint-overlay').classList.remove('hidden'); const checkWord=item.word.replace(/\s+/g,'').toLowerCase(); spellingChars=checkWord.split('').sort(()=>Math.random()-0.5); filledSlots=new Array(checkWord.length).fill(null); renderSpellingSlots(checkWord.length); renderSpellingPool(); speak(spellingWord); }
+    function startSpelling(){ document.getElementById('game-setup-view').classList.add('hidden'); document.getElementById('spelling-view').classList.remove('hidden'); updateNavButtons(); let rawItems=selectedCatKey===null?Object.values(dictionary).flatMap(d=>d.items):dictionary[selectedCatKey].items; let shuffled=dedupeByWord(rawItems.map(parseItem)).sort(()=>Math.random()-0.5); spellingTotal=Math.min(10,shuffled.length); targetItems=shuffled.slice(0,spellingTotal); spellingCurrent=0; nextSpellingTurn(); }
+    function nextSpellingTurn(){ if(targetItems.length===0){ showOverlay("🏆","ぜんぶクリア！ Good Job!"); speak("Congratulations! You did it!"); setTimeout(()=>{ if(!document.getElementById('spelling-view').classList.contains('hidden')){ document.getElementById('spelling-view').classList.add('hidden'); document.getElementById('game-setup-view').classList.remove('hidden'); document.getElementById('game-type-select').classList.remove('hidden'); document.getElementById('player-select').classList.add('hidden'); document.getElementById('bingo-size-select').classList.add('hidden'); updateNavButtons(); } },2200); return;} spellingCurrent++; document.getElementById('spell-counter').innerText=`${spellingCurrent} / ${spellingTotal}`; const item=targetItems.pop(); spellingWord=item.word; isHintUsed=false; document.getElementById('spell-img').src=item.img; document.getElementById('spell-hint-overlay').classList.remove('hidden'); const checkWord=item.word.replace(/\s+/g,'').toLowerCase(); spellingChars=checkWord.split('').sort(()=>Math.random()-0.5); filledSlots=new Array(checkWord.length).fill(null); renderSpellingSlots(checkWord.length); renderSpellingPool(); speak(spellingWord); }
     function renderSpellingSlots(len){ const slotsArea=document.getElementById('spell-slots'); slotsArea.innerHTML=''; for(let i=0;i<len;i++){ const slot=document.createElement('div'); slot.className='spell-slot'; slot.dataset.idx=i; slot.onclick=()=>returnCharToPool(i); if(filledSlots[i]){slot.innerText=filledSlots[i].char;} slotsArea.appendChild(slot); } }
     function renderSpellingPool(){ const poolArea=document.getElementById('spell-pool'); poolArea.innerHTML=''; spellingChars.forEach((char,idx)=>{ const btn=document.createElement('div'); btn.className='spell-char'; btn.innerText=char; btn.dataset.poolIdx=idx; if(filledSlots.some(s=>s&&s.poolIdx===idx)){btn.classList.add('used');} btn.onclick=()=>moveCharToSlot(char,idx,btn); poolArea.appendChild(btn); }); }
     function resetSpelling(){ filledSlots=new Array(filledSlots.length).fill(null); renderSpellingSlots(filledSlots.length); renderSpellingPool(); }
     function revealHint(){ document.getElementById('spell-hint-overlay').classList.add('hidden'); isHintUsed=true; }
-    function playSpellingAudio(){ if(spellingWord)speak(spellingWord); }
+    function playSpellingAudio(slow){ if(spellingWord)speak(spellingWord, slow?0.55:1.0); }
     function moveCharToSlot(char,poolIdx,btnEl){ const emptyIdx=filledSlots.indexOf(null); if(emptyIdx===-1)return; filledSlots[emptyIdx]={char:char,poolIdx:poolIdx}; btnEl.classList.add('used'); document.getElementById('spell-slots').children[emptyIdx].innerText=char; checkSpellingWin(); }
     function returnCharToPool(slotIdx){ const data=filledSlots[slotIdx]; if(!data)return; const poolBtns=document.querySelectorAll('.spell-char'); poolBtns.forEach(btn=>{if(parseInt(btn.dataset.poolIdx)===data.poolIdx){btn.classList.remove('used');}}); filledSlots[slotIdx]=null; document.getElementById('spell-slots').children[slotIdx].innerText=''; }
     function checkSpellingWin(){ if(filledSlots.includes(null))return; const currentStr=filledSlots.map(d=>d.char).join(''); const correctStr=spellingWord.replace(/\s+/g,'').toLowerCase(); if(currentStr===correctStr){ speak("Yes!"); const msg=isHintUsed?"Good! 👍":"Perfect!! 🌈"; showOverlay("⭕",msg); setTimeout(nextSpellingTurn,2000); }else{ speak("No..."); const slots=document.getElementById('spell-slots'); slots.animate([{transform:'translateX(-10px)'},{transform:'translateX(10px)'},{transform:'translateX(0)'}],200); } }
-    document.addEventListener('keydown',(e)=>{ if(document.getElementById('spelling-view').classList.contains('hidden'))return; if(e.key==='Backspace'){ const lastFilledIdx=filledSlots.map(s=>s!==null).lastIndexOf(true); if(lastFilledIdx!==-1)returnCharToPool(lastFilledIdx); return; } const char=e.key.toLowerCase(); if(!/^[a-z]$/.test(char))return; const poolBtns=document.querySelectorAll('.spell-char:not(.used)'); for(let btn of poolBtns){ if(btn.innerText.toLowerCase()===char){btn.click();break;} } });
+    document.addEventListener('keydown',(e)=>{ if(document.getElementById('spelling-view').classList.contains('hidden'))return; if(e.key==='Backspace'){ const lastFilledIdx=filledSlots.map(s=>s!==null).lastIndexOf(true); if(lastFilledIdx!==-1)returnCharToPool(lastFilledIdx); return; } if(e.key.length!==1)return; const char=e.key.toLowerCase(); const poolBtns=document.querySelectorAll('.spell-char:not(.used)'); for(let btn of poolBtns){ if(btn.innerText.toLowerCase()===char){btn.click();break;} } });
 
     // --- BINGO ---
     function startBingoSetup(size) { bingoSize=size; isBingoPlaying=false; completedLines=0; selectedPoolItem=null; bingoSetupGrid=new Array(bingoSize*bingoSize).fill(null); document.getElementById('game-setup-view').classList.add('hidden'); document.getElementById('bingo-view').classList.remove('hidden'); document.getElementById('bingo-right-pane').classList.remove('hidden'); document.getElementById('bingo-title').innerText="BINGO Setup"; document.getElementById('bingo-guide').innerText="右のカードを、左のマスへドラッグ(またはタップ)してね！\nDrag & Drop items to the grid!"; document.getElementById('btn-bingo-start').disabled=true; document.getElementById('btn-bingo-start').classList.remove('hidden'); document.getElementById('btn-bingo-save').classList.add('hidden'); updateNavButtons(); renderBingoSetupGrid(); renderBingoPool(); }
