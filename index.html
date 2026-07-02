@@ -620,12 +620,33 @@
 
     const allData = { grade3: grade3Data, grade4: grade4Data, grade5: grade5Data, grade6: grade6Data };
 
+    // --- 画像の読み込み先 ---
+    // ローカルやGitHub Pagesでは同じフォルダの images/ を使う。
+    // Google Apps Script (googleusercontent.com) 上で動いているときは
+    // 静的ファイルを置けないため、GitHubから直接読み込む。
+    // 別の場所に画像を置く場合は、このscriptより前に window.PD_IMAGE_BASE を定義する。
+    const IMG_BASE = window.PD_IMAGE_BASE ||
+        (location.hostname.endsWith('googleusercontent.com')
+            ? 'https://raw.githubusercontent.com/edupower07/PictureDictionary/main/images/'
+            : 'images/');
+    function imgSrc(file) { return IMG_BASE + file; }
+    // HTMLに直接書かれた <img src="images/..."> を IMG_BASE に合わせて書き換える
+    if (IMG_BASE !== 'images/') {
+        document.querySelectorAll('img').forEach(img => {
+            const src = img.getAttribute('src');
+            if (src && src.startsWith('images/')) {
+                img.style.display = '';
+                img.src = IMG_BASE + src.slice('images/'.length);
+            }
+        });
+    }
+
     function parseItem(itemStr) {
         if(itemStr.includes('=')) {
             const parts = itemStr.split('=');
-            return { word: parts[0], img: `images/${parts[1]}.jpg` };
+            return { word: parts[0], img: imgSrc(`${parts[1]}.jpg`) };
         } else {
-            return { word: itemStr, img: `images/${itemStr}.jpg` };
+            return { word: itemStr, img: imgSrc(`${itemStr}.jpg`) };
         }
     }
 
@@ -813,7 +834,7 @@
             const div = document.createElement('div');
             div.className = `cat-card ${d.group}`;
             div.innerHTML = `
-                <img src="images/${d.icon}" class="cat-icon-img" onerror="this.style.display='none'">
+                <img src="${imgSrc(d.icon)}" class="cat-icon-img" onerror="this.style.display='none'">
                 <div class="cat-title-jp">${d.label_jp}</div>
                 <div class="cat-title-en">${d.label_en}</div>
                 <div class="cat-count">${d.items.length} words</div>
