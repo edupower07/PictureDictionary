@@ -120,8 +120,7 @@
         .cat-card { background: white; border-radius: 15px; padding: 10px; text-align: center; cursor: pointer; transition: all 0.3s; border-bottom: 4px solid transparent; box-shadow: var(--shadow); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 160px; }
         .cat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
         .cat-icon-img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 8px; }
-        .cat-title-jp { font-size: 0.9rem; font-weight: 800; margin-bottom: 2px; line-height: 1.2; color: var(--text-color); }
-        .cat-title-en { font-size: 0.8rem; color: #7f8c8d; font-family: 'Fredoka One', sans-serif; margin-bottom: 5px; }
+        .cat-title-en { font-size: 1rem; color: var(--text-color); font-weight: 800; font-family: 'Fredoka One', sans-serif; margin-bottom: 6px; line-height: 1.15; }
         .cat-count { font-size: 0.7rem; color: #dfe6e9; font-weight: bold; background:#636e72; padding:2px 8px; border-radius:10px; }
         .grp-1 { border-bottom-color: var(--accent-pink); } .grp-2 { border-bottom-color: var(--accent-blue); } .grp-3 { border-bottom-color: var(--accent-yellow); } .grp-4 { border-bottom-color: var(--accent-purple); } .grp-5 { border-bottom-color: var(--primary); }
 
@@ -376,6 +375,74 @@
 
         /* --- Flash retry --- */
         .btn-flash-retry { background: var(--flash-red); color: white; }
+
+        /* --- SPEECH BUILDER (発表づくり) --- */
+        .speech-entry-btn { background: linear-gradient(135deg, #a29bfe, #6c5ce7); width: 100%; max-width: 500px; margin: 15px auto 0; padding: 15px; border-radius: 20px; cursor: pointer; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; gap: 20px; transition: transform 0.2s; border: 4px solid white; }
+        .speech-entry-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+        .speech-entry-btn .bank-title { color: white; }
+        .speech-entry-btn .bank-sub { color: #ece9ff; }
+
+        #speech-menu-view, #speech-build-view { max-width: 700px; margin: 0 auto; }
+        .speech-menu-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+        .speech-big-btn { border: none; border-radius: 18px; padding: 14px 22px; font-weight: 800; font-size: 1.05rem; cursor: pointer; box-shadow: var(--shadow); color: white; font-family: 'M PLUS Rounded 1c', sans-serif; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        .speech-big-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+        .speech-big-btn:disabled { background: #dfe6e9 !important; color: #b2bec3; cursor: not-allowed; box-shadow: none; transform: none; }
+        .btn-add-sentence { background: var(--accent-purple); }
+        .btn-present { background: var(--primary); }
+
+        #speech-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .speech-row { background: white; border-radius: 18px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow); border-left: 6px solid var(--accent-purple); }
+        .speech-row-num { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: var(--accent-purple); width: 26px; text-align: center; flex-shrink: 0; }
+        .speech-row-img { width: 54px; height: 54px; object-fit: contain; flex-shrink: 0; background: #f9f9f9; border-radius: 10px; }
+        .speech-row-text { flex: 1; font-weight: 800; font-size: 1.05rem; color: var(--text-color); line-height: 1.25; min-width: 0; }
+        .speech-row-btns { display: flex; gap: 4px; flex-shrink: 0; }
+        .speech-mini-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: #f1f2f6; cursor: pointer; font-size: 1rem; display: flex; justify-content: center; align-items: center; transition: 0.15s; color: #636e72; }
+        .speech-mini-btn:hover:not(:disabled) { background: #dfe6e9; }
+        .speech-mini-btn:disabled { opacity: 0.3; cursor: default; }
+        .speech-mini-btn.play { background: #e0f7fa; color: #00838f; }
+        .speech-mini-btn.del { background: #ffe6e6; color: #d63031; }
+        .speech-reorder-hint { text-align: center; color: #b2bec3; font-size: 0.85rem; font-weight: bold; margin-bottom: 12px; }
+
+        /* Builder steps */
+        .speech-step-title { text-align: center; font-weight: 800; color: #636e72; margin: 10px 0 12px; font-size: 1.1rem; }
+        .speech-tpl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        @media (max-width: 500px) { .speech-tpl-grid { grid-template-columns: 1fr; } }
+        .speech-tpl-btn { background: white; border: 3px solid transparent; border-radius: 16px; padding: 12px 14px; cursor: pointer; box-shadow: var(--shadow); text-align: left; transition: 0.2s; }
+        .speech-tpl-btn:hover { transform: translateY(-2px); border-color: var(--accent-purple); }
+        .speech-tpl-btn.selected { border-color: var(--accent-purple); background: #f3f1ff; }
+        .speech-tpl-en { font-weight: 800; font-size: 1.05rem; color: var(--text-color); font-family: 'Fredoka One', cursive; }
+        .speech-tpl-jp { font-size: 0.8rem; color: #888; font-weight: bold; margin-top: 2px; }
+
+        .speech-picker-grades { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
+        .speech-grade-chip { border: 2px solid #dfe6e9; background: white; border-radius: 30px; padding: 6px 16px; font-weight: 800; cursor: pointer; color: #636e72; transition: 0.15s; }
+        .speech-grade-chip.active { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
+        .speech-picker-cats { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; }
+        .speech-cat-chip { flex-shrink: 0; border: 2px solid #dfe6e9; background: white; border-radius: 30px; padding: 6px 14px; font-weight: bold; cursor: pointer; color: #636e72; white-space: nowrap; transition: 0.15s; font-family: 'Fredoka One', cursive; font-size: 0.9rem; }
+        .speech-cat-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .speech-word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; max-height: 42vh; overflow-y: auto; padding: 4px; }
+        .speech-word-card { background: white; border-radius: 12px; aspect-ratio: 4/3; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.08); border: 3px solid transparent; transition: 0.15s; overflow: hidden; }
+        .speech-word-card:hover { border-color: var(--primary); }
+        .speech-word-card.selected { border-color: var(--accent-pink); background: #fff0f3; }
+        .speech-word-card img { width: 90%; height: 90%; object-fit: contain; pointer-events: none; }
+
+        .speech-preview-bar { position: sticky; bottom: 0; background: rgba(255,255,255,0.97); backdrop-filter: blur(6px); border-top: 3px solid var(--accent-purple); padding: 12px; margin: 12px -10px 0; display: flex; align-items: center; gap: 12px; box-shadow: 0 -4px 15px rgba(0,0,0,0.08); }
+        .speech-preview-img { width: 60px; height: 60px; object-fit: contain; background: #f9f9f9; border-radius: 10px; flex-shrink: 0; }
+        .speech-preview-text { flex: 1; font-weight: 800; font-size: 1.15rem; color: var(--text-color); min-width: 0; }
+        .speech-preview-text .blank { color: #b2bec3; }
+        .speech-preview-btns { display: flex; gap: 8px; flex-shrink: 0; }
+
+        /* Present mode */
+        #speech-present-view { text-align: center; }
+        .present-stage { max-width: 640px; margin: 0 auto; background: white; border-radius: 30px; border: 5px solid var(--flash-border); box-shadow: var(--shadow-hover); padding: 20px; }
+        .present-counter { display: inline-block; background: #636e72; color: white; font-family: monospace; font-weight: bold; padding: 4px 14px; border-radius: 20px; margin-bottom: 10px; }
+        .present-img { width: 80%; max-width: 380px; aspect-ratio: 4/3; object-fit: contain; margin: 0 auto; display: block; }
+        .present-text { font-size: 1.8rem; font-weight: 800; color: var(--text-color); margin: 15px 0; line-height: 1.3; min-height: 2.6em; display: flex; align-items: center; justify-content: center; }
+        .present-nav { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px; }
+        .present-arrow { width: 64px; height: 64px; border-radius: 50%; border: none; background: var(--accent-purple); color: white; font-size: 1.8rem; cursor: pointer; box-shadow: var(--shadow); transition: 0.15s; }
+        .present-arrow:active { transform: scale(0.92); }
+        .present-arrow:disabled { background: #dfe6e9; color: #b2bec3; cursor: default; box-shadow: none; }
+        .present-speak { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--accent-yellow); background: white; font-size: 2.4rem; cursor: pointer; box-shadow: var(--shadow); }
+        .present-speak:active { transform: scale(0.95); background: #fffbe7; }
     </style>
 </head>
 <body>
@@ -401,6 +468,11 @@
         <div class="bank-entry-btn" onclick="openBankMenu()">
             <div class="bank-icon">📒</div>
             <div class="bank-text"><div class="bank-title">My Word Bank</div><div class="bank-sub">自分だけの単語帳</div></div>
+        </div>
+
+        <div class="speech-entry-btn" onclick="openSpeechMenu()">
+            <div class="bank-icon">🎤</div>
+            <div class="bank-text"><div class="bank-title">My Speech</div><div class="bank-sub">えいごで はっぴょうを つくろう</div></div>
         </div>
 
         <div class="terms-link-area">
@@ -557,6 +629,55 @@
         <h3 style="color:#2d3436;">🏆 Ranking (Top 5)</h3>
         <table class="ranking-table"><thead><tr><th>Rank</th><th>Date</th><th>Category</th><th>Time</th></tr></thead><tbody id="ranking-body"></tbody></table>
         <button class="nav-btn" style="padding:15px 30px; font-size:1.2rem; background:var(--primary);" onclick="handleBack()">OK</button>
+    </div>
+
+    <div id="speech-menu-view" class="hidden fade-in">
+        <h2 style="text-align:center; color:#6c5ce7;">🎤 My Speech</h2>
+        <p style="text-align:center; color:#888; font-weight:bold; margin-top:0;">えいごの ぶんを つくって、はっぴょうの じゅんばんを ならべよう！</p>
+        <div class="speech-menu-actions">
+            <button class="speech-big-btn btn-add-sentence" onclick="startSpeechBuilder()">➕ ぶんを つくる</button>
+            <button id="btn-present" class="speech-big-btn btn-present" onclick="startPresent()">▶ はっぴょうする</button>
+        </div>
+        <div class="speech-reorder-hint" id="speech-reorder-hint">▲▼ ボタンで じゅんばんを かえられるよ</div>
+        <div id="speech-list"></div>
+    </div>
+
+    <div id="speech-build-view" class="hidden fade-in">
+        <h2 style="text-align:center; color:#6c5ce7; margin-bottom:5px;">ぶんを つくろう</h2>
+        <div id="speech-step1">
+            <div class="speech-step-title">① いいたい かたち を えらぼう</div>
+            <div id="speech-tpl-grid" class="speech-tpl-grid"></div>
+        </div>
+        <div id="speech-step2" class="hidden">
+            <div class="speech-step-title">② ことば を えらぼう</div>
+            <div id="speech-picker-grades" class="speech-picker-grades"></div>
+            <div id="speech-picker-cats" class="speech-picker-cats"></div>
+            <div id="speech-word-grid" class="speech-word-grid"></div>
+            <div class="speech-preview-bar">
+                <img id="speech-preview-img" class="speech-preview-img" src="" style="display:none;">
+                <div id="speech-preview-text" class="speech-preview-text"></div>
+                <div class="speech-preview-btns">
+                    <button class="speech-mini-btn play" onclick="playSpeechPreview()">🔊</button>
+                    <button id="btn-speech-save" class="speech-big-btn btn-add-sentence" onclick="saveSpeechSentence()" disabled>✓ きめる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="speech-present-view" class="hidden fade-in">
+        <div class="present-stage">
+            <div id="present-counter" class="present-counter">1 / 1</div>
+            <img id="present-img" class="present-img" src="" onerror="this.style.display='none'">
+            <div id="present-text" class="present-text"></div>
+            <div class="present-nav">
+                <button id="present-prev" class="present-arrow" onclick="presentMove(-1)">◀</button>
+                <button class="present-speak" onclick="playPresent()">🔊</button>
+                <button id="present-next" class="present-arrow" onclick="presentMove(1)">▶</button>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:20px;">
+            <button class="nav-btn" style="background:#b2bec3;" onclick="openSpeechMenu()">おわる</button>
+        </div>
     </div>
 
     <div id="speaking-modal" class="hidden">
@@ -790,18 +911,25 @@
     }
 
     function goTop() {
-        ['app-view', 'game-setup-view', 'bank-menu-view', 'flash-view', 'flash-result-view', 'home-view', 'spelling-view', 'quiz-level-select', 'karuta-result-view', 'bingo-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        ['app-view', 'game-setup-view', 'bank-menu-view', 'flash-view', 'flash-result-view', 'home-view', 'spelling-view', 'quiz-level-select', 'karuta-result-view', 'bingo-view', 'speech-menu-view', 'speech-build-view', 'speech-present-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
         document.getElementById('grade-select-view').classList.remove('hidden');
         updateNavButtons();
         if(timer) clearInterval(timer);
         speechSynthesis.cancel();
-        window.scrollTo(0, 0); 
+        window.scrollTo(0, 0);
     }
 
     function handleBack() {
-        const views = ['app-view', 'game-setup-view', 'bank-menu-view', 'flash-view', 'flash-result-view', 'spelling-view', 'quiz-level-select', 'karuta-result-view', 'bingo-view'];
+        const views = ['app-view', 'game-setup-view', 'bank-menu-view', 'flash-view', 'flash-result-view', 'spelling-view', 'quiz-level-select', 'karuta-result-view', 'bingo-view', 'speech-menu-view', 'speech-build-view', 'speech-present-view'];
         let active = views.find(v => !document.getElementById(v).classList.contains('hidden'));
-        if (active === 'flash-view' || active === 'flash-result-view') { openBankMenu(); } 
+        if (active === 'flash-view' || active === 'flash-result-view') { openBankMenu(); }
+        else if (active === 'speech-menu-view' || active === 'speech-present-view') { goTop(); }
+        else if (active === 'speech-build-view') {
+            if (!document.getElementById('speech-step2').classList.contains('hidden')) {
+                document.getElementById('speech-step2').classList.add('hidden');
+                document.getElementById('speech-step1').classList.remove('hidden');
+            } else { openSpeechMenu(); }
+        }
         else if (active === 'app-view' || active === 'spelling-view') {
             if (mode.startsWith('bank_')) openBankMenu();
             else goHome();
@@ -835,7 +963,6 @@
             div.className = `cat-card ${d.group}`;
             div.innerHTML = `
                 <img src="${imgSrc(d.icon)}" class="cat-icon-img" onerror="this.style.display='none'">
-                <div class="cat-title-jp">${d.label_jp}</div>
                 <div class="cat-title-en">${d.label_en}</div>
                 <div class="cat-count">${d.items.length} words</div>
             `;
@@ -1109,7 +1236,217 @@
     function checkBingoWinLogic() { const cells=Array.from(document.querySelectorAll('.bingo-cell')); const isStamped=i=>cells[i]&&cells[i].classList.contains('stamped'); const s=bingoSize; let lines=0; for(let i=0;i<s;i++){let win=true;for(let j=0;j<s;j++)if(!isStamped(i*s+j))win=false;if(win)lines++;} for(let i=0;i<s;i++){let win=true;for(let j=0;j<s;j++)if(!isStamped(i+j*s))win=false;if(win)lines++;} let d1=true,d2=true; for(let i=0;i<s;i++){if(!isStamped(i*s+i))d1=false;if(!isStamped(i*s+(s-1-i)))d2=false;} if(d1)lines++;if(d2)lines++; if(lines>completedLines){const diff=lines-completedLines;if(diff>0){if(lines===1)showOverlay("🎉","BINGO!");else showOverlay("🔥",`${lines} LINES!`);speak(lines===1?"Bingo!":"Great!");}completedLines=lines;} }
 
     function showOverlay(icon, text) { const ol=document.getElementById('overlay'); document.getElementById('overlay-mark').innerText=icon; document.getElementById('overlay-msg').innerText=text; ol.style.opacity=1; setTimeout(()=>ol.style.opacity=0,2000); }
-    
+
+    // --- SPEECH BUILDER (発表づくり) ---
+    const SPEECH_KEY = 'mySpeech';
+    function getSpeech(){ try { return JSON.parse(localStorage.getItem(SPEECH_KEY) || '[]'); } catch(e){ return []; } }
+    function setSpeech(a){ localStorage.setItem(SPEECH_KEY, JSON.stringify(a)); }
+
+    // えいごの ぶんの かたち（テンプレート）
+    const speechTemplates = [
+        { id:'be',   en:'I want to be a ___.',  jp:'なりたい しごと',   before:'I want to be ', after:'.', article:true },
+        { id:'like', en:'I like ___.',          jp:'すきな もの',       before:'I like ',        after:'.' },
+        { id:'can',  en:'I can ___.',           jp:'できる こと',       before:'I can ',         after:'.' },
+        { id:'go',   en:'I want to go to ___.', jp:'いきたい ところ',   before:'I want to go to ', after:'.' },
+        { id:'eat',  en:'I want to eat ___.',   jp:'たべたい もの',     before:'I want to eat ', after:'.' },
+        { id:'have', en:'I have a ___.',        jp:'もっている もの',   before:'I have ',        after:'.', article:true },
+        { id:'see',  en:'I want to see ___.',   jp:'みたい もの',       before:'I want to see ', after:'.' },
+        { id:'fav',  en:'This is my ___.',      jp:'これは わたしの…',  before:'This is my ',    after:'.' },
+    ];
+
+    let speechTpl = null;
+    let speechWord = null;
+    let speechPickerGrade = null;
+    let speechCat = null;
+    let presentIdx = 0;
+
+    function speechArticle(w){ return /^[aeiou]/i.test(w) ? 'an ' : 'a '; }
+    function buildSpeechText(tpl, word){
+        if(!word) return null;
+        if(tpl.article) return tpl.before + speechArticle(word) + word + tpl.after;
+        return tpl.before + word + tpl.after;
+    }
+
+    function openSpeechMenu(){
+        ['grade-select-view','speech-build-view','speech-present-view'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+        document.getElementById('speech-menu-view').classList.remove('hidden');
+        updateNavButtons();
+        speechSynthesis.cancel();
+        renderSpeechList();
+        window.scrollTo(0,0);
+    }
+
+    function renderSpeechList(){
+        const list = getSpeech();
+        const cont = document.getElementById('speech-list');
+        const hint = document.getElementById('speech-reorder-hint');
+        const presentBtn = document.getElementById('btn-present');
+        cont.innerHTML='';
+        if(list.length===0){
+            cont.innerHTML = "<div class='empty-msg'>まだ ぶんが ないよ<br><span style='font-size:1rem'>「➕ ぶんを つくる」で はじめよう！</span></div>";
+            hint.style.display='none';
+            presentBtn.disabled = true;
+            return;
+        }
+        hint.style.display = list.length>1 ? 'block' : 'none';
+        presentBtn.disabled = false;
+        list.forEach((s, i)=>{
+            const row = document.createElement('div');
+            row.className='speech-row';
+            const up = document.createElement('button'); up.className='speech-mini-btn up'; up.textContent='▲'; if(i===0) up.disabled=true; up.onclick=()=>moveSpeech(i,-1);
+            const down = document.createElement('button'); down.className='speech-mini-btn down'; down.textContent='▼'; if(i===list.length-1) down.disabled=true; down.onclick=()=>moveSpeech(i,1);
+            const play = document.createElement('button'); play.className='speech-mini-btn play'; play.textContent='🔊'; play.onclick=()=>speak(s.text);
+            const del = document.createElement('button'); del.className='speech-mini-btn del'; del.textContent='🗑'; del.onclick=()=>deleteSpeech(i);
+            const num = document.createElement('div'); num.className='speech-row-num'; num.textContent=(i+1);
+            const img = document.createElement('img'); img.className='speech-row-img'; img.src=s.img; img.onerror=()=>{img.style.display='none';};
+            const text = document.createElement('div'); text.className='speech-row-text'; text.textContent=s.text;
+            const btns = document.createElement('div'); btns.className='speech-row-btns';
+            btns.append(play, up, down, del);
+            row.append(num, img, text, btns);
+            cont.appendChild(row);
+        });
+    }
+
+    function moveSpeech(i, dir){
+        const list = getSpeech();
+        const j = i+dir;
+        if(j<0 || j>=list.length) return;
+        [list[i], list[j]] = [list[j], list[i]];
+        setSpeech(list);
+        renderSpeechList();
+    }
+    function deleteSpeech(i){
+        const list = getSpeech();
+        list.splice(i,1);
+        setSpeech(list);
+        renderSpeechList();
+    }
+
+    function startSpeechBuilder(){
+        speechTpl=null; speechWord=null;
+        document.getElementById('speech-menu-view').classList.add('hidden');
+        document.getElementById('speech-build-view').classList.remove('hidden');
+        document.getElementById('speech-step1').classList.remove('hidden');
+        document.getElementById('speech-step2').classList.add('hidden');
+        updateNavButtons();
+        renderSpeechTemplates();
+        window.scrollTo(0,0);
+    }
+    function renderSpeechTemplates(){
+        const grid = document.getElementById('speech-tpl-grid');
+        grid.innerHTML='';
+        speechTemplates.forEach(t=>{
+            const b = document.createElement('div');
+            b.className='speech-tpl-btn';
+            b.innerHTML = `<div class="speech-tpl-en">${t.en}</div><div class="speech-tpl-jp">${t.jp}</div>`;
+            b.onclick = ()=>selectSpeechTemplate(t);
+            grid.appendChild(b);
+        });
+    }
+    function selectSpeechTemplate(t){
+        speechTpl=t; speechWord=null;
+        document.getElementById('speech-step1').classList.add('hidden');
+        document.getElementById('speech-step2').classList.remove('hidden');
+        speechPickerGrade = currentGrade || 'grade5';
+        speechCat = null;
+        renderSpeechGradeChips();
+        renderSpeechCatChips();
+        updateSpeechPreview();
+        window.scrollTo(0,0);
+    }
+    function renderSpeechGradeChips(){
+        const cont = document.getElementById('speech-picker-grades');
+        cont.innerHTML='';
+        [['grade3','3年'],['grade4','4年'],['grade5','5年'],['grade6','6年']].forEach(([g,label])=>{
+            const c = document.createElement('div');
+            c.className='speech-grade-chip'+(g===speechPickerGrade?' active':'');
+            c.textContent=label;
+            c.onclick=()=>{ speechPickerGrade=g; speechCat=null; renderSpeechGradeChips(); renderSpeechCatChips(); };
+            cont.appendChild(c);
+        });
+    }
+    function renderSpeechCatChips(){
+        const data = allData[speechPickerGrade];
+        const keys = Object.keys(data);
+        if(!speechCat || !data[speechCat]) speechCat = keys[0];
+        const cont = document.getElementById('speech-picker-cats');
+        cont.innerHTML='';
+        keys.forEach(k=>{
+            const c = document.createElement('div');
+            c.className='speech-cat-chip'+(k===speechCat?' active':'');
+            c.textContent=data[k].label_en;
+            c.onclick=()=>{ speechCat=k; renderSpeechCatChips(); };
+            cont.appendChild(c);
+        });
+        renderSpeechWordGrid();
+    }
+    function renderSpeechWordGrid(){
+        const data = allData[speechPickerGrade][speechCat];
+        const grid = document.getElementById('speech-word-grid');
+        grid.innerHTML='';
+        dedupeByWord(data.items.map(parseItem)).forEach(item=>{
+            const c = document.createElement('div');
+            c.className='speech-word-card'+(speechWord&&speechWord.word===item.word?' selected':'');
+            c.innerHTML=`<img src="${item.img}" onerror="this.style.display='none'">`;
+            c.onclick=()=>{ speechWord=item; speak(item.word); renderSpeechWordGrid(); updateSpeechPreview(); };
+            grid.appendChild(c);
+        });
+    }
+    function updateSpeechPreview(){
+        const img = document.getElementById('speech-preview-img');
+        const txt = document.getElementById('speech-preview-text');
+        const saveBtn = document.getElementById('btn-speech-save');
+        if(speechWord){
+            img.src=speechWord.img; img.style.display='';
+            txt.textContent = buildSpeechText(speechTpl, speechWord.word);
+            saveBtn.disabled=false;
+        } else {
+            img.style.display='none';
+            txt.innerHTML = speechTpl.en.replace('___', '<span class="blank">___</span>');
+            saveBtn.disabled=true;
+        }
+    }
+    function playSpeechPreview(){
+        if(speechWord) speak(buildSpeechText(speechTpl, speechWord.word));
+        else speak(speechTpl.en.replace('___',' something '));
+    }
+    function saveSpeechSentence(){
+        if(!speechWord || !speechTpl) return;
+        const list = getSpeech();
+        const text = buildSpeechText(speechTpl, speechWord.word);
+        list.push({ text: text, word: speechWord.word, img: speechWord.img });
+        setSpeech(list);
+        speak(text);
+        showOverlay("✓","ついか したよ！");
+        openSpeechMenu();
+    }
+
+    function startPresent(){
+        const list = getSpeech();
+        if(list.length===0) return;
+        presentIdx=0;
+        document.getElementById('speech-menu-view').classList.add('hidden');
+        document.getElementById('speech-present-view').classList.remove('hidden');
+        updateNavButtons();
+        showPresent();
+        window.scrollTo(0,0);
+    }
+    function showPresent(){
+        const list = getSpeech();
+        if(list.length===0){ openSpeechMenu(); return; }
+        presentIdx = Math.max(0, Math.min(presentIdx, list.length-1));
+        const s = list[presentIdx];
+        document.getElementById('present-counter').textContent = `${presentIdx+1} / ${list.length}`;
+        const img = document.getElementById('present-img');
+        img.style.display=''; img.src=s.img;
+        document.getElementById('present-text').textContent = s.text;
+        document.getElementById('present-prev').disabled = presentIdx===0;
+        document.getElementById('present-next').disabled = presentIdx===list.length-1;
+        speak(s.text);
+    }
+    function presentMove(dir){ presentIdx+=dir; showPresent(); }
+    function playPresent(){ const list=getSpeech(); if(list[presentIdx]) speak(list[presentIdx].text); }
+
     // Terms Modal
     function openTerms(){ document.getElementById('terms-modal').classList.remove('hidden'); }
     function closeTerms(){ document.getElementById('terms-modal').classList.add('hidden'); }
