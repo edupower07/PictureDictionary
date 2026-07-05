@@ -970,6 +970,24 @@
     // Terms Modal
     function openTerms(){ document.getElementById('terms-modal').classList.remove('hidden'); }
     function closeTerms(){ document.getElementById('terms-modal').classList.add('hidden'); }
+
+    // --- ポータルからのクイックアクセス(URLハッシュでモードを直接ひらく) ---
+    // 例) #g3(3年生), #g5-game(5年生のゲームタブ), #bank(全学年の単語バンク)
+    function routeFromHash(){
+        const h = (location.hash || '').replace('#', '').toLowerCase();
+        if(!h) return;
+        try{
+            if(h === 'bank'){ goTop(); openBankMenu(); return; }
+            const m = h.match(/^g([3-6])(?:-(study|quiz|game))?$/);
+            if(m){
+                goTop();
+                selectGrade('grade' + m[1]);
+                if(m[2]) switchMode(m[2]);
+            }
+        }catch(e){}
+    }
+    window.addEventListener('hashchange', routeFromHash);
+    routeFromHash();
 </script>
 </body>
 </html>
