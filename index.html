@@ -120,7 +120,8 @@
         .cat-card { background: white; border-radius: 15px; padding: 10px; text-align: center; cursor: pointer; transition: all 0.3s; border-bottom: 4px solid transparent; box-shadow: var(--shadow); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 160px; }
         .cat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
         .cat-icon-img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 8px; }
-        .cat-title-en { font-size: 1rem; color: var(--text-color); font-weight: 800; font-family: 'Fredoka One', sans-serif; margin-bottom: 6px; line-height: 1.15; }
+        .cat-title-en { font-size: 1rem; color: var(--text-color); font-weight: 800; font-family: 'Fredoka One', sans-serif; margin-bottom: 2px; line-height: 1.15; }
+        .cat-title-jp { font-size: 0.78rem; color: #636e72; font-weight: 700; margin-bottom: 6px; line-height: 1.1; }
         .cat-count { font-size: 0.7rem; color: #dfe6e9; font-weight: bold; background:#636e72; padding:2px 8px; border-radius:10px; }
         .grp-1 { border-bottom-color: var(--accent-pink); } .grp-2 { border-bottom-color: var(--accent-blue); } .grp-3 { border-bottom-color: var(--accent-yellow); } .grp-4 { border-bottom-color: var(--accent-purple); } .grp-5 { border-bottom-color: var(--primary); }
 
@@ -354,7 +355,7 @@
         .quiz-card img { width: 90%; height: 90%; object-fit: contain; pointer-events: none; }
 
         /* --- Slow audio mini button on cards --- */
-        .slow-btn-mini { position: absolute; bottom: 5px; left: 5px; width: 30px; height: 30px; background: white; border-radius: 50%; border: 2px solid #eee; display: flex; justify-content: center; align-items: center; font-size: 1rem; cursor: pointer; z-index: 10; transition: 0.2s; }
+        .slow-btn-mini { position: absolute; top: 40px; right: 5px; width: 30px; height: 30px; background: white; border-radius: 50%; border: 2px solid #eee; display: flex; justify-content: center; align-items: center; font-size: 1rem; cursor: pointer; z-index: 10; transition: 0.2s; }
         .slow-btn-mini:hover { background: #e8f8f5; border-color: #00b894; }
 
         /* --- Quiz Result --- */
@@ -986,6 +987,7 @@
             div.innerHTML = `
                 <img src="${imgSrc(d.icon)}" class="cat-icon-img" onerror="this.style.display='none'">
                 <div class="cat-title-en">${d.label_en}</div>
+                <div class="cat-title-jp">${d.label_jp}</div>
                 <div class="cat-count">${d.items.length} words</div>
             `;
             div.onclick = () => handleCatSelect(key);
