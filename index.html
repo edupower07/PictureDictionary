@@ -440,6 +440,11 @@
         .speech-tpl-group { font-weight: 800; color: #636e72; font-size: 0.95rem; margin: 6px 0 8px; display: flex; align-items: center; gap: 8px; }
         .speech-tpl-group::after { content: ''; flex: 1; height: 3px; background: #eef0f3; border-radius: 3px; }
         .speech-tpl-btn.ask { border-left: 6px solid var(--accent-yellow); }
+        .speech-tpl-btn.fixed { border-left: 6px solid var(--accent-blue); }
+        .speech-tpl-btn.fixed:hover { border-color: var(--accent-blue); }
+        .speech-dup-hint { text-align: center; font-weight: bold; font-size: 0.9rem; color: #7a5c00; background: #fff8e1; border: 3px solid var(--accent-yellow); border-radius: 14px; padding: 8px 14px; margin: 0 auto 12px; max-width: 640px; }
+        .speech-dup-hint b { font-family: 'Fredoka One', cursive; }
+        .speech-row.dup { background: #fffdf3; }
         .speech-tpl-btn.ask:hover { border-color: var(--accent-yellow); }
         /* おすすめカテゴリーの あんない */
         .speech-rec-hint { text-align: center; font-weight: bold; font-size: 0.9rem; color: #0984a8; background: #e0f7fa; border-radius: 14px; padding: 6px 12px; margin-bottom: 10px; }
@@ -692,6 +697,7 @@
             <button id="btn-present" class="speech-big-btn btn-present" onclick="startPresent()">▶ はっぴょうする</button>
         </div>
         <div class="speech-reorder-hint" id="speech-reorder-hint">⠿ を ドラッグ、または ▲▼ ボタンで じゅんばんを かえられるよ</div>
+        <div id="speech-dup-hint" class="speech-dup-hint" style="display:none"></div>
         <div id="speech-list"></div>
     </div>
 
@@ -703,6 +709,8 @@
             <div id="speech-tpl-say" class="speech-tpl-grid"></div>
             <div class="speech-tpl-group">たずねる文（はじめの といかけに）</div>
             <div id="speech-tpl-ask" class="speech-tpl-grid"></div>
+            <div class="speech-tpl-group">あいさつ・しめくくり（そのまま ついか）</div>
+            <div id="speech-tpl-fixed" class="speech-tpl-grid"></div>
         </div>
         <div id="speech-step2" class="hidden">
             <div class="speech-step-title">② ことば を えらぼう</div>
@@ -1375,6 +1383,28 @@
     ];
     function tplById(id){ return speechTemplates.find(t=>t.id===id) || null; }
 
+    // ことばを えらばずに そのまま つかえる 文（はじめの あいさつ・おわりの ことば）
+    const speechFixedSentences = [
+        { text:'Hello.',            jp:'こんにちは',       img:'Hello.jpg' },
+        { text:'Hello, everyone.',  jp:'みなさん こんにちは', img:'Hello.jpg' },
+        { text:'Good morning.',     jp:'おはよう',         img:'Good morning.jpg' },
+        { text:'Nice to meet you.', jp:'はじめまして',     img:'Hi.jpg' },
+        { text:'Thank you.',        jp:'ありがとう',       img:'thank you.jpg' },
+        { text:"That's all.",       jp:'これで おわりです', img:'great.jpg' },
+        { text:'See you.',          jp:'またね',           img:'See you.jpg' },
+        { text:'Goodbye.',          jp:'さようなら',       img:'Goodbye.jpg' }
+    ];
+    function addFixedSentence(f){
+        const list = getSpeech();
+        list.push({ id:newSpeechId(), text:f.text, tplId:'fixed',
+                    words:[{ word:f.text, img:imgSrc(f.img) }], tail:null,
+                    word:f.text, img:imgSrc(f.img) });
+        setSpeech(list);
+        speak(f.text);
+        showOverlay('✓','ついか したよ！');
+        openSpeechMenu();
+    }
+
     let speechTpl = null;
     let speechWords = [];     // えらんだ ことば（さいだい3つ。2つ以上なら and でつながる）
     let speechTail = null;    // そえことば
@@ -1453,6 +1483,86 @@
         return g ? { grade:g, cat:tpl.rec[g] } : null;
     }
 
+
+    // ── ことばの しゅるい（タグ）──────────────────────────────
+    // カードは 725語 しかないので、カテゴリー既定 + 例外表 で ぜんぶに
+    // しゅるいを つけられる。文のかたちと かみ合わない ときだけ ヒントを出す。
+    const CAT_TAG = {
+        // 3年
+        g3_u01:'greeting', g3_u02:'adj',   g3_u03:'number', g3_u04:'color', g3_u05:'food',
+        g3_u06:'letter',   g3_u07:'thing', g3_u08:'animal', g3_u09:'person',
+        // 4年
+        g4_u01:'place', g4_u02:'adj',    g4_u03:'time',   g4_u04:'time', g4_u05:'thing',
+        g4_u06:'letter', g4_u07:'food',  g4_u08:'place',  g4_u09:'action',
+        // 5年
+        c01:'adj',   c18:'adj',   c14:'subject', c15:'action', c17:'job',   c13:'time',
+        c11:'time',  c25:'number', c12:'thing',  c03:'color',  c04:'sport', c05:'animal',
+        c06:'food',  c08:'food',  c07:'food',    c09:'food',   c10:'adj',   c19:'place',
+        c21:'direction', c02:'adj', c20:'place', c16:'person', c23:'adj',   c24:'adj',
+        // 6年
+        g01:'place', g13:'club',  g14:'subject', g15:'job',  g16:'event', g05:'event',
+        g08:'action', g07:'time', g06:'action',  g06b:'action', g02:'ing', g11:'animal',
+        g10:'place', g12:'body',  g09:'place',   g03:'time', g04:'time',  g19:'number',
+        g17:'adj',   g18:'adj'
+    };
+    // カテゴリーの中に しゅるいが 混ざっている ぶんの 例外
+    const WORD_TAG = (function(){
+        const m = {};
+        const put = (tag, ws) => ws.forEach(w => { m[w] = tag; });
+        put('sport',   ['soccer','baseball','basketball','dodgeball','swimming','tennis']);
+        put('greeting',['thank you','Konnichiwa','Nihao','Bonjour','Namaste','Sawasdee']);
+        put('thing',   ['rock','scissors','paper',
+                        // c03 は「いろ と かたち」の 混在。かたちは もの あつかい
+                        'circle','triangle','cross','heart','square','rectangle','star','diamond',
+                        // 自然カテゴリの うち、ばしょ ではなく もの
+                        'tree','flower','cherry blossoms','sun','sunrise','sunset','rainbow',
+                        'stars','autumn leaves','sky','leaves','grass']);
+        put('adj',     ['big','small','long','short','fun']);
+        put('body',    ['ear','eye','nose','mouth','tail','leg','body']);
+        put('animal',  ['dog','monkey','pheasant','bugs']);
+        put('action',  ['play tag','play cards','play dodgeball','jump rope','study',
+                        'Go straight','Turn right','Turn left','Stop','go straight','turn right','turn left','stop']);
+        put('number',  ['one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve']);
+        put('place',   ['school','corner','block','hot spring']);
+        put('subject', ['P.E.']);
+        put('food',    ['Japanese food','Japanese sweets','matcha','nuts','fruits','seaweed','water']);
+        put('past',    ['saw','ate','went','enjoyed','visited','made','talked','sang','cooked',
+                        'watched','played','practiced','tried','washed','walked']);
+        put('other',   ['I am','name']);
+        return m;
+    })();
+    function tagOf(word, cat){ return WORD_TAG[word] || CAT_TAG[cat] || 'other'; }
+    const TAG_LABEL = {
+        action:'うごき', past:'むかしの かたち', ing:'～ing の かたち', food:'たべもの', sport:'スポーツ',
+        job:'しごと', place:'ばしょ', thing:'もの', animal:'いきもの', person:'ひと',
+        adj:'ようす・きもち', color:'いろ', number:'かず', letter:'アルファベット', time:'とき',
+        greeting:'あいさつ', subject:'きょうか', event:'ぎょうじ', body:'からだ',
+        direction:'みちあんない', club:'ぶかつ', other:''
+    };
+    // 文のかたちごとに 入ってよい しゅるい（まよったら 通す = ゆるめ）
+    const TPL_ACCEPT = {
+        like:  ['food','sport','animal','color','subject','thing','ing','event','club','place','person','time','other'],
+        q_like:['food','sport','animal','color','subject','thing','ing','event','club','place','person','time','other'],
+        q_how: ['food','sport','animal','color','subject','thing','ing','event','club','place','person','time','other'],
+        can:   ['action','other'],
+        q_can: ['action','other'],
+        good:  ['ing','sport','subject','club','other'],
+        be:    ['job','other'],
+        go:    ['place','event','club','other'],
+        eat:   ['food','other'],
+        have:  ['thing','animal','food','body','other'],
+        q_have:['thing','animal','food','body','other'],
+        see:   ['place','animal','event','thing','person','club','other'],
+        fav:   ['thing','animal','person','body','subject','club','place','food','other']
+    };
+    const TPL_WANT = {
+        like:'すきな ものの カード', q_like:'すきな ものの カード', q_how:'すきな ものの カード',
+        can:'うごきの カード', q_can:'うごきの カード',
+        good:'とくいな ことの カード', be:'しごとの カード', go:'ばしょの カード',
+        eat:'たべもの・のみものの カード', have:'もちものの カード', q_have:'もちものの カード',
+        see:'みたい もの・ばしょの カード', fav:'ものや ひとの カード'
+    };
+
     // ── 文のかたちと ことばが 合わないときに、やさしく 直しかたを 出す ──
     function checkSpeechFit(tpl, item){
         if(!tpl || !item) return null;
@@ -1461,7 +1571,10 @@
         const catHint = ()=>{
             const t = speechRecTarget(tpl);
             if(!t) return null;
-            return { type:'cat', target:t, msg:`「${tpl.en}」には <b>${speechCatLabel(t.grade,t.cat)}</b> の カードが おすすめだよ` };
+            // いま ひらいている カテゴリーが おすすめ本人なら、ボタンは 出さない
+            const same = (t.grade === speechPickerGrade && t.cat === speechCat);
+            return { type: same ? 'none' : 'cat', target:t,
+                     msg:`「${tpl.en}」には <b>${speechCatLabel(t.grade,t.cat)}</b> の カードが おすすめだよ` };
         };
         if(tpl.need === 'verb'){
             if(ING_WORDS.has(w)){
@@ -1475,9 +1588,9 @@
             if(!isAction){
                 const cand = findSpeechCard('play ' + w) || findSpeechCard('play the ' + w);
                 if(cand) return { type:'card', card:cand, msg:`<b>${cand.word}</b> の カードが あるよ！` };
-                return catHint();
+                return tagHint(tpl, item, catHint) || catHint();
             }
-            return null;
+            return tagHint(tpl, item, catHint);
         }
         if(tpl.need === 'ing'){
             if(isAction){
@@ -1489,9 +1602,9 @@
                     const c = findSpeechCard(w.slice(5));
                     if(c) return { type:'card', card:c, msg:`<b>${c.word}</b> の カードが ぴったりだよ` };
                 }
-                return catHint();
+                return tagHint(tpl, item, catHint) || catHint();
             }
-            return null;
+            return tagHint(tpl, item, catHint);
         }
         // need === 'noun'
         if(isAction || PAST_WORDS.has(w)){
@@ -1503,9 +1616,25 @@
                 const c = findSpeechCard(BASE2ING[w]);
                 if(c) return { type:'card', card:c, msg:`「${tpl.before.trim()}」の あとは <b>${c.word}</b> の かたちだよ` };
             }
-            return catHint();
+            return tagHint(tpl, item, catHint) || catHint();
         }
-        return null;
+        return tagHint(tpl, item, catHint);
+    }
+
+    // ことばの しゅるいが 文のかたちに 合わない ときの ヒント
+    function tagHint(tpl, item, catHint){
+        const accept = TPL_ACCEPT[tpl.id];
+        if(!accept) return null;
+        const tag = tagOf(item.word, item.cat);
+        if(tag === 'other' || accept.indexOf(tag) >= 0) return null;
+        const label = TAG_LABEL[tag] || '';
+        const want = TPL_WANT[tpl.id] || '';
+        const base = catHint();
+        const msg = label
+            ? `<b>${item.word}</b> は「${label}」の ことばだよ。${want}を えらぼう`
+            : `${want}を えらぼう`;
+        if(base && base.type === 'cat') return { type:'cat', target:base.target, msg:msg };
+        return { type:'none', msg:msg };
     }
 
     // ── じぶんの声（ろくおん）の ほぞん: IndexedDB ──
@@ -1607,11 +1736,25 @@
         }
         hint.style.display = list.length>1 ? 'block' : 'none';
         presentBtn.disabled = false;
+        // おなじ 文が 2つ いじょう あるかを しらべる
+        const seen = {}, dupTexts = [];
+        list.forEach(s=>{
+            const key = (s.text||'').replace(/\s+/g,' ').trim().toLowerCase();
+            seen[key] = (seen[key]||0) + 1;
+            if(seen[key]===2) dupTexts.push(s.text);
+        });
+        const dupBox = document.getElementById('speech-dup-hint');
+        if(dupTexts.length){
+            dupBox.innerHTML = '💡 おなじ ぶんが 2かい あるよ: ' + dupTexts.map(t=>`<b>${t}</b>`).join('、');
+            dupBox.style.display='block';
+        } else { dupBox.style.display='none'; }
+        const dupKeys = Object.keys(seen).filter(k=>seen[k]>1);
         list.forEach((s, i)=>{
             const row = document.createElement('div');
             row.className='speech-row';
             row.dataset.idx = i;
             if(s.text && s.text.trim().slice(-1) === '?') row.classList.add('ask');
+            if(dupKeys.indexOf((s.text||'').replace(/\s+/g,' ').trim().toLowerCase()) >= 0) row.classList.add('dup');
 
             const handle = document.createElement('div');
             handle.className='speech-drag-handle'; handle.textContent='⠿'; handle.title='ドラッグで じゅんばんを かえる';
@@ -1720,6 +1863,15 @@
         window.scrollTo(0,0);
     }
     function renderSpeechTemplates(){
+        const fixedGrid = document.getElementById('speech-tpl-fixed');
+        fixedGrid.innerHTML='';
+        speechFixedSentences.forEach(f=>{
+            const b = document.createElement('div');
+            b.className='speech-tpl-btn fixed';
+            b.innerHTML = `<div class="speech-tpl-en">${f.text}</div><div class="speech-tpl-jp">${f.jp}</div>`;
+            b.onclick = ()=>addFixedSentence(f);
+            fixedGrid.appendChild(b);
+        });
         [['say','speech-tpl-say'], ['ask','speech-tpl-ask']].forEach(([grp, id])=>{
             const grid = document.getElementById(id);
             grid.innerHTML='';
@@ -1819,7 +1971,7 @@
             speechWords.splice(at,1);
         } else {
             if(speechWords.length >= SPEECH_MAX_WORDS){ showOverlay('✋', `ことばは ${SPEECH_MAX_WORDS}つまで`); return; }
-            speechWords.push({ word:item.word, img:item.img });
+            speechWords.push({ word:item.word, img:item.img, cat:speechCat, grade:speechPickerGrade });
             speak(item.word);
         }
         renderSpeechWordGrid();
@@ -1884,12 +2036,13 @@
         box.style.display='flex';
         const msg = document.createElement('div');
         msg.className='speech-fix-msg'; msg.innerHTML='💡 ' + fix.msg;
+        if(fix.type==='none'){ box.append(msg); return; }
         const btn = document.createElement('button');
         btn.className='speech-fix-btn';
         if(fix.type==='card'){
             btn.textContent='この カードに する';
             btn.onclick=()=>{
-                speechWords[speechWords.length-1] = { word:fix.card.word, img:fix.card.img };
+                speechWords[speechWords.length-1] = { word:fix.card.word, img:fix.card.img, cat:fix.card.cat, grade:fix.card.grade };
                 speechPickerGrade = fix.card.grade; speechCat = fix.card.cat;
                 renderSpeechGradeChips(); renderSpeechCatChips(); updateSpeechPreview();
             };
