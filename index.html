@@ -436,6 +436,53 @@
         .speech-preview-text .blank { color: #b2bec3; }
         .speech-preview-btns { display: flex; gap: 8px; flex-shrink: 0; }
 
+        /* ぶんのかたち: つたえる文 / たずねる文 */
+        .speech-tpl-group { font-weight: 800; color: #636e72; font-size: 0.95rem; margin: 6px 0 8px; display: flex; align-items: center; gap: 8px; }
+        .speech-tpl-group::after { content: ''; flex: 1; height: 3px; background: #eef0f3; border-radius: 3px; }
+        .speech-tpl-btn.ask { border-left: 6px solid var(--accent-yellow); }
+        .speech-tpl-btn.ask:hover { border-color: var(--accent-yellow); }
+        /* おすすめカテゴリーの あんない */
+        .speech-rec-hint { text-align: center; font-weight: bold; font-size: 0.9rem; color: #0984a8; background: #e0f7fa; border-radius: 14px; padding: 6px 12px; margin-bottom: 10px; }
+        .speech-rec-hint.tappable { cursor: pointer; }
+        .speech-rec-hint.tappable:hover { background: #b2ebf2; }
+        .speech-cat-chip.rec { border-color: var(--primary); color: var(--primary); }
+        .speech-cat-chip.rec.active { color: white; }
+        /* えらんだ ことば */
+        .speech-chosen-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 4px; }
+        .speech-chosen-chip { display: flex; align-items: center; gap: 6px; background: #fff0f3; border: 2px solid var(--accent-pink); border-radius: 30px; padding: 4px 6px 4px 4px; font-weight: 800; font-size: 0.95rem; }
+        .speech-chosen-chip img { width: 34px; height: 34px; object-fit: contain; background: white; border-radius: 50%; }
+        .speech-chosen-chip button { border: none; background: #ffd6de; color: #c0392b; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-weight: 800; }
+        .speech-chosen-more { font-size: 0.85rem; color: #b2bec3; font-weight: bold; }
+        /* そえことば */
+        .speech-tail-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 6px; }
+        .speech-tail-label { font-size: 0.85rem; font-weight: 800; color: #888; }
+        .speech-tail-chip { border: 2px solid #dfe6e9; background: white; border-radius: 30px; padding: 6px 14px; font-weight: bold; cursor: pointer; color: #636e72; font-family: 'Fredoka One', cursive; font-size: 0.9rem; transition: 0.15s; }
+        .speech-tail-chip:hover { border-color: var(--accent-purple); }
+        .speech-tail-chip.active { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
+        /* やさしい 直しかたの あんない */
+        .speech-fix-banner { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: #fff8e1; border: 3px solid var(--accent-yellow); border-radius: 16px; padding: 10px 14px; margin-bottom: 8px; }
+        .speech-fix-msg { flex: 1; font-weight: bold; color: #7a5c00; font-size: 0.95rem; min-width: 200px; }
+        .speech-fix-msg b { font-family: 'Fredoka One', cursive; color: #d35400; }
+        .speech-fix-btn { border: none; border-radius: 14px; padding: 10px 16px; font-weight: 800; cursor: pointer; background: var(--accent-yellow); color: #6b4e00; box-shadow: var(--shadow); font-family: 'M PLUS Rounded 1c', sans-serif; }
+        .speech-fix-btn:active { transform: scale(0.96); }
+        /* いちらんの 行（ドラッグ・ろくおん）*/
+        .speech-row { transition: transform 0.15s ease; touch-action: pan-y; }
+        .speech-row.ask { border-left-color: var(--accent-yellow); }
+        .speech-row.dragging { transition: none; z-index: 5; position: relative; box-shadow: var(--shadow-hover); opacity: 0.95; }
+        .speech-drag-handle { flex-shrink: 0; width: 26px; text-align: center; color: #ccd3d8; font-size: 1.3rem; cursor: grab; touch-action: none; user-select: none; }
+        .speech-drag-handle:active { cursor: grabbing; color: var(--accent-purple); }
+        .speech-mini-btn.rec { background: #ffe9e9; color: #c0392b; }
+        .speech-mini-btn.rec.recording { background: #c0392b; color: white; animation: recPulse 1s infinite; }
+        .speech-mini-btn.mine { background: #e8f8ef; color: #1e8449; }
+        .speech-mini-btn.minedel { background: #f1f2f6; color: #b2bec3; }
+        @keyframes recPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.5); } 50% { box-shadow: 0 0 0 8px rgba(192,57,43,0); } }
+        /* はっぴょう画面の ろくおんボタン */
+        .present-rec-row { display: flex; justify-content: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+        .present-rec-btn { border: 3px solid #ffd6de; background: white; color: #c0392b; border-radius: 30px; padding: 12px 22px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: var(--shadow); font-family: 'M PLUS Rounded 1c', sans-serif; }
+        .present-rec-btn.recording { background: #c0392b; color: white; border-color: #c0392b; animation: recPulse 1s infinite; }
+        .present-mine-btn { border: 3px solid #b7e4c7; background: white; color: #1e8449; border-radius: 30px; padding: 12px 22px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: var(--shadow); font-family: 'M PLUS Rounded 1c', sans-serif; }
+        .present-hint { color: #b2bec3; font-weight: bold; font-size: 0.85rem; margin-top: 10px; }
+
         /* Present mode */
         #speech-present-view { text-align: center; }
         .present-stage { max-width: 640px; margin: 0 auto; background: white; border-radius: 30px; border: 5px solid var(--flash-border); box-shadow: var(--shadow-hover); padding: 20px; }
@@ -639,12 +686,12 @@
 
     <div id="speech-menu-view" class="hidden fade-in">
         <h2 style="text-align:center; color:#6c5ce7;">🎤 My Speech</h2>
-        <p style="text-align:center; color:#888; font-weight:bold; margin-top:0;">えいごの ぶんを つくって、はっぴょうの じゅんばんを ならべよう！</p>
+        <p style="text-align:center; color:#888; font-weight:bold; margin-top:0;">えいごの ぶんを つくって、はっぴょうの じゅんばんを ならべよう！<br>🎙 で じぶんの声も ろくおんできるよ。</p>
         <div class="speech-menu-actions">
             <button class="speech-big-btn btn-add-sentence" onclick="startSpeechBuilder()">➕ ぶんを つくる</button>
             <button id="btn-present" class="speech-big-btn btn-present" onclick="startPresent()">▶ はっぴょうする</button>
         </div>
-        <div class="speech-reorder-hint" id="speech-reorder-hint">▲▼ ボタンで じゅんばんを かえられるよ</div>
+        <div class="speech-reorder-hint" id="speech-reorder-hint">⠿ を ドラッグ、または ▲▼ ボタンで じゅんばんを かえられるよ</div>
         <div id="speech-list"></div>
     </div>
 
@@ -652,13 +699,20 @@
         <h2 style="text-align:center; color:#6c5ce7; margin-bottom:5px;">ぶんを つくろう</h2>
         <div id="speech-step1">
             <div class="speech-step-title">① いいたい かたち を えらぼう</div>
-            <div id="speech-tpl-grid" class="speech-tpl-grid"></div>
+            <div class="speech-tpl-group">つたえる文</div>
+            <div id="speech-tpl-say" class="speech-tpl-grid"></div>
+            <div class="speech-tpl-group">たずねる文（はじめの といかけに）</div>
+            <div id="speech-tpl-ask" class="speech-tpl-grid"></div>
         </div>
         <div id="speech-step2" class="hidden">
             <div class="speech-step-title">② ことば を えらぼう</div>
             <div id="speech-picker-grades" class="speech-picker-grades"></div>
+            <div id="speech-rec-hint" class="speech-rec-hint" style="display:none"></div>
             <div id="speech-picker-cats" class="speech-picker-cats"></div>
             <div id="speech-word-grid" class="speech-word-grid"></div>
+            <div id="speech-chosen-row" class="speech-chosen-row" style="display:none"></div>
+            <div id="speech-fix-banner" class="speech-fix-banner" style="display:none"></div>
+            <div id="speech-tail-row" class="speech-tail-row" style="display:none"></div>
             <div class="speech-preview-bar">
                 <img id="speech-preview-img" class="speech-preview-img" src="" style="display:none;">
                 <div id="speech-preview-text" class="speech-preview-text"></div>
@@ -677,9 +731,14 @@
             <div id="present-text" class="present-text"></div>
             <div class="present-nav">
                 <button id="present-prev" class="present-arrow" onclick="presentMove(-1)">◀</button>
-                <button class="present-speak" onclick="playPresent()">🔊</button>
+                <button class="present-speak" onclick="playPresent()" title="おてほんを きく">🔊</button>
                 <button id="present-next" class="present-arrow" onclick="presentMove(1)">▶</button>
             </div>
+            <div class="present-rec-row">
+                <button id="present-rec" class="present-rec-btn" onclick="presentToggleRec()">🎙 ろくおん</button>
+                <button id="present-mine" class="present-mine-btn" onclick="presentPlayMine()" style="display:none">▶ じぶんの声</button>
+            </div>
+            <div class="present-hint">🔊 は おてほん。じぶんで 言ってから きいてみよう！</div>
         </div>
         <div style="text-align:center; margin-top:20px;">
             <button class="nav-btn" style="background:#b2bec3;" onclick="openSpeechMenu()">おわる</button>
@@ -1264,34 +1323,267 @@
 
     // --- SPEECH BUILDER (発表づくり) ---
     const SPEECH_KEY = 'mySpeech';
-    function getSpeech(){ try { return JSON.parse(localStorage.getItem(SPEECH_KEY) || '[]'); } catch(e){ return []; } }
+    function newSpeechId(){ return 'sp' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+    function getSpeech(){
+        let list;
+        try { list = JSON.parse(localStorage.getItem(SPEECH_KEY) || '[]'); } catch(e){ return []; }
+        if(!Array.isArray(list)) return [];
+        // 古い形式（{text, word, img} だけ）を 新しい形式へ そっと引きあげる
+        let changed = false;
+        list.forEach(s=>{
+            if(!s.id){ s.id = newSpeechId(); changed = true; }
+            if(!Array.isArray(s.words)){ s.words = [{ word:s.word, img:s.img }]; changed = true; }
+        });
+        if(changed) localStorage.setItem(SPEECH_KEY, JSON.stringify(list));
+        return list;
+    }
     function setSpeech(a){ localStorage.setItem(SPEECH_KEY, JSON.stringify(a)); }
 
     // えいごの ぶんの かたち（テンプレート）
+    //  need : 空らんに入る ことばの しゅるい（noun=なまえ / verb=どうさ(原形) / ing=～ing・なまえ）
+    //  rec  : 学年ごとの おすすめカテゴリー（これを さいしょに ひらく）
+    //  tails: そえことば（つけても つけなくても よい）
     const speechTemplates = [
-        { id:'be',   en:'I want to be a ___.',  jp:'なりたい しごと',   before:'I want to be ', after:'.', article:true },
-        { id:'like', en:'I like ___.',          jp:'すきな もの',       before:'I like ',        after:'.' },
-        { id:'can',  en:'I can ___.',           jp:'できる こと',       before:'I can ',         after:'.' },
-        { id:'go',   en:'I want to go to ___.', jp:'いきたい ところ',   before:'I want to go to ', after:'.' },
-        { id:'eat',  en:'I want to eat ___.',   jp:'たべたい もの',     before:'I want to eat ', after:'.' },
-        { id:'have', en:'I have a ___.',        jp:'もっている もの',   before:'I have ',        after:'.', article:true },
-        { id:'see',  en:'I want to see ___.',   jp:'みたい もの',       before:'I want to see ', after:'.' },
-        { id:'fav',  en:'This is my ___.',      jp:'これは わたしの…',  before:'This is my ',    after:'.' },
+        // ── つたえる文 ──────────────────────────────
+        { id:'like', grp:'say', en:'I like ___.',          jp:'すきな もの',       before:'I like ',          after:'.', need:'noun',
+          rec:{ grade3:'g3_u05', grade4:'g4_u07', grade5:'c04', grade6:'g11' }, tails:['very much','a lot','too'] },
+        { id:'can',  grp:'say', en:'I can ___.',           jp:'できる こと',       before:'I can ',           after:'.', need:'verb',
+          rec:{ grade5:'c15', grade6:'g06b' }, tails:['well','very well','a little','every day','at school','with my friends'] },
+        { id:'good', grp:'say', en:"I'm good at ___.",     jp:'とくいな こと',     before:"I'm good at ",     after:'.', need:'ing',
+          rec:{ grade5:'c04', grade6:'g02' }, tails:['too'] },
+        { id:'be',   grp:'say', en:'I want to be a ___.',  jp:'なりたい しごと',   before:'I want to be ',    after:'.', article:true, need:'noun',
+          rec:{ grade5:'c17', grade6:'g15' }, tails:['in the future','someday'] },
+        { id:'go',   grp:'say', en:'I want to go to ___.', jp:'いきたい ところ',   before:'I want to go to ', after:'.', need:'noun', the:true,
+          rec:{ grade4:'g4_u08', grade5:'c19', grade6:'g01' }, tails:['someday','with my family','next summer'] },
+        { id:'eat',  grp:'say', en:'I want to eat ___.',   jp:'たべたい もの',     before:'I want to eat ',   after:'.', need:'noun',
+          rec:{ grade3:'g3_u05', grade4:'g4_u07', grade5:'c08' }, tails:['for breakfast','for lunch','every day'] },
+        { id:'have', grp:'say', en:'I have a ___.',        jp:'もっている もの',   before:'I have ',          after:'.', article:true, need:'noun',
+          rec:{ grade3:'g3_u07', grade4:'g4_u05', grade5:'c12' }, tails:['at home','in my bag'] },
+        { id:'see',  grp:'say', en:'I want to see ___.',   jp:'みたい もの',       before:'I want to see ',   after:'.', need:'noun', the:true,
+          rec:{ grade5:'c20', grade6:'g11' }, tails:['someday','in Japan'] },
+        { id:'fav',  grp:'say', en:'This is my ___.',      jp:'これは わたしの…',  before:'This is my ',      after:'.', need:'noun',
+          rec:{ grade3:'g3_u07', grade4:'g4_u05', grade5:'c12' }, tails:[] },
+        // ── たずねる文（はじめの あいさつや、とちゅうの といかけに） ──
+        { id:'q_like', grp:'ask', en:'Do you like ___?',   jp:'すき？と きく',     before:'Do you like ',     after:'?', need:'noun',
+          rec:{ grade3:'g3_u05', grade4:'g4_u07', grade5:'c04', grade6:'g11' }, tails:[] },
+        { id:'q_can',  grp:'ask', en:'Can you ___?',       jp:'できる？と きく',   before:'Can you ',         after:'?', need:'verb',
+          rec:{ grade5:'c15', grade6:'g06b' }, tails:[] },
+        { id:'q_have', grp:'ask', en:'Do you have ___?',   jp:'もってる？と きく', before:'Do you have ',     after:'?', article:true, need:'noun',
+          rec:{ grade3:'g3_u07', grade4:'g4_u05', grade5:'c12' }, tails:[] },
+        { id:'q_how',  grp:'ask', en:'How about ___?',     jp:'あなたは？と きく', before:'How about ',       after:'?', need:'noun',
+          rec:{ grade3:'g3_u05', grade4:'g4_u07', grade5:'c04', grade6:'g11' }, tails:[] },
     ];
+    function tplById(id){ return speechTemplates.find(t=>t.id===id) || null; }
 
     let speechTpl = null;
-    let speechWord = null;
+    let speechWords = [];     // えらんだ ことば（さいだい3つ。2つ以上なら and でつながる）
+    let speechTail = null;    // そえことば
     let speechPickerGrade = null;
     let speechCat = null;
     let presentIdx = 0;
+    const SPEECH_MAX_WORDS = 3;
 
     function speechArticle(w){ return /^[aeiou]/i.test(w) ? 'an ' : 'a '; }
-    function buildSpeechText(tpl, word){
-        if(!word) return null;
-        if(tpl.article) return tpl.before + speechArticle(word) + word + tpl.after;
-        return tpl.before + word + tpl.after;
+    // a / an / the を ことばに あわせて つける
+    function speechPrefix(tpl, word){
+        if(/^the /i.test(word)) return '';
+        if(tpl.article) return speechArticle(word);
+        if(tpl.the && /^[a-z]/.test(word)) return 'the ';
+        return '';
+    }
+    function joinSpeechWords(tpl, words){
+        const parts = words.map(w => speechPrefix(tpl, w.word) + w.word);
+        if(parts.length <= 1) return parts[0] || '';
+        if(parts.length === 2) return parts[0] + ' and ' + parts[1];
+        return parts.slice(0,-1).join(', ') + ' and ' + parts[parts.length-1];
+    }
+    function buildSpeechText(tpl, words, tail){
+        if(!tpl || !words || !words.length) return null;
+        return tpl.before + joinSpeechWords(tpl, words) + (tail ? ' ' + tail : '') + tpl.after;
     }
 
+    // ── ぜんぶの学年から 単語を ひけるようにする（おせっかい提案に つかう）──
+    let speechIndex = null;
+    function getSpeechIndex(){
+        if(speechIndex) return speechIndex;
+        speechIndex = new Map();
+        ['grade5','grade6','grade3','grade4'].forEach(g=>{
+            Object.keys(allData[g]).forEach(c=>{
+                allData[g][c].items.map(parseItem).forEach(it=>{
+                    if(!speechIndex.has(it.word)) speechIndex.set(it.word, { word:it.word, img:it.img, grade:g, cat:c });
+                });
+            });
+        });
+        return speechIndex;
+    }
+    function findSpeechCard(word){ return getSpeechIndex().get(word) || null; }
+
+    // かたちの いいかえ表
+    const ING2BASE = { 'swimming':'swim', 'cooking':'cook', 'dancing':'dance', 'singing':'sing well', 'running':'run fast',
+                       'jumping rope':'jump rope', 'riding a unicycle':'ride a unicycle', 'drawing pictures':'draw pictures',
+                       'playing the piano':'play the piano', 'playing the recorder':'play the recorder' };
+    const BASE2ING = {}; Object.keys(ING2BASE).forEach(k=>{ BASE2ING[ING2BASE[k]] = k; });
+    const PAST2BASE = { 'saw':'see', 'ate':'eat', 'went':'go', 'enjoyed':'enjoy', 'visited':'visit', 'made':'make', 'talked':'talk',
+                        'sang':'sing', 'cooked':'cook', 'watched':'watch', 'played':'play', 'practiced':'practice', 'tried':'try',
+                        'washed':'wash', 'walked':'walk' };
+    const ING_WORDS  = new Set(Object.keys(ING2BASE));
+    const PAST_WORDS = new Set(Object.keys(PAST2BASE));
+
+    // 「どうさ（原形）」の カードの あつまり
+    const ACTION_SOURCES = [['grade5','c15'], ['grade6','g06b'], ['grade4','g4_u09']];
+    const EXTRA_ACTIONS  = ['play tag','play cards','play dodgeball','jump rope'];
+    const NOT_ACTIONS    = new Set(['every day']);
+    let actionWordSet = null;
+    function getActionWords(){
+        if(actionWordSet) return actionWordSet;
+        actionWordSet = new Set(EXTRA_ACTIONS);
+        ACTION_SOURCES.forEach(([g,c])=>{
+            if(allData[g] && allData[g][c]) allData[g][c].items.map(parseItem).forEach(it=>actionWordSet.add(it.word));
+        });
+        NOT_ACTIONS.forEach(w=>actionWordSet.delete(w));
+        return actionWordSet;
+    }
+
+    const SPEECH_GRADE_LABEL = { grade3:'3年', grade4:'4年', grade5:'5年', grade6:'6年' };
+    function speechCatLabel(g, c){ return (allData[g] && allData[g][c]) ? allData[g][c].label_en : ''; }
+    function speechRecTarget(tpl){
+        if(!tpl || !tpl.rec) return null;
+        if(tpl.rec[speechPickerGrade]) return { grade:speechPickerGrade, cat:tpl.rec[speechPickerGrade] };
+        const g = tpl.rec['grade5'] ? 'grade5' : Object.keys(tpl.rec)[0];
+        return g ? { grade:g, cat:tpl.rec[g] } : null;
+    }
+
+    // ── 文のかたちと ことばが 合わないときに、やさしく 直しかたを 出す ──
+    function checkSpeechFit(tpl, item){
+        if(!tpl || !item) return null;
+        const w = item.word;
+        const isAction = getActionWords().has(w);
+        const catHint = ()=>{
+            const t = speechRecTarget(tpl);
+            if(!t) return null;
+            return { type:'cat', target:t, msg:`「${tpl.en}」には <b>${speechCatLabel(t.grade,t.cat)}</b> の カードが おすすめだよ` };
+        };
+        if(tpl.need === 'verb'){
+            if(ING_WORDS.has(w)){
+                const c = findSpeechCard(ING2BASE[w]);
+                if(c) return { type:'card', card:c, msg:`「${tpl.before.trim()}」の あとは <b>${c.word}</b> の かたちだよ` };
+            }
+            if(PAST_WORDS.has(w)){
+                const c = findSpeechCard(PAST2BASE[w]);
+                if(c) return { type:'card', card:c, msg:`「${tpl.before.trim()}」の あとは <b>${c.word}</b>（もとの かたち）だよ` };
+            }
+            if(!isAction){
+                const cand = findSpeechCard('play ' + w) || findSpeechCard('play the ' + w);
+                if(cand) return { type:'card', card:cand, msg:`<b>${cand.word}</b> の カードが あるよ！` };
+                return catHint();
+            }
+            return null;
+        }
+        if(tpl.need === 'ing'){
+            if(isAction){
+                if(BASE2ING[w]){
+                    const c = findSpeechCard(BASE2ING[w]);
+                    if(c) return { type:'card', card:c, msg:`「${tpl.before.trim()}」の あとは <b>${c.word}</b> の かたちだよ` };
+                }
+                if(w.indexOf('play ') === 0){
+                    const c = findSpeechCard(w.slice(5));
+                    if(c) return { type:'card', card:c, msg:`<b>${c.word}</b> の カードが ぴったりだよ` };
+                }
+                return catHint();
+            }
+            return null;
+        }
+        // need === 'noun'
+        if(isAction || PAST_WORDS.has(w)){
+            if(w.indexOf('play ') === 0){
+                const c = findSpeechCard(w.slice(5));
+                if(c) return { type:'card', card:c, msg:`<b>${c.word}</b> の カードが ぴったりだよ` };
+            }
+            if(BASE2ING[w] && (tpl.id==='like' || tpl.id==='q_like' || tpl.id==='q_how')){
+                const c = findSpeechCard(BASE2ING[w]);
+                if(c) return { type:'card', card:c, msg:`「${tpl.before.trim()}」の あとは <b>${c.word}</b> の かたちだよ` };
+            }
+            return catHint();
+        }
+        return null;
+    }
+
+    // ── じぶんの声（ろくおん）の ほぞん: IndexedDB ──
+    let speechDB = null;
+    function openSpeechDB(){
+        return new Promise((res, rej)=>{
+            if(speechDB) return res(speechDB);
+            if(!window.indexedDB) return rej(new Error('no indexedDB'));
+            const req = indexedDB.open('pdSpeechRec', 1);
+            req.onupgradeneeded = ()=>{ req.result.createObjectStore('rec'); };
+            req.onsuccess = ()=>{ speechDB = req.result; res(speechDB); };
+            req.onerror = ()=>rej(req.error);
+        });
+    }
+    async function saveSpeechRec(id, blob){
+        const db = await openSpeechDB();
+        return new Promise((res, rej)=>{ const tx=db.transaction('rec','readwrite'); tx.objectStore('rec').put(blob, id); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); });
+    }
+    async function loadSpeechRec(id){
+        try{
+            const db = await openSpeechDB();
+            return await new Promise((res)=>{ const tx=db.transaction('rec','readonly'); const r=tx.objectStore('rec').get(id); r.onsuccess=()=>res(r.result||null); r.onerror=()=>res(null); });
+        }catch(e){ return null; }
+    }
+    async function removeSpeechRec(id){
+        try{
+            const db = await openSpeechDB();
+            await new Promise((res)=>{ const tx=db.transaction('rec','readwrite'); tx.objectStore('rec').delete(id); tx.oncomplete=()=>res(); tx.onerror=()=>res(); });
+        }catch(e){}
+    }
+
+    let speechRecorder = null, speechRecChunks = [], speechRecId = null;
+    function isSpeechRecording(){ return !!(speechRecorder && speechRecorder.state === 'recording'); }
+    async function toggleSpeechRec(id, btn){
+        if(isSpeechRecording()){ speechRecorder.stop(); return; }
+        if(!navigator.mediaDevices || !window.MediaRecorder){ alert('この ブラウザでは ろくおん できません。'); return; }
+        speechSynthesis.cancel();
+        try{
+            const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+            let mt = '';
+            if(MediaRecorder.isTypeSupported('audio/mp4')) mt = 'audio/mp4';
+            else if(MediaRecorder.isTypeSupported('audio/webm')) mt = 'audio/webm';
+            speechRecorder = new MediaRecorder(stream, mt ? { mimeType:mt } : {});
+            speechRecChunks = []; speechRecId = id;
+            speechRecorder.ondataavailable = e=>{ if(e.data.size>0) speechRecChunks.push(e.data); };
+            speechRecorder.onstop = async ()=>{
+                const blob = new Blob(speechRecChunks, { type: mt || 'audio/webm' });
+                stream.getTracks().forEach(t=>t.stop());
+                speechRecorder = null; speechRecId = null;
+                try{
+                    await saveSpeechRec(id, blob);
+                    const list = getSpeech(); const s = list.find(x=>x.id===id);
+                    if(s){ s.rec = 1; setSpeech(list); }
+                    showOverlay('🎙','ろくおん できた！');
+                }catch(e){ alert('ろくおんを ほぞん できませんでした。'); }
+                renderSpeechList(); refreshPresentRecBtns();
+            };
+            speechRecorder.start();
+            if(btn){ btn.classList.add('recording'); btn.textContent = '■'; }
+        }catch(e){ alert('マイクが つかえませんでした。ブラウザの きょかを かくにんしてね。'); }
+    }
+    async function playMySpeechVoice(id){
+        const blob = await loadSpeechRec(id);
+        if(!blob) return;
+        speechSynthesis.cancel();
+        const url = URL.createObjectURL(blob);
+        const a = new Audio(url);
+        a.onended = ()=>URL.revokeObjectURL(url);
+        a.play().catch(()=>{});
+    }
+    async function clearMySpeechVoice(id){
+        await removeSpeechRec(id);
+        const list = getSpeech(); const s = list.find(x=>x.id===id);
+        if(s){ delete s.rec; setSpeech(list); }
+        renderSpeechList(); refreshPresentRecBtns();
+    }
+
+    // ── メニュー（つくった文の いちらん）──
     function openSpeechMenu(){
         ['grade-select-view','speech-build-view','speech-present-view'].forEach(id=>document.getElementById(id).classList.add('hidden'));
         document.getElementById('speech-menu-view').classList.remove('hidden');
@@ -1318,18 +1610,86 @@
         list.forEach((s, i)=>{
             const row = document.createElement('div');
             row.className='speech-row';
+            row.dataset.idx = i;
+            if(s.text && s.text.trim().slice(-1) === '?') row.classList.add('ask');
+
+            const handle = document.createElement('div');
+            handle.className='speech-drag-handle'; handle.textContent='⠿'; handle.title='ドラッグで じゅんばんを かえる';
+            handle.onpointerdown = (e)=>startSpeechDrag(e, i);
+
+            const num = document.createElement('div'); num.className='speech-row-num'; num.textContent=(i+1);
+            const img = document.createElement('img'); img.className='speech-row-img'; fallbackImg(img, s.words[0] ? s.words[0].word : s.word); img.src=(s.words[0]||s).img;
+            const text = document.createElement('div'); text.className='speech-row-text'; text.textContent=s.text;
+
+            const play = document.createElement('button'); play.className='speech-mini-btn play'; play.textContent='🔊'; play.title='おてほんを きく'; play.onclick=()=>speak(s.text);
+            const rec  = document.createElement('button'); rec.className='speech-mini-btn rec'; rec.textContent='🎙'; rec.title='じぶんの声を ろくおんする';
+            rec.onclick=()=>toggleSpeechRec(s.id, rec);
+            const mine = document.createElement('button'); mine.className='speech-mini-btn mine'; mine.textContent='▶'; mine.title='じぶんの声を きく';
+            mine.onclick=()=>playMySpeechVoice(s.id);
+            const mineDel = document.createElement('button'); mineDel.className='speech-mini-btn minedel'; mineDel.textContent='🚫'; mineDel.title='ろくおんを けす';
+            mineDel.onclick=()=>clearMySpeechVoice(s.id);
             const up = document.createElement('button'); up.className='speech-mini-btn up'; up.textContent='▲'; if(i===0) up.disabled=true; up.onclick=()=>moveSpeech(i,-1);
             const down = document.createElement('button'); down.className='speech-mini-btn down'; down.textContent='▼'; if(i===list.length-1) down.disabled=true; down.onclick=()=>moveSpeech(i,1);
-            const play = document.createElement('button'); play.className='speech-mini-btn play'; play.textContent='🔊'; play.onclick=()=>speak(s.text);
             const del = document.createElement('button'); del.className='speech-mini-btn del'; del.textContent='🗑'; del.onclick=()=>deleteSpeech(i);
-            const num = document.createElement('div'); num.className='speech-row-num'; num.textContent=(i+1);
-            const img = document.createElement('img'); img.className='speech-row-img'; fallbackImg(img, s.word); img.src=s.img;
-            const text = document.createElement('div'); text.className='speech-row-text'; text.textContent=s.text;
+
             const btns = document.createElement('div'); btns.className='speech-row-btns';
-            btns.append(play, up, down, del);
-            row.append(num, img, text, btns);
+            btns.append(play, rec);
+            if(s.rec) btns.append(mine, mineDel);
+            btns.append(up, down, del);
+            row.append(handle, num, img, text, btns);
             cont.appendChild(row);
         });
+    }
+
+    // ── ドラッグで じゅんばんを かえる（▲▼ も のこしてある）──
+    let speechDrag = null;
+    function startSpeechDrag(e, i){
+        if(e.button !== undefined && e.button !== 0) return;
+        e.preventDefault();
+        const cont = document.getElementById('speech-list');
+        const rows = Array.from(cont.children);
+        const row = rows[i];
+        if(!row) return;
+        const rect = row.getBoundingClientRect();
+        const gap = 12;
+        speechDrag = { from:i, to:i, startY:e.clientY, rows, row, step:rect.height + gap };
+        row.classList.add('dragging');
+        try{ e.target.setPointerCapture(e.pointerId); }catch(err){}
+        window.addEventListener('pointermove', onSpeechDrag);
+        window.addEventListener('pointerup', endSpeechDrag, { once:true });
+        window.addEventListener('pointercancel', endSpeechDrag, { once:true });
+    }
+    function onSpeechDrag(e){
+        if(!speechDrag) return;
+        const d = speechDrag;
+        const dy = e.clientY - d.startY;
+        d.row.style.transform = `translateY(${dy}px)`;
+        let to = d.from + Math.round(dy / d.step);
+        to = Math.max(0, Math.min(d.rows.length-1, to));
+        if(to !== d.to){
+            d.to = to;
+            d.rows.forEach((r, idx)=>{
+                if(idx === d.from) return;
+                let shift = 0;
+                if(d.from < to && idx > d.from && idx <= to) shift = -d.step;
+                else if(d.from > to && idx >= to && idx < d.from) shift = d.step;
+                r.style.transform = shift ? `translateY(${shift}px)` : '';
+            });
+        }
+    }
+    function endSpeechDrag(){
+        if(!speechDrag) return;
+        const { from, to } = speechDrag;
+        window.removeEventListener('pointermove', onSpeechDrag);
+        speechDrag.rows.forEach(r=>{ r.style.transform=''; r.classList.remove('dragging'); });
+        speechDrag = null;
+        if(from !== to){
+            const list = getSpeech();
+            const [moved] = list.splice(from, 1);
+            list.splice(to, 0, moved);
+            setSpeech(list);
+        }
+        renderSpeechList();
     }
 
     function moveSpeech(i, dir){
@@ -1342,14 +1702,16 @@
     }
     function deleteSpeech(i){
         const list = getSpeech();
-        list.splice(i,1);
+        const gone = list.splice(i,1)[0];
         setSpeech(list);
+        if(gone && gone.id) removeSpeechRec(gone.id);
         renderSpeechList();
     }
 
+    // ── ① 文のかたちを えらぶ ──
     function startSpeechBuilder(){
-        speechTpl=null; speechWord=null;
-        document.getElementById('speech-menu-view').classList.add('hidden');
+        speechTpl=null; speechWords=[]; speechTail=null;
+        ['grade-select-view','speech-menu-view','speech-present-view'].forEach(id=>document.getElementById(id).classList.add('hidden'));
         document.getElementById('speech-build-view').classList.remove('hidden');
         document.getElementById('speech-step1').classList.remove('hidden');
         document.getElementById('speech-step2').classList.add('hidden');
@@ -1358,22 +1720,30 @@
         window.scrollTo(0,0);
     }
     function renderSpeechTemplates(){
-        const grid = document.getElementById('speech-tpl-grid');
-        grid.innerHTML='';
-        speechTemplates.forEach(t=>{
-            const b = document.createElement('div');
-            b.className='speech-tpl-btn';
-            b.innerHTML = `<div class="speech-tpl-en">${t.en}</div><div class="speech-tpl-jp">${t.jp}</div>`;
-            b.onclick = ()=>selectSpeechTemplate(t);
-            grid.appendChild(b);
+        [['say','speech-tpl-say'], ['ask','speech-tpl-ask']].forEach(([grp, id])=>{
+            const grid = document.getElementById(id);
+            grid.innerHTML='';
+            speechTemplates.filter(t=>t.grp===grp).forEach(t=>{
+                const b = document.createElement('div');
+                b.className='speech-tpl-btn' + (grp==='ask' ? ' ask' : '');
+                b.innerHTML = `<div class="speech-tpl-en">${t.en}</div><div class="speech-tpl-jp">${t.jp}</div>`;
+                b.onclick = ()=>selectSpeechTemplate(t);
+                grid.appendChild(b);
+            });
         });
     }
+
+    // ── ② ことばを えらぶ ──
     function selectSpeechTemplate(t){
-        speechTpl=t; speechWord=null;
+        speechTpl=t; speechWords=[]; speechTail=null;
         document.getElementById('speech-step1').classList.add('hidden');
         document.getElementById('speech-step2').classList.remove('hidden');
-        speechPickerGrade = currentGrade || 'grade5';
-        speechCat = null;
+        const g = (currentGrade && t.rec && t.rec[currentGrade]) ? currentGrade
+                : (t.rec && t.rec['grade5']) ? 'grade5'
+                : (t.rec && Object.keys(t.rec).length) ? Object.keys(t.rec)[0]
+                : (currentGrade || 'grade5');
+        speechPickerGrade = g;
+        speechCat = (t.rec && t.rec[g]) || null;
         renderSpeechGradeChips();
         renderSpeechCatChips();
         updateSpeechPreview();
@@ -1386,23 +1756,48 @@
             const c = document.createElement('div');
             c.className='speech-grade-chip'+(g===speechPickerGrade?' active':'');
             c.textContent=label;
-            c.onclick=()=>{ speechPickerGrade=g; speechCat=null; renderSpeechGradeChips(); renderSpeechCatChips(); };
+            c.onclick=()=>{
+                speechPickerGrade=g;
+                speechCat=(speechTpl && speechTpl.rec && speechTpl.rec[g]) || null;
+                renderSpeechGradeChips(); renderSpeechCatChips();
+            };
             cont.appendChild(c);
         });
     }
     function renderSpeechCatChips(){
         const data = allData[speechPickerGrade];
         const keys = Object.keys(data);
-        if(!speechCat || !data[speechCat]) speechCat = keys[0];
+        const recCat = speechTpl && speechTpl.rec ? speechTpl.rec[speechPickerGrade] : null;
+        if(!speechCat || !data[speechCat]) speechCat = (recCat && data[recCat]) ? recCat : keys[0];
+        const hint = document.getElementById('speech-rec-hint');
+        hint.onclick = null; hint.classList.remove('tappable');
+        if(recCat && data[recCat]){
+            hint.innerHTML = `👍 この かたちには <b>⭐ ${data[recCat].label_en}</b> の カードが おすすめ`;
+            hint.style.display='block';
+            hint.classList.add('tappable');
+            hint.onclick = ()=>{ speechCat = recCat; renderSpeechCatChips(); };
+        } else {
+            // この学年に おすすめが ないときは、ほかの学年の おすすめへ 案内する
+            const t = speechRecTarget(speechTpl);
+            if(t){
+                hint.innerHTML = `👍 この かたちには <b>${SPEECH_GRADE_LABEL[t.grade]} の ${speechCatLabel(t.grade,t.cat)}</b> が おすすめ（タップで ひらく）`;
+                hint.style.display='block';
+                hint.classList.add('tappable');
+                hint.onclick = ()=>{ speechPickerGrade=t.grade; speechCat=t.cat; renderSpeechGradeChips(); renderSpeechCatChips(); };
+            } else { hint.style.display='none'; }
+        }
         const cont = document.getElementById('speech-picker-cats');
         cont.innerHTML='';
         keys.forEach(k=>{
             const c = document.createElement('div');
-            c.className='speech-cat-chip'+(k===speechCat?' active':'');
-            c.textContent=data[k].label_en;
+            c.className='speech-cat-chip'+(k===speechCat?' active':'')+(k===recCat?' rec':'');
+            c.textContent=(k===recCat?'⭐ ':'')+data[k].label_en;
             c.onclick=()=>{ speechCat=k; renderSpeechCatChips(); };
             cont.appendChild(c);
         });
+        // いま えらんでいる カテゴリーの チップが 見えるところに くるように
+        const activeChip = cont.querySelector('.speech-cat-chip.active');
+        if(activeChip) cont.scrollLeft = Math.max(0, activeChip.offsetLeft - 12);
         renderSpeechWordGrid();
     }
     function renderSpeechWordGrid(){
@@ -1411,19 +1806,112 @@
         grid.innerHTML='';
         dedupeByWord(data.items.map(parseItem)).forEach(item=>{
             const c = document.createElement('div');
-            c.className='speech-word-card'+(speechWord&&speechWord.word===item.word?' selected':'');
+            const chosen = speechWords.some(w=>w.word===item.word);
+            c.className='speech-word-card'+(chosen?' selected':'');
             const wImg=document.createElement('img'); fallbackImg(wImg, item.word); wImg.src=item.img; c.appendChild(wImg);
-            c.onclick=()=>{ speechWord=item; speak(item.word); renderSpeechWordGrid(); updateSpeechPreview(); };
+            c.onclick=()=>toggleSpeechWord(item);
             grid.appendChild(c);
         });
+    }
+    function toggleSpeechWord(item){
+        const at = speechWords.findIndex(w=>w.word===item.word);
+        if(at >= 0){
+            speechWords.splice(at,1);
+        } else {
+            if(speechWords.length >= SPEECH_MAX_WORDS){ showOverlay('✋', `ことばは ${SPEECH_MAX_WORDS}つまで`); return; }
+            speechWords.push({ word:item.word, img:item.img });
+            speak(item.word);
+        }
+        renderSpeechWordGrid();
+        updateSpeechPreview();
+    }
+    function removeSpeechWord(i){
+        speechWords.splice(i,1);
+        renderSpeechWordGrid();
+        updateSpeechPreview();
+    }
+    function setSpeechTail(t){
+        speechTail = (speechTail === t) ? null : t;
+        renderSpeechTails();
+        updateSpeechPreview();
+    }
+    function renderSpeechChosen(){
+        const cont = document.getElementById('speech-chosen-row');
+        cont.innerHTML='';
+        if(!speechWords.length){ cont.style.display='none'; return; }
+        cont.style.display='flex';
+        speechWords.forEach((w,i)=>{
+            const chip = document.createElement('div');
+            chip.className='speech-chosen-chip';
+            const im = document.createElement('img'); fallbackImg(im, w.word); im.src=w.img;
+            const tx = document.createElement('span'); tx.textContent=w.word;
+            const x  = document.createElement('button'); x.textContent='✕'; x.onclick=()=>removeSpeechWord(i);
+            chip.append(im, tx, x);
+            cont.appendChild(chip);
+        });
+        if(speechWords.length < SPEECH_MAX_WORDS){
+            const more = document.createElement('div');
+            more.className='speech-chosen-more';
+            more.textContent='＋ もう1つ えらぶと and で つながるよ';
+            cont.appendChild(more);
+        }
+    }
+    function renderSpeechTails(){
+        const cont = document.getElementById('speech-tail-row');
+        // えらんだ ことばに もう入っている そえことばは 出さない（sing well + well を ふせぐ）
+        const tails = ((speechTpl && speechTpl.tails) || [])
+            .filter(t => !speechWords.some(w => (' '+w.word+' ').indexOf(' '+t+' ') >= 0 || w.word.endsWith(' '+t)));
+        cont.innerHTML='';
+        if(!speechWords.length || !tails.length){ cont.style.display='none'; return; }
+        cont.style.display='flex';
+        const label = document.createElement('div');
+        label.className='speech-tail-label'; label.textContent='そえことば';
+        cont.appendChild(label);
+        tails.forEach(t=>{
+            const c = document.createElement('div');
+            c.className='speech-tail-chip'+(speechTail===t?' active':'');
+            c.textContent=t;
+            c.onclick=()=>setSpeechTail(t);
+            cont.appendChild(c);
+        });
+    }
+    function renderSpeechFix(){
+        const box = document.getElementById('speech-fix-banner');
+        box.innerHTML='';
+        if(!speechWords.length){ box.style.display='none'; return; }
+        const fix = checkSpeechFit(speechTpl, speechWords[speechWords.length-1]);
+        if(!fix){ box.style.display='none'; return; }
+        box.style.display='flex';
+        const msg = document.createElement('div');
+        msg.className='speech-fix-msg'; msg.innerHTML='💡 ' + fix.msg;
+        const btn = document.createElement('button');
+        btn.className='speech-fix-btn';
+        if(fix.type==='card'){
+            btn.textContent='この カードに する';
+            btn.onclick=()=>{
+                speechWords[speechWords.length-1] = { word:fix.card.word, img:fix.card.img };
+                speechPickerGrade = fix.card.grade; speechCat = fix.card.cat;
+                renderSpeechGradeChips(); renderSpeechCatChips(); updateSpeechPreview();
+            };
+        } else {
+            btn.textContent='そのカードを ひらく';
+            btn.onclick=()=>{
+                speechPickerGrade = fix.target.grade; speechCat = fix.target.cat;
+                renderSpeechGradeChips(); renderSpeechCatChips();
+            };
+        }
+        box.append(msg, btn);
     }
     function updateSpeechPreview(){
         const img = document.getElementById('speech-preview-img');
         const txt = document.getElementById('speech-preview-text');
         const saveBtn = document.getElementById('btn-speech-save');
-        if(speechWord){
-            img.src=speechWord.img; img.style.display='';
-            txt.textContent = buildSpeechText(speechTpl, speechWord.word);
+        renderSpeechChosen();
+        renderSpeechTails();
+        renderSpeechFix();
+        if(speechWords.length){
+            img.src=speechWords[0].img; img.style.display='';
+            txt.textContent = buildSpeechText(speechTpl, speechWords, speechTail);
             saveBtn.disabled=false;
         } else {
             img.style.display='none';
@@ -1432,20 +1920,29 @@
         }
     }
     function playSpeechPreview(){
-        if(speechWord) speak(buildSpeechText(speechTpl, speechWord.word));
+        if(speechWords.length) speak(buildSpeechText(speechTpl, speechWords, speechTail));
         else speak(speechTpl.en.replace('___',' something '));
     }
     function saveSpeechSentence(){
-        if(!speechWord || !speechTpl) return;
+        if(!speechWords.length || !speechTpl) return;
         const list = getSpeech();
-        const text = buildSpeechText(speechTpl, speechWord.word);
-        list.push({ text: text, word: speechWord.word, img: speechWord.img });
+        const text = buildSpeechText(speechTpl, speechWords, speechTail);
+        list.push({
+            id: newSpeechId(),
+            text: text,
+            tplId: speechTpl.id,
+            words: speechWords.map(w=>({ word:w.word, img:w.img })),
+            tail: speechTail || null,
+            word: speechWords[0].word,
+            img: speechWords[0].img
+        });
         setSpeech(list);
         speak(text);
         showOverlay("✓","ついか したよ！");
         openSpeechMenu();
     }
 
+    // ── ③ はっぴょうする（じどうで 読み上げない。おてほんは 🔊 を おしたときだけ）──
     function startPresent(){
         const list = getSpeech();
         if(list.length===0) return;
@@ -1459,18 +1956,39 @@
     function showPresent(){
         const list = getSpeech();
         if(list.length===0){ openSpeechMenu(); return; }
+        speechSynthesis.cancel();
         presentIdx = Math.max(0, Math.min(presentIdx, list.length-1));
         const s = list[presentIdx];
         document.getElementById('present-counter').textContent = `${presentIdx+1} / ${list.length}`;
         const img = document.getElementById('present-img');
-        img.style.display=''; img.src=s.img;
+        img.style.display=''; img.src=(s.words && s.words[0] ? s.words[0].img : s.img);
         document.getElementById('present-text').textContent = s.text;
         document.getElementById('present-prev').disabled = presentIdx===0;
         document.getElementById('present-next').disabled = presentIdx===list.length-1;
-        speak(s.text);
+        refreshPresentRecBtns();
+    }
+    function refreshPresentRecBtns(){
+        const view = document.getElementById('speech-present-view');
+        if(!view || view.classList.contains('hidden')) return;
+        const list = getSpeech();
+        const s = list[presentIdx];
+        const recBtn = document.getElementById('present-rec');
+        const mineBtn = document.getElementById('present-mine');
+        if(!s){ return; }
+        recBtn.classList.toggle('recording', isSpeechRecording() && speechRecId===s.id);
+        recBtn.textContent = (isSpeechRecording() && speechRecId===s.id) ? '■ とめる' : '🎙 ろくおん';
+        mineBtn.style.display = s.rec ? '' : 'none';
     }
     function presentMove(dir){ presentIdx+=dir; showPresent(); }
     function playPresent(){ const list=getSpeech(); if(list[presentIdx]) speak(list[presentIdx].text); }
+    function presentToggleRec(){
+        const list=getSpeech(); const s=list[presentIdx]; if(!s) return;
+        const btn=document.getElementById('present-rec');
+        toggleSpeechRec(s.id, null).then(()=>refreshPresentRecBtns());
+        setTimeout(refreshPresentRecBtns, 300);
+        if(btn){ /* 表示は refreshPresentRecBtns が ととのえる */ }
+    }
+    function presentPlayMine(){ const list=getSpeech(); const s=list[presentIdx]; if(s) playMySpeechVoice(s.id); }
 
     // Terms Modal
     function openTerms(){ document.getElementById('terms-modal').classList.remove('hidden'); }
