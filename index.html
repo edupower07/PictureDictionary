@@ -1792,10 +1792,16 @@
         const cont = document.getElementById('speech-list');
         const rows = Array.from(cont.children);
         const row = rows[i];
-        if(!row) return;
-        const rect = row.getBoundingClientRect();
-        const gap = 12;
-        speechDrag = { from:i, to:i, startY:e.clientY, rows, row, step:rect.height + gap };
+        if(!row || rows.length < 2) return;
+        /* 行の高さは そろっていない(長い文は 2行に おりかえる)。
+           あとで「どの行を こえたか」を 見るために、いまの位置を ぜんぶ 覚えておく。 */
+        const rects = rows.map(r => r.getBoundingClientRect());
+        let gap = 12;
+        try{
+            const g = parseFloat(getComputedStyle(cont).rowGap);
+            if(!isNaN(g)) gap = g;
+        }catch(err){}
+        speechDrag = { from:i, to:i, startY:e.clientY, rows, rects, row, step:rects[i].height + gap };
         row.classList.add('dragging');
         try{ e.target.setPointerCapture(e.pointerId); }catch(err){}
         window.addEventListener('pointermove', onSpeechDrag);
@@ -1807,8 +1813,17 @@
         const d = speechDrag;
         const dy = e.clientY - d.startY;
         d.row.style.transform = `translateY(${dy}px)`;
-        let to = d.from + Math.round(dy / d.step);
-        to = Math.max(0, Math.min(d.rows.length-1, to));
+        /* うごかしている行の まん中が、どの行の まん中を こえたかで いき先を きめる。
+           行の高さで わり算すると、2行に おりかえた行が あるときに ずれる。 */
+        const cy = d.rects[d.from].top + d.rects[d.from].height / 2 + dy;
+        const half = d.step / 2;   // 半分こえたら 入れかわる(まるごと1行 うごかさなくてよい)
+        let to = d.from;
+        for(let k = 0; k < d.rects.length; k++){
+            if(k === d.from) continue;
+            const mid = d.rects[k].top + d.rects[k].height / 2;
+            if(k < d.from && cy < mid + half) to = Math.min(to, k);
+            if(k > d.from && cy > mid - half) to = Math.max(to, k);
+        }
         if(to !== d.to){
             d.to = to;
             d.rows.forEach((r, idx)=>{
