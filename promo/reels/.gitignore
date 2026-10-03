@@ -1,0 +1,5 @@
+# すべて README の手順で再生成できるもの
+remotion/node_modules/
+remotion/out/
+remotion/public/
+fonts/
