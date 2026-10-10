@@ -8,7 +8,8 @@ import React from "react";
 import { AbsoluteFill, Sequence, useCurrentFrame } from "remotion";
 import { C, CUTS_PORTAL as CUTS, F, GRADE_COLOR, IMPACT, K, SAFE, V, s } from "./theme";
 import { cl, easeBack, easeInOut, easeOut, lerp, pulse } from "./lib";
-import { Box, Chip, Flash, FollowEnd, Phone, Shot, TopTelop, Wall, shakeAt } from "./parts";
+import { Box, Chip, CommentEnd, END_SAMPLE, Flash, FollowEnd, Phone, Shot, TopTelop, Wall, shakeAt } from "./parts";
+import type { Cta } from "./ReelCards";
 import { Fonts } from "./Fonts";
 import { Soundtrack } from "./Soundtrack";
 import man from "../public/manifest.json";
@@ -275,17 +276,30 @@ const Cards: React.FC = () => {
 };
 
 /* 26.6–32.0 締め:フォロー */
-const Close: React.FC = () => {
+const Close: React.FC<{ cta: Cta }> = ({ cta }) => {
   const t = useSec();
   const out = cl((t - 5.05) / 0.35); // 最後に冒頭と同じ紫へ(ループのつなぎ)
+  const bg = (
+    <Wall files={wallFiles} dir="shots/wall" cols={6} rows={6} t={0} fall={false} blurPx={8} bg={C.purpleDeep} fit="cover" gap={12} radius={18} />
+  );
   return (
     <AbsoluteFill>
-      <FollowEnd
-        t={t}
-        lead={"小学校の先生向けに\n無料の授業アプリ・教材を\nシェアしています"}
-        save={"🔖 保存して\n次の外国語の授業で使ってみてね"}
-        bgLayer={<Wall files={wallFiles} dir="shots/wall" cols={6} rows={6} t={0} fall={false} blurPx={8} bg={C.purpleDeep} fit="cover" gap={12} radius={18} />}
-      />
+      {cta === "comment" ? (
+        <CommentEnd
+          t={t}
+          lead={`アプリ${APP_COUNT}本のリンク\nほしい人は…`}
+          keyword="アプリ"
+          dm="アプリのリンクはこちら！"
+          bgLayer={bg}
+        />
+      ) : (
+        <FollowEnd
+          t={t}
+          lead={"小学校の先生向けに\n無料の授業アプリ・教材を\nシェアしています"}
+          save={"🔖 保存して\n次の外国語の授業で使ってみてね"}
+          bgLayer={bg}
+        />
+      )}
       <Flash v={(1 - t / 0.16) * 0.7} />
       <AbsoluteFill style={{ background: C.purpleDeep, opacity: out }} />
     </AbsoluteFill>
@@ -297,8 +311,8 @@ const cut = (name: keyof typeof CUTS) => {
   return { from: s(a), durationInFrames: s(b) - s(a) };
 };
 
-export const ReelPortal: React.FC = () => (
-  <Fonts fonts={F} sampleText={SAMPLE_PORTAL}>
+export const ReelPortal: React.FC<{ cta?: Cta }> = ({ cta = "url" }) => (
+  <Fonts fonts={F} sampleText={SAMPLE_PORTAL + END_SAMPLE}>
     <AbsoluteFill style={{ background: C.bg }}>
       <Sequence {...cut("hook")}>
         <Hook />
@@ -319,7 +333,7 @@ export const ReelPortal: React.FC = () => (
         <Cards />
       </Sequence>
       <Sequence {...cut("close")}>
-        <Close />
+        <Close cta={cta} />
       </Sequence>
       <Soundtrack bgmSrc="audio/bgm_portal.mp3" fps={V.fps} fadeInSec={0.05} />
     </AbsoluteFill>

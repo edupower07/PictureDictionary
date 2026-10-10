@@ -67,7 +67,10 @@ export const Phone: React.FC<{
   rot?: number;
   scale?: number;
   opacity?: number;
-}> = ({ src, x, y, w, h, rot = 0, scale = 1, opacity = 1 }) => (
+  /** 画面を上にずらす量(CSSピクセル)。枠の下にはみ出す要素を見せたいとき */
+  offsetCss?: number;
+  children?: React.ReactNode;
+}> = ({ src, x, y, w, h, rot = 0, scale = 1, opacity = 1, offsetCss = 0, children }) => (
   <div
     style={{
       position: "absolute",
@@ -84,7 +87,11 @@ export const Phone: React.FC<{
       opacity,
     }}
   >
-    <Img src={staticFile(src)} style={{ width: "100%", display: "block" }} />
+    <Img
+      src={staticFile(src)}
+      style={{ width: "100%", display: "block", marginTop: -offsetCss * ((w - 28) / 390) }}
+    />
+    {children}
   </div>
 );
 
@@ -422,57 +429,39 @@ export const Confetti: React.FC<{ t: number; x: number; y: number }> = ({ t, x, 
 };
 
 /* ------------------------------------------------------------------ *
- * 締め:フォローをうながすエンドカード(2本で共通)
- * プロフィール風のカードの「フォロー」が押されて「フォロー中」に変わる。
+ * 締めのエンドカード(2本で共通)
+ *   FollowEnd  … フォローをうながす+ポータルの URL(最初の版)
+ *   CommentEnd … URL は出さず「フォロー+キーワードをコメント → DMでリンク」(コメント配布版)
+ * どちらもプロフィール風のカードの「フォロー」が押されて「フォロー中」に変わる。
  * ------------------------------------------------------------------ */
-export const FollowEnd: React.FC<{
-  t: number;
-  lead: string;
-  bgLayer: React.ReactNode;
-  save: string;
-}> = ({ t, lead, bgLayer, save }) => {
-  const a = pulse(t, 0.12, 99, 0.3, 0.01);
-  const b = pulse(t, 0.45, 99, 0.3, 0.01);
-  const c = pulse(t, 2.1, 99, 0.3, 0.01);
-  const d = pulse(t, 2.5, 99, 0.3, 0.01);
-  const tap = 1.45;
+
+/** エンドカードで使う文字(フォントの読み込み待ちに足す) */
+export const END_SAMPLE =
+  "小学校の先生向けに無料の授業アプリ・教材をシェアしていますフォロー中全力先生保存しておくと授業準備のときすぐ見返せます" +
+  "ポータルはプロフィールのリンクから次の外国語の授業で使ってみてね配布リンクほしい人へ欲しい方はコメントに" +
+  "と書くとDMで届きますこの投稿にコメントを追加送信さんがあなたのリンクはこちら絵カード枚アプリ本①②③📩💬🎁🔖";
+
+/** プロフィール風カード。tap 秒に「フォロー」が押される */
+const ProfileCard: React.FC<{ t: number; top: number; tap: number; appear: number; scale?: number }> = ({
+  t,
+  top,
+  tap,
+  appear,
+  scale = 1,
+}) => {
+  const b = pulse(t, appear, 99, 0.3, 0.01);
   const followed = t > tap + 0.12;
   const press = t > tap && t < tap + 0.18 ? 0.92 : 1;
-  const cardTop = 760;
-  const btn = { x: 650, y: cardTop + 78, w: 240, h: 92 };
+  const btn = { x: 650, y: top + 78 * scale, w: 240, h: 92 * scale };
   return (
-    <AbsoluteFill style={{ background: C.deep }}>
-      {bgLayer}
-      <AbsoluteFill style={{ background: C.deep, opacity: 0.84 }} />
-
-      <div
-        style={{
-          position: "absolute",
-          left: 60,
-          right: 60,
-          top: 330,
-          textAlign: "center",
-          fontFamily: F.display.family,
-          fontWeight: 800,
-          fontSize: 66,
-          lineHeight: 1.3,
-          color: "#fff",
-          whiteSpace: "pre-line",
-          opacity: a,
-          transform: `translateY(${lerp(30, 0, easeOut(a))}px)`,
-        }}
-      >
-        {lead}
-      </div>
-
-      {/* プロフィール風カード */}
+    <>
       <div
         style={{
           position: "absolute",
           left: 90,
-          top: cardTop,
+          top,
           width: 900,
-          height: 248,
+          height: 248 * scale,
           background: "#fff",
           borderRadius: 40,
           boxShadow: "0 24px 60px rgba(0,0,0,.4)",
@@ -484,9 +473,9 @@ export const FollowEnd: React.FC<{
           style={{
             position: "absolute",
             left: 40,
-            top: 44,
-            width: 160,
-            height: 160,
+            top: 44 * scale,
+            width: 160 * scale,
+            height: 160 * scale,
             borderRadius: "50%",
             padding: 6,
             background: "linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)",
@@ -504,7 +493,7 @@ export const FollowEnd: React.FC<{
               justifyContent: "center",
               fontFamily: F.display.family,
               fontWeight: 800,
-              fontSize: 72,
+              fontSize: 72 * scale,
               color: "#fff",
               boxSizing: "border-box",
             }}
@@ -512,17 +501,17 @@ export const FollowEnd: React.FC<{
             全
           </div>
         </div>
-        <div style={{ position: "absolute", left: 236, top: 62 }}>
-          <div style={{ fontFamily: F.display.family, fontWeight: 800, fontSize: 50, color: C.ink }}>
+        <div style={{ position: "absolute", left: 40 + 196 * scale, top: 62 * scale }}>
+          <div style={{ fontFamily: F.display.family, fontWeight: 800, fontSize: 50 * scale, color: C.ink }}>
             全力先生
           </div>
-          <div style={{ fontFamily: F.latin.family, fontSize: 40, color: C.sub, marginTop: 6 }}>@edupower07</div>
+          <div style={{ fontFamily: F.latin.family, fontSize: 40 * scale, color: C.sub, marginTop: 6 }}>@edupower07</div>
         </div>
         <div
           style={{
             position: "absolute",
             left: btn.x - 90,
-            top: btn.y - cardTop,
+            top: btn.y - top,
             width: btn.w,
             height: btn.h,
             borderRadius: 22,
@@ -542,7 +531,59 @@ export const FollowEnd: React.FC<{
       </div>
       <TapRing xCss={btn.x + btn.w / 2} yCss={btn.y + btn.h / 2} t={t - tap + 0.25} color={C.yellow} px />
       <Confetti t={t - tap - 0.1} x={btn.x + btn.w / 2} y={btn.y + btn.h / 2} />
+    </>
+  );
+};
 
+/** 上に載せる見出し(2〜3行) */
+const Lead: React.FC<{ t: number; text: string; top: number; size?: number }> = ({ t, text, top, size = 66 }) => {
+  const a = pulse(t, 0.12, 99, 0.3, 0.01);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 60,
+        right: 60,
+        top,
+        textAlign: "center",
+        fontFamily: F.display.family,
+        fontWeight: 800,
+        fontSize: size,
+        lineHeight: 1.3,
+        color: "#fff",
+        whiteSpace: "pre-line",
+        opacity: a,
+        transform: `translateY(${lerp(30, 0, easeOut(a))}px)`,
+      }}
+    >
+      {text}
+    </div>
+  );
+};
+
+export const FollowEnd: React.FC<{
+  t: number;
+  lead: string;
+  bgLayer: React.ReactNode;
+  save: string;
+  linkLabel?: string;
+  linkUrl?: string;
+}> = ({
+  t,
+  lead,
+  bgLayer,
+  save,
+  linkLabel = "ポータルは プロフィールのリンクから",
+  linkUrl = "edupower07.github.io/Englishapp",
+}) => {
+  const c = pulse(t, 2.1, 99, 0.3, 0.01);
+  const d = pulse(t, 2.5, 99, 0.3, 0.01);
+  return (
+    <AbsoluteFill style={{ background: C.deep }}>
+      {bgLayer}
+      <AbsoluteFill style={{ background: C.deep, opacity: 0.84 }} />
+      <Lead t={t} text={lead} top={330} />
+      <ProfileCard t={t} top={760} tap={1.45} appear={0.45} />
       <div
         style={{
           position: "absolute",
@@ -586,9 +627,215 @@ export const FollowEnd: React.FC<{
           opacity: d,
         }}
       >
-        ポータルは プロフィールのリンクから
+        {linkLabel}
         <br />
-        <span style={{ fontFamily: F.latin.family, fontSize: 36 }}>edupower07.github.io/Englishapp</span>
+        <span style={{ fontFamily: F.latin.family, fontSize: 36 }}>{linkUrl}</span>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+/** ステップ番号つきの小見出し */
+const StepLabel: React.FC<{ t: number; at: number; top: number; n: string; text: React.ReactNode }> = ({
+  t,
+  at,
+  top,
+  n,
+  text,
+}) => {
+  const p = pulse(t, at, 99, 0.25, 0.01);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 90,
+        right: 90,
+        top,
+        display: "flex",
+        alignItems: "center",
+        gap: 18,
+        opacity: p,
+        transform: `translateX(${lerp(-40, 0, easeOut(p))}px)`,
+      }}
+    >
+      <span
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: "50%",
+          background: C.yellow,
+          color: C.deep,
+          fontFamily: F.display.family,
+          fontWeight: 800,
+          fontSize: 40,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flex: "none",
+        }}
+      >
+        {n}
+      </span>
+      <span style={{ fontFamily: F.display.family, fontWeight: 800, fontSize: 50, color: "#fff" }}>{text}</span>
+    </div>
+  );
+};
+
+/**
+ * コメント配布版のエンドカード。URL は出さず、
+ *   ① フォロー → ② キーワードをコメント → ③ DMでリンクが届く
+ * の3ステップを、Instagram の画面に似せた部品で見せる。
+ */
+export const CommentEnd: React.FC<{
+  t: number;
+  /** 見出し(何がもらえるか) */
+  lead: string;
+  /** コメントしてもらう言葉 */
+  keyword: string;
+  /** DM の1行目に出す文言 */
+  dm: string;
+  bgLayer: React.ReactNode;
+}> = ({ t, lead, keyword, dm, bgLayer }) => {
+  const s1 = 0.4; // ① フォロー
+  const s2 = 1.65; // ② コメント
+  const s3 = 2.75; // ③ DM
+  // コメント欄に1文字ずつ入る
+  const typeAt = s2 + 0.3;
+  const shown = keyword.slice(0, Math.max(0, Math.min(keyword.length, Math.floor((t - typeAt) / 0.12) + 1)));
+  const sent = t > typeAt + keyword.length * 0.12 + 0.25;
+  const box = pulse(t, s2 + 0.05, 99, 0.25, 0.01);
+  const dmP = pulse(t, s3 + 0.15, 99, 0.3, 0.01);
+  const caret = Math.floor(t * 2.6) % 2 === 0;
+  return (
+    <AbsoluteFill style={{ background: C.deep }}>
+      {bgLayer}
+      <AbsoluteFill style={{ background: C.deep, opacity: 0.86 }} />
+      <Lead t={t} text={lead} top={262} size={62} />
+
+      <StepLabel t={t} at={s1} top={470} n="①" text="フォローして" />
+      <ProfileCard t={t} top={560} tap={s1 + 0.75} appear={s1 + 0.05} scale={0.82} />
+
+      <StepLabel
+        t={t}
+        at={s2}
+        top={810}
+        n="②"
+        text={
+          <>
+            「<span style={{ color: C.yellow }}>{keyword}</span>」とコメント
+          </>
+        }
+      />
+      {/* コメント入力欄(送信すると自分のコメントとして表示される) */}
+      <div
+        style={{
+          position: "absolute",
+          left: 90,
+          top: 900,
+          width: 900,
+          height: 128,
+          background: "#fff",
+          borderRadius: 64,
+          display: "flex",
+          alignItems: "center",
+          padding: "0 22px",
+          boxSizing: "border-box",
+          gap: 20,
+          opacity: box,
+          transform: `scale(${lerp(0.9, 1, easeBack(box))})`,
+          boxShadow: "0 18px 44px rgba(0,0,0,.35)",
+        }}
+      >
+        <div
+          style={{
+            width: 84,
+            height: 84,
+            borderRadius: "50%",
+            background: "linear-gradient(135deg,#ffeaa7,#fab1a0)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 46,
+            flex: "none",
+          }}
+        >
+          🧑‍🏫
+        </div>
+        <div style={{ flex: 1, fontFamily: F.display.family, fontWeight: 800, fontSize: 52, color: C.ink }}>
+          {shown.length === 0 && !sent ? (
+            <span style={{ color: "#b2bec3", fontWeight: 700, fontSize: 40 }}>コメントを追加…</span>
+          ) : (
+            <>
+              {shown}
+              {!sent && caret && (
+                <span style={{ display: "inline-block", width: 4, height: 50, background: C.ink, marginLeft: 4, verticalAlign: "middle" }} />
+              )}
+            </>
+          )}
+        </div>
+        <div
+          style={{
+            fontFamily: F.display.family,
+            fontWeight: 800,
+            fontSize: 40,
+            color: sent ? "#fff" : C.follow,
+            background: sent ? C.follow : "transparent",
+            padding: "14px 28px",
+            borderRadius: 999,
+            flex: "none",
+          }}
+        >
+          {sent ? "送信 ✓" : "送信"}
+        </div>
+      </div>
+      {sent && <TapRing xCss={900} yCss={964} t={t - (typeAt + keyword.length * 0.12 + 0.25) + 0.2} color={C.yellow} px />}
+
+      <StepLabel t={t} at={s3} top={1080} n="③" text="DMでリンクが届きます" />
+      {/* DM の通知(上からすべり込む) */}
+      <div
+        style={{
+          position: "absolute",
+          left: 90,
+          top: 1170,
+          width: 900,
+          background: "#fff",
+          borderRadius: 34,
+          padding: "22px 30px",
+          boxSizing: "border-box",
+          display: "flex",
+          alignItems: "center",
+          gap: 22,
+          opacity: dmP,
+          transform: `translateY(${lerp(-40, 0, easeOut(dmP))}px) scale(${lerp(0.92, 1, easeBack(dmP))})`,
+          boxShadow: "0 18px 44px rgba(0,0,0,.35)",
+        }}
+      >
+        <div
+          style={{
+            width: 88,
+            height: 88,
+            borderRadius: "50%",
+            background: `linear-gradient(135deg, ${C.purple}, ${C.purpleDeep})`,
+            color: "#fff",
+            fontFamily: F.display.family,
+            fontWeight: 800,
+            fontSize: 44,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flex: "none",
+          }}
+        >
+          全
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontFamily: F.display.family, fontWeight: 800, fontSize: 36, color: C.ink }}>
+            全力先生 <span style={{ color: C.sub, fontWeight: 700, fontSize: 30 }}>・今</span>
+          </div>
+          <div style={{ fontFamily: F.display.family, fontWeight: 700, fontSize: 38, color: C.ink, marginTop: 4 }}>
+            📩 {dm}
+          </div>
+        </div>
       </div>
     </AbsoluteFill>
   );

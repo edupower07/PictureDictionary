@@ -1,0 +1,26 @@
+/* リール表紙(1080×1920)。プロフィールの3:4切り抜き(y 240〜1680)に要素をすべて収める */
+*{margin:0;padding:0;box-sizing:border-box;}
+body{width:1080px;height:1920px;background:var(--bg);color:#fff;overflow:hidden;position:relative;
+  font-family:'Noto Sans JP',sans-serif;word-break:normal;line-break:strict;}
+.glow{position:absolute;inset:0;background:
+  radial-gradient(900px 700px at 80% 22%, rgba(255,255,255,.16), transparent 60%),
+  radial-gradient(800px 800px at 10% 95%, rgba(0,0,0,.28), transparent 60%);}
+.dots{position:absolute;inset:0;opacity:.10;
+  background-image:radial-gradient(#fff 2.2px, transparent 2.6px);background-size:44px 44px;}
+.zone{position:absolute;left:0;right:0;top:240px;height:1440px;}
+.tag{position:absolute;left:84px;top:70px;background:var(--accent);color:var(--tagink);
+  font-size:38px;font-weight:900;letter-spacing:.08em;padding:14px 34px;border-radius:12px;}
+.h1{position:absolute;left:84px;top:178px;font-size:var(--h1);font-weight:900;line-height:1.18;letter-spacing:-.01em;
+  text-shadow:0 6px 0 rgba(0,0,0,.18);}
+.big{position:absolute;left:70px;font-family:'Dela Gothic One';color:var(--accent);line-height:1;
+  text-shadow:0 10px 0 rgba(0,0,0,.22);white-space:nowrap;}
+.big .u{color:#fff;}
+.burst{position:absolute;width:290px;height:290px;border-radius:50%;background:#FF4D5A;color:#fff;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  font-family:'Dela Gothic One';font-size:62px;line-height:1.12;transform:rotate(12deg);
+  box-shadow:0 0 0 12px rgba(255,255,255,.95), 0 22px 40px rgba(0,0,0,.35);}
+.lead{position:absolute;left:84px;right:84px;font-size:46px;font-weight:900;line-height:1.5;}
+.lead .hl{background:linear-gradient(transparent 62%, var(--hl) 62%);padding:0 4px;}
+.foot{position:absolute;left:84px;right:84px;bottom:46px;display:flex;justify-content:space-between;align-items:center;
+  font-size:34px;font-weight:900;letter-spacing:.04em;}
+.foot .save{background:rgba(255,255,255,.16);border:3px solid rgba(255,255,255,.5);padding:10px 26px;border-radius:999px;}

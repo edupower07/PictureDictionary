@@ -74,5 +74,17 @@ export const CUTS_PORTAL = {
   close: [26.6, 32.0],
 } as const;
 
+/** Picture Dictionary 紹介リール(32秒)のカット割り(秒) */
+export const CUTS_PD = {
+  hook: [0.0, 3.0],
+  grade: [3.0, 6.2],
+  study: [6.2, 9.8],
+  rec: [9.8, 13.0],
+  quiz: [13.0, 16.4],
+  games: [16.4, 23.6],
+  speech: [23.6, 27.0],
+  close: [27.0, 32.0],
+} as const;
+
 /** BGM のインパクト(フックの着地)。bgm.py の第3引数とそろえる */
 export const IMPACT = 1.35;
