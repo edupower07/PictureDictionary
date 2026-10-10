@@ -518,6 +518,51 @@
         .present-arrow:disabled { background: #dfe6e9; color: #b2bec3; cursor: default; box-shadow: none; }
         .present-speak { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--accent-yellow); background: white; font-size: 2.4rem; cursor: pointer; box-shadow: var(--shadow); }
         .present-speak:active { transform: scale(0.95); background: #fffbe7; }
+
+        /* --- がんばりきろく（学びの見える化） --- */
+        .record-entry-btn { background: linear-gradient(135deg, #55efc4, #00b894); width: 100%; max-width: 500px; margin: 15px auto 0; padding: 15px; border-radius: 20px; cursor: pointer; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; gap: 20px; transition: transform 0.2s; border: 4px solid white; }
+        .record-entry-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+        .record-entry-btn .bank-title { color: white; }
+        .record-entry-btn .bank-sub { color: #e6fff7; }
+
+        #record-view { max-width: 700px; margin: 0 auto; }
+        .record-top { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .record-stat { background: white; border-radius: 20px; padding: 14px 10px; text-align: center; box-shadow: var(--shadow); }
+        .record-stat-num { font-family: 'Fredoka One', cursive; font-size: 2.4rem; line-height: 1.1; color: #e17055; }
+        .record-stat.days .record-stat-num { color: #00b894; }
+        .record-stat-label { font-weight: 800; color: #636e72; font-size: 0.9rem; }
+        .record-stat-sub { font-size: 0.8rem; color: #b2bec3; font-weight: bold; margin-top: 2px; }
+
+        .record-card { background: white; border-radius: 20px; padding: 14px; box-shadow: var(--shadow); margin-bottom: 16px; }
+        .record-card h3 { margin: 0 0 10px; font-size: 1.05rem; color: #636e72; }
+        .record-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .record-cal-head { text-align: center; font-size: 0.75rem; font-weight: 800; color: #b2bec3; }
+        .record-cal-head.sun { color: #ff7675; } .record-cal-head.sat { color: #74b9ff; }
+        .record-cal-day { aspect-ratio: 1 / 1; border-radius: 10px; background: #f1f2f6; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 0.7rem; font-weight: bold; color: #b2bec3; position: relative; }
+        .record-cal-day .stamp { font-size: 1.1rem; line-height: 1; }
+        .record-cal-day.lv1 { background: #d6f5ec; color: #00a383; }
+        .record-cal-day.lv2 { background: #9be7d1; color: #007a63; }
+        .record-cal-day.lv3 { background: #55efc4; color: #005c4a; }
+        .record-cal-day.today { outline: 3px solid #fdcb6e; }
+        .record-cal-day.future { background: transparent; }
+
+        .record-grades { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .record-cat-row { display: flex; align-items: center; gap: 10px; padding: 8px 4px; border-bottom: 1px solid #f1f2f6; }
+        .record-cat-row:last-child { border-bottom: none; }
+        .record-cat-row img { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
+        .record-cat-name { flex: 1; min-width: 0; font-weight: 800; color: var(--text-color); line-height: 1.2; }
+        .record-cat-name small { display: block; font-size: 0.75rem; color: #b2bec3; font-weight: bold; }
+        .record-cat-score { text-align: right; flex-shrink: 0; font-weight: 800; color: #636e72; font-size: 0.85rem; line-height: 1.3; }
+        .record-cat-score .stars { font-size: 1rem; letter-spacing: -2px; }
+        .record-cat-row.none .record-cat-score { color: #dfe6e9; }
+        .record-weak { background: #fff5f5; border: 3px dashed #ffb8b8; }
+        .record-weak-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+        .record-weak-row .record-cat-name { font-size: 0.95rem; }
+        .record-go-btn { border: none; background: var(--accent-pink); color: white; border-radius: 20px; padding: 8px 14px; font-weight: 800; cursor: pointer; font-family: 'M PLUS Rounded 1c', sans-serif; flex-shrink: 0; }
+        .record-empty { text-align: center; color: #b2bec3; font-weight: bold; padding: 10px; }
+        .record-reset { display: block; margin: 10px auto 30px; background: none; border: none; color: #b2bec3; text-decoration: underline; cursor: pointer; font-size: 0.8rem; }
+
+        .cat-best { position: absolute; top: 6px; right: 6px; font-size: 0.7rem; background: #fffbe7; border: 2px solid #ffeaa7; border-radius: 10px; padding: 1px 6px; font-weight: 800; color: #d35400; letter-spacing: -1px; }
     </style>
 </head>
 <body>
@@ -548,6 +593,11 @@
         <div class="speech-entry-btn" onclick="openSpeechMenu()">
             <div class="bank-icon">🎤</div>
             <div class="bank-text"><div class="bank-title">My Speech</div><div class="bank-sub">えいごで はっぴょうを つくろう</div></div>
+        </div>
+
+        <div class="record-entry-btn" onclick="openRecord()">
+            <div class="bank-icon">📊</div>
+            <div class="bank-text"><div class="bank-title">My Record</div><div class="bank-sub" id="record-entry-sub">がんばりきろく</div></div>
         </div>
 
         <div class="terms-link-area">
@@ -705,6 +755,25 @@
         <h3 style="color:#2d3436;">🏆 Ranking (Top 5)</h3>
         <table class="ranking-table"><thead><tr><th>Rank</th><th>Date</th><th>Category</th><th>Time</th></tr></thead><tbody id="ranking-body"></tbody></table>
         <button class="nav-btn" style="padding:15px 30px; font-size:1.2rem; background:var(--primary);" onclick="handleBack()">OK</button>
+    </div>
+
+    <div id="record-view" class="hidden fade-in">
+        <h2 style="text-align:center; color:#00a383;">📊 My Record</h2>
+        <div class="record-top">
+            <div class="record-stat streak"><div class="record-stat-num" id="rec-streak">0</div><div class="record-stat-label">🔥 れんぞく</div><div class="record-stat-sub" id="rec-streak-sub"></div></div>
+            <div class="record-stat days"><div class="record-stat-num" id="rec-days">0</div><div class="record-stat-label">📅 がんばった日</div><div class="record-stat-sub">これまでの ごうけい</div></div>
+        </div>
+        <div class="record-card">
+            <h3>📅 さいきん 5しゅうかん</h3>
+            <div id="rec-cal" class="record-cal"></div>
+        </div>
+        <div id="rec-weak" class="record-card record-weak" style="display:none"></div>
+        <div class="record-card">
+            <h3>🎯 クイズの きろく（Practice）</h3>
+            <div id="rec-grades" class="record-grades"></div>
+            <div id="rec-cats"></div>
+        </div>
+        <button class="record-reset" onclick="resetRecord()">きろくを ぜんぶ けす</button>
     </div>
 
     <div id="speech-menu-view" class="hidden fade-in">
@@ -1027,8 +1096,9 @@
     }
 
     function goTop() {
-        ['app-view', 'game-setup-view', 'bank-menu-view', 'flash-view', 'flash-result-view', 'home-view', 'spelling-view', 'quiz-level-select', 'karuta-result-view', 'bingo-view', 'speech-menu-view', 'speech-build-view', 'speech-present-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        ['app-view', 'game-setup-view', 'bank-menu-view', 'flash-view', 'flash-result-view', 'home-view', 'spelling-view', 'quiz-level-select', 'karuta-result-view', 'bingo-view', 'speech-menu-view', 'speech-build-view', 'speech-present-view', 'record-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
         document.getElementById('grade-select-view').classList.remove('hidden');
+        updateRecordEntry();
         updateNavButtons();
         if(timer) clearInterval(timer);
         speechSynthesis.cancel();
@@ -1036,10 +1106,10 @@
     }
 
     function handleBack() {
-        const views = ['app-view', 'game-setup-view', 'bank-menu-view', 'flash-view', 'flash-result-view', 'spelling-view', 'quiz-level-select', 'karuta-result-view', 'bingo-view', 'speech-menu-view', 'speech-build-view', 'speech-present-view'];
+        const views = ['app-view', 'game-setup-view', 'bank-menu-view', 'flash-view', 'flash-result-view', 'spelling-view', 'quiz-level-select', 'karuta-result-view', 'bingo-view', 'speech-menu-view', 'speech-build-view', 'speech-present-view', 'record-view'];
         let active = views.find(v => !document.getElementById(v).classList.contains('hidden'));
         if (active === 'flash-view' || active === 'flash-result-view') { openBankMenu(); }
-        else if (active === 'speech-menu-view' || active === 'speech-present-view') { goTop(); }
+        else if (active === 'speech-menu-view' || active === 'speech-present-view' || active === 'record-view') { goTop(); }
         else if (active === 'speech-build-view') {
             if (!document.getElementById('speech-step2').classList.contains('hidden')) {
                 document.getElementById('speech-step2').classList.add('hidden');
@@ -1062,8 +1132,9 @@
     }
 
     function goHome() {
-        ['app-view', 'game-setup-view', 'bank-menu-view', 'flash-view', 'flash-result-view', 'spelling-view', 'quiz-level-select', 'karuta-result-view', 'bingo-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        ['app-view', 'game-setup-view', 'bank-menu-view', 'flash-view', 'flash-result-view', 'spelling-view', 'quiz-level-select', 'karuta-result-view', 'bingo-view', 'record-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
         document.getElementById('home-view').classList.remove('hidden');
+        if(currentGrade) renderCategories();   // クイズの さいこう★を さいしんに
         updateNavButtons();
         if(timer) clearInterval(timer);
         speechSynthesis.cancel();
@@ -1083,6 +1154,14 @@
                 <div class="cat-title-jp">${d.label_jp}</div>
                 <div class="cat-count">${d.items.length} words</div>
             `;
+            const best = getQuizRecord(currentGrade, key);
+            if(best){
+                const b = document.createElement('div');
+                b.className = 'cat-best';
+                b.textContent = quizStars(best.best, best.total) || '✔';
+                b.title = `クイズ さいこう ${best.best}/${best.total}`;
+                div.appendChild(b);
+            }
             div.onclick = () => handleCatSelect(key);
             grid.appendChild(div);
         });
@@ -1176,7 +1255,7 @@
         fallbackImg(img, item.word); img.src=item.img;
         card.appendChild(img);
         if(options.speakOnTap){
-            card.onclick=()=>{ speak(item.word); card.animate([{transform:'scale(1)'},{transform:'scale(0.95)'},{transform:'scale(1)'}], 200); };
+            card.onclick=()=>{ speak(item.word); logActivity(); card.animate([{transform:'scale(1)'},{transform:'scale(0.95)'},{transform:'scale(1)'}], 200); };
         }
         return card;
     }
@@ -1245,7 +1324,7 @@
         showFlashcard(); 
     }
     
-    function finishFlashcards(){ 
+    function finishFlashcards(){ logActivity();
         document.getElementById('flash-view').classList.add('hidden'); 
         document.getElementById('flash-result-view').classList.remove('hidden'); 
         updateNavButtons(); 
@@ -1297,6 +1376,7 @@
         }); setTimeout(()=>speak(currentTarget.word),600);
     }
     function showQuizResult(){
+        recordQuiz(currentGrade, selectedCatKey, quizScore, quizTotal);
         const grid=document.getElementById('card-area');
         grid.className='grid';
         document.getElementById('view-title').innerText='Result';
@@ -1321,7 +1401,7 @@
     
     function initKaruta(items){ document.getElementById('view-title').innerText="Speed Karuta"; document.getElementById('karuta-bar').classList.remove('hidden'); document.getElementById('replay-btn').classList.remove('hidden'); targetItems=items.sort(()=>Math.random()-0.5).slice(0,24); const grid=document.getElementById('card-area'); targetItems.forEach((item,idx)=>{ const card=document.createElement('div'); card.className='card-common game-card'; card.id=`k-${idx}`; card.innerHTML=`<img src="${item.img}" class="card-img" onerror="this.style.display='none'">`; card.onclick=()=>checkKaruta(item,idx); grid.appendChild(card); }); startTime=Date.now(); currentKarutaTime = 0; document.getElementById('k-left').innerText=targetItems.length; timer=setInterval(()=>{currentKarutaTime = (Date.now()-startTime)/1000; document.getElementById('k-timer').innerText = currentKarutaTime.toFixed(1)+'s';},100); speak("Ready? Go!"); setTimeout(nextKarutaTurn,1000); }
     function nextKarutaTurn(){ if(document.getElementById('app-view').classList.contains('hidden')||!document.getElementById('k-0'))return; const rem=targetItems.filter((_,i)=>!document.getElementById(`k-${i}`).classList.contains('taken')); if(rem.length===0){ clearInterval(timer); finishKarutaGame(currentKarutaTime); return; } currentTarget=rem[Math.floor(Math.random()*rem.length)]; speak(currentTarget.word); }
-    function finishKarutaGame(timeVal){ speak("Finish!"); document.getElementById('app-view').classList.add('hidden'); document.getElementById('karuta-result-view').classList.remove('hidden'); const catName=selectedCatKey?dictionary[selectedCatKey].label_en:"All Random"; document.getElementById('res-cat-name').innerText=catName; document.getElementById('res-time-val').innerText=timeVal.toFixed(1) + 's'; const dateStr=new Date().toLocaleDateString(); let scores=JSON.parse(localStorage.getItem('karutaScores')||'[]'); const newScore={date:dateStr,cat:catName,time:timeVal}; scores.push(newScore); scores.sort((a,b)=>a.time-b.time); scores=scores.slice(0,5); localStorage.setItem('karutaScores',JSON.stringify(scores)); const tbody=document.getElementById('ranking-body'); tbody.innerHTML=''; scores.forEach((s,i)=>{ const isNew = (Math.abs(s.time - timeVal) < 0.05 && s.date === dateStr && s.cat === catName); const rankIcon=i===0?'🥇':(i===1?'🥈':(i===2?'🥉':i+1)); const row=`<tr><td class="rank-${i+1}">${rankIcon}</td><td style="font-size:0.8rem; color:#888;">${s.date}</td><td style="font-size:0.9rem;">${s.cat}</td><td>${s.time.toFixed(1)}s ${isNew?'<span class="new-record">New!</span>':''}</td></tr>`; tbody.innerHTML+=row; }); }
+    function finishKarutaGame(timeVal){ logActivity(); speak("Finish!"); document.getElementById('app-view').classList.add('hidden'); document.getElementById('karuta-result-view').classList.remove('hidden'); const catName=selectedCatKey?dictionary[selectedCatKey].label_en:"All Random"; document.getElementById('res-cat-name').innerText=catName; document.getElementById('res-time-val').innerText=timeVal.toFixed(1) + 's'; const dateStr=new Date().toLocaleDateString(); let scores=JSON.parse(localStorage.getItem('karutaScores')||'[]'); const newScore={date:dateStr,cat:catName,time:timeVal}; scores.push(newScore); scores.sort((a,b)=>a.time-b.time); scores=scores.slice(0,5); localStorage.setItem('karutaScores',JSON.stringify(scores)); const tbody=document.getElementById('ranking-body'); tbody.innerHTML=''; scores.forEach((s,i)=>{ const isNew = (Math.abs(s.time - timeVal) < 0.05 && s.date === dateStr && s.cat === catName); const rankIcon=i===0?'🥇':(i===1?'🥈':(i===2?'🥉':i+1)); const row=`<tr><td class="rank-${i+1}">${rankIcon}</td><td style="font-size:0.8rem; color:#888;">${s.date}</td><td style="font-size:0.9rem;">${s.cat}</td><td>${s.time.toFixed(1)}s ${isNew?'<span class="new-record">New!</span>':''}</td></tr>`; tbody.innerHTML+=row; }); }
     function checkKaruta(item, idx){ if(!currentTarget)return; const el=document.getElementById(`k-${idx}`); if(el.classList.contains('taken'))return; if(item.word===currentTarget.word){ el.classList.add('taken'); el.innerHTML="✨"; speak("Yes!"); document.getElementById('k-left').innerText=document.querySelectorAll('.game-card:not(.taken)').length; setTimeout(nextKarutaTurn,600); } }
     
     // --- Memory Game Fix (Fit to Screen) ---
@@ -1329,7 +1409,7 @@
     function updateScoreboard(){ const board=document.getElementById('memory-bar'); board.innerHTML=''; for(let i=0;i<memoryPlayers;i++){ const div=document.createElement('div'); div.className=`player-score ${i===memoryTurn?'active':''}`; div.innerText=`${playerIcons[i]} : ${memoryScores[i]}`; board.appendChild(div); } }
     function handleMemoryClick(card, word){ if(isProcessing||card.classList.contains('flipped')||card.classList.contains('matched')||flippedCards.length>=2)return; speak(word); card.classList.add('flipped'); flippedCards.push({el:card,word:word}); if(flippedCards.length===2){isProcessing=true;setTimeout(checkMemoryMatch,2200);} }
     function checkMemoryMatch(){ const [c1,c2]=flippedCards; if(c1.word===c2.word){ speak("Yes!"); c1.el.classList.add('matched'); c2.el.classList.add('matched'); memoryScores[memoryTurn]++; if(memoryScores.reduce((a,b)=>a+b,0)===document.querySelectorAll('.memory-card').length/2)finishMemoryGame(); updateScoreboard(); flippedCards=[]; isProcessing=false; }else{ speak("No..."); setTimeout(()=>{ c1.el.classList.remove('flipped'); c2.el.classList.remove('flipped'); memoryTurn=(memoryTurn+1)%memoryPlayers; updateScoreboard(); flippedCards=[]; isProcessing=false; },1000); } }
-    function finishMemoryGame(){ let max=-1,winners=[]; memoryScores.forEach((s,i)=>{if(s>max){max=s;winners=[i];}else if(s===max)winners.push(i);}); showOverlay("🏆",winners.length===1?`${playerIcons[winners[0]]} Wins!`:"Draw!"); speak("Finish!"); updateScoreboard(); }
+    function finishMemoryGame(){ logActivity(); let max=-1,winners=[]; memoryScores.forEach((s,i)=>{if(s>max){max=s;winners=[i];}else if(s===max)winners.push(i);}); showOverlay("🏆",winners.length===1?`${playerIcons[winners[0]]} Wins!`:"Draw!"); speak("Finish!"); updateScoreboard(); }
     
     function startSpelling(){ document.getElementById('game-setup-view').classList.add('hidden'); document.getElementById('spelling-view').classList.remove('hidden'); updateNavButtons(); let rawItems=selectedCatKey===null?Object.values(dictionary).flatMap(d=>d.items):dictionary[selectedCatKey].items; let shuffled=dedupeByWord(rawItems.map(parseItem)).sort(()=>Math.random()-0.5); spellingTotal=Math.min(10,shuffled.length); targetItems=shuffled.slice(0,spellingTotal); spellingCurrent=0; nextSpellingTurn(); }
     function nextSpellingTurn(){ if(targetItems.length===0){ showOverlay("🏆","ぜんぶクリア！ Good Job!"); speak("Congratulations! You did it!"); setTimeout(()=>{ if(!document.getElementById('spelling-view').classList.contains('hidden')){ document.getElementById('spelling-view').classList.add('hidden'); document.getElementById('game-setup-view').classList.remove('hidden'); document.getElementById('game-type-select').classList.remove('hidden'); document.getElementById('player-select').classList.add('hidden'); document.getElementById('bingo-size-select').classList.add('hidden'); updateNavButtons(); } },2200); return;} spellingCurrent++; document.getElementById('spell-counter').innerText=`${spellingCurrent} / ${spellingTotal}`; const item=targetItems.pop(); spellingWord=item.word; isHintUsed=false; document.getElementById('spell-img').src=item.img; document.getElementById('spell-hint-overlay').classList.remove('hidden'); const checkWord=item.word.replace(/\s+/g,'').toLowerCase(); spellingChars=checkWord.split('').sort(()=>Math.random()-0.5); filledSlots=new Array(checkWord.length).fill(null); renderSpellingSlots(checkWord.length); renderSpellingPool(); speak(spellingWord); }
@@ -1340,7 +1420,7 @@
     function playSpellingAudio(slow){ if(spellingWord)speak(spellingWord, slow?0.55:1.0); }
     function moveCharToSlot(char,poolIdx,btnEl){ const emptyIdx=filledSlots.indexOf(null); if(emptyIdx===-1)return; filledSlots[emptyIdx]={char:char,poolIdx:poolIdx}; btnEl.classList.add('used'); document.getElementById('spell-slots').children[emptyIdx].innerText=char; checkSpellingWin(); }
     function returnCharToPool(slotIdx){ const data=filledSlots[slotIdx]; if(!data)return; const poolBtns=document.querySelectorAll('.spell-char'); poolBtns.forEach(btn=>{if(parseInt(btn.dataset.poolIdx)===data.poolIdx){btn.classList.remove('used');}}); filledSlots[slotIdx]=null; document.getElementById('spell-slots').children[slotIdx].innerText=''; }
-    function checkSpellingWin(){ if(filledSlots.includes(null))return; const currentStr=filledSlots.map(d=>d.char).join(''); const correctStr=spellingWord.replace(/\s+/g,'').toLowerCase(); if(currentStr===correctStr){ speak("Yes!"); const msg=isHintUsed?"Good! 👍":"Perfect!! 🌈"; showOverlay("⭕",msg); setTimeout(nextSpellingTurn,2000); }else{ speak("No..."); const slots=document.getElementById('spell-slots'); slots.animate([{transform:'translateX(-10px)'},{transform:'translateX(10px)'},{transform:'translateX(0)'}],200); } }
+    function checkSpellingWin(){ if(filledSlots.includes(null))return; const currentStr=filledSlots.map(d=>d.char).join(''); const correctStr=spellingWord.replace(/\s+/g,'').toLowerCase(); if(currentStr===correctStr){ logActivity(); speak("Yes!"); const msg=isHintUsed?"Good! 👍":"Perfect!! 🌈"; showOverlay("⭕",msg); setTimeout(nextSpellingTurn,2000); }else{ speak("No..."); const slots=document.getElementById('spell-slots'); slots.animate([{transform:'translateX(-10px)'},{transform:'translateX(10px)'},{transform:'translateX(0)'}],200); } }
     document.addEventListener('keydown',(e)=>{ if(document.getElementById('spelling-view').classList.contains('hidden'))return; if(e.key==='Backspace'){ const lastFilledIdx=filledSlots.map(s=>s!==null).lastIndexOf(true); if(lastFilledIdx!==-1)returnCharToPool(lastFilledIdx); return; } if(e.key.length!==1)return; const char=e.key.toLowerCase(); const poolBtns=document.querySelectorAll('.spell-char:not(.used)'); for(let btn of poolBtns){ if(btn.innerText.toLowerCase()===char){btn.click();break;} } });
 
     // --- BINGO ---
@@ -1353,6 +1433,210 @@
     function checkBingoWinLogic() { const cells=Array.from(document.querySelectorAll('.bingo-cell')); const isStamped=i=>cells[i]&&cells[i].classList.contains('stamped'); const s=bingoSize; let lines=0; for(let i=0;i<s;i++){let win=true;for(let j=0;j<s;j++)if(!isStamped(i*s+j))win=false;if(win)lines++;} for(let i=0;i<s;i++){let win=true;for(let j=0;j<s;j++)if(!isStamped(i+j*s))win=false;if(win)lines++;} let d1=true,d2=true; for(let i=0;i<s;i++){if(!isStamped(i*s+i))d1=false;if(!isStamped(i*s+(s-1-i)))d2=false;} if(d1)lines++;if(d2)lines++; if(lines>completedLines){const diff=lines-completedLines;if(diff>0){if(lines===1)showOverlay("🎉","BINGO!");else showOverlay("🔥",`${lines} LINES!`);speak(lines===1?"Bingo!":"Great!");}completedLines=lines;} }
 
     function showOverlay(icon, text) { const ol=document.getElementById('overlay'); document.getElementById('overlay-mark').innerText=icon; document.getElementById('overlay-msg').innerText=text; ol.style.opacity=1; setTimeout(()=>ol.style.opacity=0,2000); }
+
+    // --- がんばりきろく（学びの見える化）---
+    // きろくは この端末の ブラウザの中だけに ほぞんする（名前などは あつかわない）
+    //   days : { 'YYYY-MM-DD': その日の 学習の かいすう }
+    //   quiz : { 'grade5|c01': { plays, best, total, last, lastDate } }   ('|all' は ぜんぶランダム)
+    const RECORD_KEY = 'pdRecord';
+    function getRecord(){
+        try{
+            const r = JSON.parse(localStorage.getItem(RECORD_KEY) || '{}');
+            return { days: (r && r.days) || {}, quiz: (r && r.quiz) || {} };
+        }catch(e){ return { days:{}, quiz:{} }; }
+    }
+    function setRecord(r){ try{ localStorage.setItem(RECORD_KEY, JSON.stringify(r)); }catch(e){} }
+    function dayKey(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+
+    // 学習した ことを きろくする（単語カードを きく・クイズ・ゲーム・文づくり など）
+    function logActivity(){
+        const r = getRecord();
+        const k = dayKey(new Date());
+        r.days[k] = (r.days[k] || 0) + 1;
+        setRecord(r);
+    }
+    function recordQuiz(grade, catKey, score, total){
+        if(!grade) return;
+        const r = getRecord();
+        const k = grade + '|' + (catKey || 'all');
+        const q = r.quiz[k] || { plays:0, best:0, total:total };
+        q.plays++;
+        if(q.total !== total){ q.total = total; q.best = 0; }   // もんだい数が かわったら さいこうを とりなおす
+        q.best = Math.max(q.best, score);
+        q.last = score;
+        q.lastDate = dayKey(new Date());
+        r.quiz[k] = q;
+        r.days[q.lastDate] = (r.days[q.lastDate] || 0) + 1;
+        setRecord(r);
+    }
+    function getQuizRecord(grade, catKey){
+        if(!grade) return null;
+        return getRecord().quiz[grade + '|' + (catKey || 'all')] || null;
+    }
+    // クイズ結果と おなじ きじゅんで ★の数を きめる
+    function quizStarCount(score, total){
+        if(!total) return 0;
+        if(score >= total*0.9) return 3;
+        if(score >= total*0.6) return 2;
+        if(score >= total*0.3) return 1;
+        return 0;
+    }
+    function quizStars(score, total){ return '🌟'.repeat(quizStarCount(score, total)); }
+
+    // れんぞく日数: きょう まだでも、きのうまで つづいていれば その日数（きょう やれば +1）
+    function getStreak(days){
+        const d = new Date();
+        let doneToday = !!days[dayKey(d)];
+        if(!doneToday) d.setDate(d.getDate() - 1);
+        let n = 0;
+        while(days[dayKey(d)]){ n++; d.setDate(d.getDate() - 1); }
+        return { n, doneToday };
+    }
+
+    function updateRecordEntry(){
+        const sub = document.getElementById('record-entry-sub');
+        if(!sub) return;
+        const { n, doneToday } = getStreak(getRecord().days);
+        sub.textContent = n === 0 ? 'がんばりきろく'
+            : doneToday ? `🔥 ${n}日 れんぞく！` : `🔥 ${n}日 れんぞく中（きょうも やろう）`;
+    }
+
+    let recordGrade = null;
+    function openRecord(){
+        goTop();
+        document.getElementById('grade-select-view').classList.add('hidden');
+        document.getElementById('record-view').classList.remove('hidden');
+        updateNavButtons();
+        if(!recordGrade) recordGrade = currentGrade || 'grade5';
+        renderRecord();
+        window.scrollTo(0,0);
+    }
+    function renderRecord(){
+        const r = getRecord();
+        const { n, doneToday } = getStreak(r.days);
+        document.getElementById('rec-streak').textContent = n;
+        document.getElementById('rec-streak-sub').textContent =
+            n === 0 ? 'きょうから はじめよう' : doneToday ? 'きょうも できたね！' : 'きょう やると つづくよ';
+        document.getElementById('rec-days').textContent = Object.keys(r.days).filter(k=>r.days[k]>0).length;
+        renderRecordCalendar(r.days);
+        renderRecordWeak(r.quiz);
+        renderRecordQuiz(r.quiz);
+    }
+    function renderRecordCalendar(days){
+        const cal = document.getElementById('rec-cal');
+        cal.innerHTML = '';
+        ['にち','げつ','か','すい','もく','きん','ど'].forEach((w,i)=>{
+            const h = document.createElement('div');
+            h.className = 'record-cal-head' + (i===0 ? ' sun' : i===6 ? ' sat' : '');
+            h.textContent = w;
+            cal.appendChild(h);
+        });
+        // きょうを ふくむ しゅうの どようびで おわる 5しゅうかん
+        const today = new Date(); today.setHours(0,0,0,0);
+        const end = new Date(today); end.setDate(end.getDate() + (6 - end.getDay()));
+        const start = new Date(end); start.setDate(start.getDate() - 34);
+        for(let d = new Date(start); d <= end; d.setDate(d.getDate()+1)){
+            const k = dayKey(d);
+            const c = days[k] || 0;
+            const cell = document.createElement('div');
+            let cls = 'record-cal-day';
+            if(d > today) cls += ' future';
+            else if(c >= 10) cls += ' lv3';
+            else if(c >= 4) cls += ' lv2';
+            else if(c >= 1) cls += ' lv1';
+            if(d.getTime() === today.getTime()) cls += ' today';
+            cell.className = cls;
+            cell.title = `${d.getMonth()+1}/${d.getDate()}` + (c ? ` ・ ${c}かい` : '');
+            if(c && d <= today){
+                const st = document.createElement('div'); st.className = 'stamp'; st.textContent = c >= 10 ? '🌟' : '⭐';
+                cell.appendChild(st);
+            }
+            const num = document.createElement('div'); num.textContent = d.getDate();
+            cell.appendChild(num);
+            cal.appendChild(cell);
+        }
+    }
+    // ★が 1つ いか（6わり みまん）の カテゴリーを「もういちど」に だす
+    function renderRecordWeak(quiz){
+        const box = document.getElementById('rec-weak');
+        const weak = Object.keys(quiz).map(k=>{
+            const [g, c] = k.split('|');
+            return { g, c, q: quiz[k] };
+        }).filter(x => x.c !== 'all' && allData[x.g] && allData[x.g][x.c] && quizStarCount(x.q.best, x.q.total) < 2)
+          .sort((a,b) => (a.q.best/a.q.total) - (b.q.best/b.q.total))
+          .slice(0, 3);
+        box.innerHTML = '';
+        if(!weak.length){ box.style.display = 'none'; return; }
+        box.style.display = 'block';
+        const h = document.createElement('h3'); h.textContent = '💪 もういちど チャレンジ！'; box.appendChild(h);
+        weak.forEach(x=>{
+            const d = allData[x.g][x.c];
+            const row = document.createElement('div'); row.className = 'record-weak-row';
+            const img = document.createElement('img'); img.style.cssText = 'width:36px;height:36px;object-fit:contain;'; img.src = imgSrc(d.icon); img.onerror = ()=>{ img.style.visibility='hidden'; };
+            const name = document.createElement('div'); name.className = 'record-cat-name';
+            name.textContent = d.label_en;
+            const sm = document.createElement('small'); sm.textContent = `${SPEECH_GRADE_LABEL[x.g]} ・ さいこう ${x.q.best}/${x.q.total}`; name.appendChild(sm);
+            const go = document.createElement('button'); go.className = 'record-go-btn'; go.textContent = '▶ れんしゅう';
+            go.onclick = ()=>practiceFromRecord(x.g, x.c);
+            row.append(img, name, go);
+            box.appendChild(row);
+        });
+    }
+    function renderRecordQuiz(quiz){
+        const tabs = document.getElementById('rec-grades');
+        tabs.innerHTML = '';
+        Object.keys(SPEECH_GRADE_LABEL).forEach(g=>{
+            const c = document.createElement('div');
+            c.className = 'speech-grade-chip' + (g === recordGrade ? ' active' : '');
+            const played = Object.keys(quiz).filter(k => k.startsWith(g + '|')).length;
+            c.textContent = SPEECH_GRADE_LABEL[g] + (played ? ` (${played})` : '');
+            c.onclick = ()=>{ recordGrade = g; renderRecordQuiz(getRecord().quiz); };
+            tabs.appendChild(c);
+        });
+        const list = document.getElementById('rec-cats');
+        list.innerHTML = '';
+        const data = allData[recordGrade];
+        const keys = Object.keys(data).concat(quiz[recordGrade + '|all'] ? ['all'] : []);
+        let any = false;
+        keys.forEach(k=>{
+            const q = quiz[recordGrade + '|' + k];
+            if(q) any = true;
+            const row = document.createElement('div'); row.className = 'record-cat-row' + (q ? '' : ' none');
+            const img = document.createElement('img');
+            if(k === 'all'){ img.style.visibility = 'hidden'; } else { img.src = imgSrc(data[k].icon); img.onerror = ()=>{ img.style.visibility='hidden'; }; }
+            const name = document.createElement('div'); name.className = 'record-cat-name';
+            name.textContent = k === 'all' ? 'ALL Random' : data[k].label_en;
+            const sm = document.createElement('small');
+            sm.textContent = k === 'all' ? 'ぜんぶランダム' : data[k].label_jp;
+            name.appendChild(sm);
+            const sc = document.createElement('div'); sc.className = 'record-cat-score';
+            if(q){
+                const st = document.createElement('div'); st.className = 'stars'; st.textContent = quizStars(q.best, q.total) || '💪';
+                const t = document.createElement('div'); t.textContent = `さいこう ${q.best}/${q.total}`;
+                const p = document.createElement('div'); p.style.cssText = 'font-size:0.75rem;color:#b2bec3;'; p.textContent = `${q.plays}かい・さいご ${q.last}/${q.total}`;
+                sc.append(st, t, p);
+            } else { sc.textContent = 'まだ'; }
+            row.append(img, name, sc);
+            list.appendChild(row);
+        });
+        if(!any){
+            const e = document.createElement('div'); e.className = 'record-empty';
+            e.textContent = `${SPEECH_GRADE_LABEL[recordGrade]}の クイズは まだ やっていないよ。Practice で ちょうせん しよう！`;
+            list.prepend(e);
+        }
+    }
+    // 「▶ れんしゅう」: その学年・カテゴリーの クイズの レベルえらびへ
+    function practiceFromRecord(g, c){
+        document.getElementById('record-view').classList.add('hidden');
+        selectGrade(g);
+        switchMode('quiz');
+        handleCatSelect(c);
+    }
+    function resetRecord(){
+        if(!confirm('がんばりきろくを ぜんぶ けしますか？（もとに もどせません）')) return;
+        try{ localStorage.removeItem(RECORD_KEY); }catch(e){}
+        renderRecord();
+    }
 
     // --- SPEECH BUILDER (発表づくり) ---
     const SPEECH_KEY = 'mySpeech';
@@ -1427,6 +1711,7 @@
     }
     // 文を ほぞんする。なおしている ときは おなじ場所に 上書きし、ちがう文に なったら ろくおんは けす
     function storeSpeechEntry(entry){
+        logActivity();
         const list = getSpeech();
         const at = editingSpeechId ? list.findIndex(s=>s.id===editingSpeechId) : -1;
         if(at >= 0){
@@ -2302,6 +2587,7 @@
         if(!h) return;
         try{
             if(h === 'bank'){ goTop(); openBankMenu(); return; }
+            if(h === 'record'){ openRecord(); return; }
             const m = h.match(/^g([3-6])(?:-(study|quiz|game))?$/);
             if(m){
                 goTop();
@@ -2311,6 +2597,7 @@
         }catch(e){}
     }
     window.addEventListener('hashchange', routeFromHash);
+    updateRecordEntry();
     routeFromHash();
 </script>
 </body>
