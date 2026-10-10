@@ -9,7 +9,9 @@
 
 | `out/reel1_cards_comment.mp4` / `out/reel2_portal_comment.mp4` | ①②の**コメント配布版**(締めに URL を出さず「フォロー+コメントで DM 配布」) | 30秒 / 32秒 |
 | `out/caption1_cards_comment.txt` / `out/caption2_portal_comment.txt` | コメント配布版の投稿文 | — |
-| `out/dm_reply_templates.txt` | コメントしてくれた人に送る DM の文面 | — |
+| `out/reel3_pd.mp4` / `out/reel3_pd_comment.mp4` | ③ Picture Dictionary 紹介(URL 版 / コメント配布版。キーワード「絵じてん」) | 32秒 |
+| `out/cover3_pd.png` / `out/caption3_pd*.txt` | ③ の表紙と投稿文 | — |
+| `out/dm_reply_templates.txt` | コメントしてくれた人に送る DM の文面(①②③) | — |
 
 いずれも 1080×1920 / 30fps / BGMつき(合成したオリジナル曲)・ナレーションなし。
 
@@ -57,6 +59,21 @@
 | 23.0–26.6 | おまけ | 絵カードライブラリ+枚数カウンタ | 絵カード862枚も ダウンロードOK |
 | 26.6–32.0 | 締め | フォローが押されるエンドカード | 先生向けに無料の授業アプリ・教材をシェア / 🔖 保存して… |
 
+### ③ Picture Dictionary 紹介(32秒)
+
+| 秒 | 役割 | 画 | テロップ |
+|---|---|---|---|
+| 0.0–3.0 | フック | 問いかけ → 絵カードが降ってきて敷き詰まる → 白フラッシュ | 英単語、どうやって覚えさせてますか？ → 小学校外国語の 絵じてんアプリ / PictureDictionary / ぜんぶ無料・登録なし |
+| 3.0–6.2 | 入口 | 学年をえらぶ画面 | 学年をえらぶだけ(音声つき / 4線つきUDフォント) |
+| 6.2–9.8 | 学ぶ | 単語カードをタップ | タップで発音が聞ける(ゆっくり音声 / 単語バンク) |
+| 9.8–13.0 | 発音練習 | 録音の画面 | じぶんの声を録音して お手本とくらべる |
+| 13.0–16.4 | 練習 | 聞いてえらぶクイズ → 正解 | 聞いてえらぶクイズ |
+| 16.4–23.6 | ゲーム | かるた・神経衰弱・スペリング・ビンゴを 1.8 秒ずつ | ゲームも4種類 |
+| 23.6–27.0 | My Speech | 文づくり → 発表モード | 英文をつくって 発表の練習まで |
+| 27.0–32.0 | 締め | フォロー(URL 版 / コメント配布版) | — |
+
+画面は `shots_pd.py` で撮る(PictureDictionary を 8001 番で配信しておく)。BGM は `python3 bgm.py bgm_pd 32 1.35 27.0 canon`。
+
 ## 作り直す手順
 
 ジャンルは「SNS向け短尺CM」なので、実録画ではなく**実画面のスクリーンショット+Remotion合成**で作っている
@@ -92,6 +109,9 @@ npx remotion render ReelPortal out/reel2_portal.mp4 --concurrency=3
 # コメント配布版
 npx remotion render ReelCardsComment out/reel1_cards_comment.mp4 --concurrency=3
 npx remotion render ReelPortalComment out/reel2_portal_comment.mp4 --concurrency=3
+# ③ Picture Dictionary
+npx remotion render ReelPD out/reel3_pd.mp4 --concurrency=3
+npx remotion render ReelPDComment out/reel3_pd_comment.mp4 --concurrency=3
 # 表紙
 npx remotion still ReelCards out/cover1_cards.png --frame=87
 npx remotion still ReelPortal out/cover2_portal.png --frame=93
@@ -113,7 +133,7 @@ npx remotion still ReelPortal out/cover2_portal.png --frame=93
 ## 表紙(カバー画像)
 
 `covers/` の HTML を、スキル `instagram-cover-image` の `render_cover.py` で 1080×1920 の PNG にする
-(型I カラーブロックがもと。① は藍、② は深緑にして、並んだときに見分けがつくようにしている)。
+(型I カラーブロックがもと。① は藍、② は深緑、③ は菫にして、並んだときに見分けがつくようにしている)。
 文字・数字・写真はすべてプロフィールの 3:4 切り抜き(上下 240px より内側)に収めてある。
 
 ```bash
@@ -122,4 +142,4 @@ python3 <スキル>/scripts/render_cover.py covers/cover1_cards.html -o out/cove
 python3 <スキル>/scripts/render_cover.py covers/cover2_portal.html -o out/cover2_portal.png --size 1080x1920
 ```
 
-② の表紙はアプリの画面を `remotion/public/shots/` から読むので、先に `shots.py` を実行しておく。
+②③ の表紙はアプリの画面を `remotion/public/shots/` から読むので、先に `shots.py` / `shots_pd.py` を実行しておく。

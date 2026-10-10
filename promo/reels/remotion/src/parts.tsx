@@ -67,7 +67,10 @@ export const Phone: React.FC<{
   rot?: number;
   scale?: number;
   opacity?: number;
-}> = ({ src, x, y, w, h, rot = 0, scale = 1, opacity = 1 }) => (
+  /** 画面を上にずらす量(CSSピクセル)。枠の下にはみ出す要素を見せたいとき */
+  offsetCss?: number;
+  children?: React.ReactNode;
+}> = ({ src, x, y, w, h, rot = 0, scale = 1, opacity = 1, offsetCss = 0, children }) => (
   <div
     style={{
       position: "absolute",
@@ -84,7 +87,11 @@ export const Phone: React.FC<{
       opacity,
     }}
   >
-    <Img src={staticFile(src)} style={{ width: "100%", display: "block" }} />
+    <Img
+      src={staticFile(src)}
+      style={{ width: "100%", display: "block", marginTop: -offsetCss * ((w - 28) / 390) }}
+    />
+    {children}
   </div>
 );
 
@@ -559,7 +566,16 @@ export const FollowEnd: React.FC<{
   lead: string;
   bgLayer: React.ReactNode;
   save: string;
-}> = ({ t, lead, bgLayer, save }) => {
+  linkLabel?: string;
+  linkUrl?: string;
+}> = ({
+  t,
+  lead,
+  bgLayer,
+  save,
+  linkLabel = "ポータルは プロフィールのリンクから",
+  linkUrl = "edupower07.github.io/Englishapp",
+}) => {
   const c = pulse(t, 2.1, 99, 0.3, 0.01);
   const d = pulse(t, 2.5, 99, 0.3, 0.01);
   return (
@@ -611,9 +627,9 @@ export const FollowEnd: React.FC<{
           opacity: d,
         }}
       >
-        ポータルは プロフィールのリンクから
+        {linkLabel}
         <br />
-        <span style={{ fontFamily: F.latin.family, fontSize: 36 }}>edupower07.github.io/Englishapp</span>
+        <span style={{ fontFamily: F.latin.family, fontSize: 36 }}>{linkUrl}</span>
       </div>
     </AbsoluteFill>
   );

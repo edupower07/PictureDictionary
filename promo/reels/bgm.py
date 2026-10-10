@@ -7,7 +7,7 @@ Englishapp/promo/cards_cm/bgm.py をもとに、尺とインパクト位置を�
   IMPACT-OUTRO 本編グルーヴ
   OUTRO-TOTAL  締め(コード伸ばし)
 
-使い方: python3 bgm.py <出力名> <尺秒> <インパクト秒> <締め秒> [pop|oudou]
+使い方: python3 bgm.py <出力名> <尺秒> <インパクト秒> <締め秒> [pop|oudou|canon]
   例) python3 bgm.py bgm_cards 30 1.35 25.4 pop
 出力: remotion/public/audio/<出力名>.mp3 (-14.5 LUFS 前後に整音)
 """
@@ -52,6 +52,15 @@ if len(sys.argv) > 5 and sys.argv[5] == "oudou":
         ("G", ["G", "B", "D"]),
         ("E", ["E", "G", "B"]),
         ("A", ["A", "C", "E"]),
+    ]
+
+# 3本目はカノン風(C - G - Am - Em)
+if len(sys.argv) > 5 and sys.argv[5] == "canon":
+    PROG = [
+        ("C", ["C", "E", "G"]),
+        ("G", ["G", "B", "D"]),
+        ("A", ["A", "C", "E"]),
+        ("E", ["E", "G", "B"]),
     ]
 
 rng = np.random.default_rng(11)
