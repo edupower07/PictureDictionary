@@ -13,7 +13,7 @@ import React from "react";
 import { AbsoluteFill, Img, Sequence, staticFile, useCurrentFrame } from "remotion";
 import { C, CUTS_CARDS as CUTS, F, IMPACT, K, SAFE, V, s } from "./theme";
 import { cl, easeBack, easeInOut, easeOut, lerp, pulse } from "./lib";
-import { Box, Chip, Flash, FollowEnd, Highlight, Shot, TapRing, TopTelop, Wall, shakeAt } from "./parts";
+import { Box, Chip, CommentEnd, END_SAMPLE, Flash, FollowEnd, Highlight, Shot, TapRing, TopTelop, Wall, shakeAt } from "./parts";
 import { Fonts } from "./Fonts";
 import { Soundtrack } from "./Soundtrack";
 import man from "../public/manifest.json";
@@ -404,18 +404,32 @@ const Zip: React.FC = () => {
   );
 };
 
+/** 締めの形: url = ポータルの URL を出す / comment = フォロー+コメントで DM 配布 */
+export type Cta = "url" | "comment";
+
 /* 25.4–30.0 締め:フォロー */
-const Close: React.FC = () => {
+const Close: React.FC<{ cta: Cta }> = ({ cta }) => {
   const t = useSec();
   const out = cl((t - 4.25) / 0.35); // 最後に白→紫へ(冒頭につながる)
+  const bg = <Wall files={M.hook_cards} dir="cards" cols={4} rows={7} t={0} fall={false} blurPx={8} />;
   return (
     <AbsoluteFill>
-      <FollowEnd
-        t={t}
-        lead={"小学校の先生向けに\n無料の授業アプリ・教材を\nシェアしています"}
-        save={"🔖 保存しておくと\n授業準備のとき すぐ見返せます"}
-        bgLayer={<Wall files={M.hook_cards} dir="cards" cols={4} rows={7} t={0} fall={false} blurPx={8} />}
-      />
+      {cta === "comment" ? (
+        <CommentEnd
+          t={t}
+          lead={`絵カード${TOTAL}枚のリンク\nほしい人は…`}
+          keyword="絵カード"
+          dm="絵カードのリンクはこちら！"
+          bgLayer={bg}
+        />
+      ) : (
+        <FollowEnd
+          t={t}
+          lead={"小学校の先生向けに\n無料の授業アプリ・教材を\nシェアしています"}
+          save={"🔖 保存しておくと\n授業準備のとき すぐ見返せます"}
+          bgLayer={bg}
+        />
+      )}
       <Flash v={(1 - t / 0.16) * 0.7} />
       <AbsoluteFill style={{ background: C.purple, opacity: out }} />
     </AbsoluteFill>
@@ -427,8 +441,8 @@ const cut = (name: keyof typeof CUTS) => {
   return { from: s(a), durationInFrames: s(b) - s(a) };
 };
 
-export const ReelCards: React.FC = () => (
-  <Fonts fonts={F} sampleText={SAMPLE}>
+export const ReelCards: React.FC<{ cta?: Cta }> = ({ cta = "url" }) => (
+  <Fonts fonts={F} sampleText={SAMPLE + END_SAMPLE}>
     <AbsoluteFill style={{ background: C.bg }}>
       <Sequence {...cut("hook")}>
         <Hook />
@@ -452,7 +466,7 @@ export const ReelCards: React.FC = () => (
         <Zip />
       </Sequence>
       <Sequence {...cut("close")}>
-        <Close />
+        <Close cta={cta} />
       </Sequence>
       <Soundtrack bgmSrc="audio/bgm_cards.mp3" fps={V.fps} fadeInSec={0.05} />
     </AbsoluteFill>

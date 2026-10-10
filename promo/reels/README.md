@@ -7,7 +7,18 @@
 | `out/cover1_cards.png` / `out/cover2_portal.png` | リールの表紙(1080×1920。プロフィールの3:4切り抜きでも文字が切れない位置) | — |
 | `out/caption1_cards.txt` / `out/caption2_portal.txt` | 投稿文 | — |
 
+| `out/reel1_cards_comment.mp4` / `out/reel2_portal_comment.mp4` | ①②の**コメント配布版**(締めに URL を出さず「フォロー+コメントで DM 配布」) | 30秒 / 32秒 |
+| `out/caption1_cards_comment.txt` / `out/caption2_portal_comment.txt` | コメント配布版の投稿文 | — |
+| `out/dm_reply_templates.txt` | コメントしてくれた人に送る DM の文面 | — |
+
 いずれも 1080×1920 / 30fps / BGMつき(合成したオリジナル曲)・ナレーションなし。
+
+### コメント配布版
+
+締めの4〜5秒だけが違う。URL を出すかわりに、Instagram の画面に似せた部品で
+「① フォロー → ② キーワードをコメント → ③ DM でリンクが届く」を見せる。
+キーワードは ① が「絵カード」、② が「アプリ」。
+コメントに DM を返す作業が発生するので、手で返すか、自動返信ツールを使う。
 
 ## ねらい(フォロワーを増やすために入れたこと)
 
@@ -78,6 +89,9 @@ python3 bgm.py bgm_portal 32 1.35 26.6 oudou
 cd remotion && npm install
 npx remotion render ReelCards out/reel1_cards.mp4 --concurrency=3
 npx remotion render ReelPortal out/reel2_portal.mp4 --concurrency=3
+# コメント配布版
+npx remotion render ReelCardsComment out/reel1_cards_comment.mp4 --concurrency=3
+npx remotion render ReelPortalComment out/reel2_portal_comment.mp4 --concurrency=3
 # 表紙
 npx remotion still ReelCards out/cover1_cards.png --frame=87
 npx remotion still ReelPortal out/cover2_portal.png --frame=93
@@ -90,7 +104,8 @@ npx remotion still ReelPortal out/cover2_portal.png --frame=93
 - **文言だけ直したい** → `remotion/src/ReelCards.tsx` / `ReelPortal.tsx` のテロップ文字列を直してレンダーし直すだけ
 - **カット割りを変えたい** → `remotion/src/theme.ts` の `CUTS_CARDS` / `CUTS_PORTAL`。
   BGM の締め(`bgm.py` の第4引数)も合わせる
-- **プロフィール名・ハンドル** → `parts.tsx` の `FollowEnd`(「全力先生」「@edupower07」)
+- **プロフィール名・ハンドル** → `parts.tsx` の `ProfileCard`(「全力先生」「@edupower07」)
+- **コメント配布版のキーワード・DM の文言** → `ReelCards.tsx` / `ReelPortal.tsx` の `Close` にある `CommentEnd` の `keyword` / `dm`
 - **見せるアプリを入れ替えたい** → `shots.py` の `PLAY_APPS`(押すボタンの文言つき)
 - 撮影はスマホ幅 390px × dsf=3。動画では CSS ピクセル×(1080/390) で表示している
 - かるた(g3_u6)はビューポートの高さが足りないと札の文字が写らない。アプリの画面は 390×844 で撮っている
