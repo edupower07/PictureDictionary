@@ -109,3 +109,17 @@ npx remotion still ReelPortal out/cover2_portal.png --frame=93
 - **見せるアプリを入れ替えたい** → `shots.py` の `PLAY_APPS`(押すボタンの文言つき)
 - 撮影はスマホ幅 390px × dsf=3。動画では CSS ピクセル×(1080/390) で表示している
 - かるた(g3_u6)はビューポートの高さが足りないと札の文字が写らない。アプリの画面は 390×844 で撮っている
+
+## 表紙(カバー画像)
+
+`covers/` の HTML を、スキル `instagram-cover-image` の `render_cover.py` で 1080×1920 の PNG にする
+(型I カラーブロックがもと。① は藍、② は深緑にして、並んだときに見分けがつくようにしている)。
+文字・数字・写真はすべてプロフィールの 3:4 切り抜き(上下 240px より内側)に収めてある。
+
+```bash
+export JAPANESE_FONTS_DIR=<Instagram投稿素材>/_system/fonts   # Dela Gothic One・Noto Sans JP が入っているもの
+python3 <スキル>/scripts/render_cover.py covers/cover1_cards.html -o out/cover1_cards.png --size 1080x1920
+python3 <スキル>/scripts/render_cover.py covers/cover2_portal.html -o out/cover2_portal.png --size 1080x1920
+```
+
+② の表紙はアプリの画面を `remotion/public/shots/` から読むので、先に `shots.py` を実行しておく。
