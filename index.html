@@ -401,6 +401,12 @@
         .speech-row-img { width: 54px; height: 54px; object-fit: contain; flex-shrink: 0; background: #f9f9f9; border-radius: 10px; }
         .speech-row-text { flex: 1; font-weight: 800; font-size: 1.05rem; color: var(--text-color); line-height: 1.25; min-width: 0; }
         .speech-row-btns { display: flex; gap: 4px; flex-shrink: 0; }
+        /* スマホ・タブレット縦: ボタンを 文の下の段に まわして、文を 1〜2行で 読めるように */
+        @media (max-width: 640px) {
+            .speech-row { flex-wrap: wrap; row-gap: 8px; }
+            .speech-row-text { flex-basis: calc(100% - 150px); }
+            .speech-row-btns { width: 100%; justify-content: flex-end; flex-wrap: wrap; padding-top: 8px; border-top: 1px dashed #eee; }
+        }
         .speech-mini-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: #f1f2f6; cursor: pointer; font-size: 1rem; display: flex; justify-content: center; align-items: center; transition: 0.15s; color: #636e72; }
         .speech-mini-btn:hover:not(:disabled) { background: #dfe6e9; }
         .speech-mini-btn:disabled { opacity: 0.3; cursor: default; }
@@ -487,6 +493,18 @@
         .present-rec-btn.recording { background: #c0392b; color: white; border-color: #c0392b; animation: recPulse 1s infinite; }
         .present-mine-btn { border: 3px solid #b7e4c7; background: white; color: #1e8449; border-radius: 30px; padding: 12px 22px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: var(--shadow); font-family: 'M PLUS Rounded 1c', sans-serif; }
         .present-hint { color: #b2bec3; font-weight: bold; font-size: 0.85rem; margin-top: 10px; }
+        /* とおしで きく（じぶんで おしたときだけ うごく） */
+        .present-auto-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; padding-top: 14px; border-top: 2px dashed #eee; }
+        .present-auto-btn { border: 3px solid #d6d1ff; background: white; color: #6c5ce7; border-radius: 30px; padding: 10px 18px; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: var(--shadow); font-family: 'M PLUS Rounded 1c', sans-serif; }
+        .present-auto-btn.slow { border-color: #b8f0e0; color: #00a383; }
+        .present-auto-btn.playing { background: #6c5ce7; color: white; border-color: #6c5ce7; }
+        .present-auto-btn.slow.playing { background: #00b894; border-color: #00b894; }
+        .present-auto-btn:disabled { opacity: 0.35; cursor: default; }
+        .present-stage.autoplaying { border-color: var(--accent-purple); }
+        /* 文を なおすとき */
+        .speech-edit-banner { background: #fff8e1; border: 3px solid #fdcb6e; border-radius: 16px; padding: 10px 14px; margin: 8px 0 12px; font-weight: 800; color: #b36b00; text-align: center; line-height: 1.4; }
+        .speech-edit-banner b { color: var(--text-color); }
+        .speech-mini-btn.edit { background: #fff8e1; color: #b36b00; }
 
         /* Present mode */
         #speech-present-view { text-align: center; }
@@ -703,6 +721,7 @@
 
     <div id="speech-build-view" class="hidden fade-in">
         <h2 style="text-align:center; color:#6c5ce7; margin-bottom:5px;">ぶんを つくろう</h2>
+        <div id="speech-edit-banner" class="speech-edit-banner" style="display:none"></div>
         <div id="speech-step1">
             <div class="speech-step-title">① いいたい かたち を えらぼう</div>
             <div class="speech-tpl-group">つたえる文</div>
@@ -747,6 +766,10 @@
                 <button id="present-mine" class="present-mine-btn" onclick="presentPlayMine()" style="display:none">▶ じぶんの声</button>
             </div>
             <div class="present-hint">🔊 は おてほん。じぶんで 言ってから きいてみよう！</div>
+            <div class="present-auto-row">
+                <button id="present-auto" class="present-auto-btn" onclick="togglePresentAutoplay(1.0)">⏵ とおしで きく</button>
+                <button id="present-auto-slow" class="present-auto-btn slow" onclick="togglePresentAutoplay(0.6)">🐢 ゆっくり とおす</button>
+            </div>
         </div>
         <div style="text-align:center; margin-top:20px;">
             <button class="nav-btn" style="background:#b2bec3;" onclick="openSpeechMenu()">おわる</button>
@@ -921,7 +944,8 @@
     speechSynthesis.onvoiceschanged = loadVoices;
     loadVoices();
 
-    function speak(txt, rate = 1.0) {
+    // onEnd: 読み終わったとき（とちゅうで とめられたときも）に よばれる
+    function speak(txt, rate = 1.0, onEnd) {
         speechSynthesis.cancel();
         let textToSpeak = txt;
         if (textToSpeak.length === 1 && /^[A-Z]$/.test(textToSpeak)) {
@@ -935,6 +959,7 @@
             const preferredVoice = englishVoices.find(v => v.name.includes("Google US English")) || englishVoices.find(v => v.name.includes("Samantha")) || englishVoices[0];
             u.voice = preferredVoice;
         }
+        if (onEnd) { u.onend = onEnd; u.onerror = onEnd; }
         speechSynthesis.speak(u);
     }
 
@@ -1395,13 +1420,27 @@
         { text:'Goodbye.',          jp:'さようなら',       img:'Goodbye.jpg' }
     ];
     function addFixedSentence(f){
-        const list = getSpeech();
-        list.push({ id:newSpeechId(), text:f.text, tplId:'fixed',
-                    words:[{ word:f.text, img:imgSrc(f.img) }], tail:null,
-                    word:f.text, img:imgSrc(f.img) });
-        setSpeech(list);
+        const entry = { tplId:'fixed', text:f.text, words:[{ word:f.text, img:imgSrc(f.img) }], tail:null,
+                        word:f.text, img:imgSrc(f.img) };
+        storeSpeechEntry(entry);
         speak(f.text);
-        showOverlay('✓','ついか したよ！');
+    }
+    // 文を ほぞんする。なおしている ときは おなじ場所に 上書きし、ちがう文に なったら ろくおんは けす
+    function storeSpeechEntry(entry){
+        const list = getSpeech();
+        const at = editingSpeechId ? list.findIndex(s=>s.id===editingSpeechId) : -1;
+        if(at >= 0){
+            const old = list[at];
+            const next = Object.assign({}, entry, { id: old.id });
+            if(old.rec && old.text === entry.text) next.rec = old.rec;
+            else if(old.rec) removeSpeechRec(old.id);
+            list[at] = next;
+            showOverlay('✏','なおしたよ！');
+        } else {
+            list.push(Object.assign({ id:newSpeechId() }, entry));
+            showOverlay('✓','ついか したよ！');
+        }
+        setSpeech(list);
         openSpeechMenu();
     }
 
@@ -1411,6 +1450,9 @@
     let speechPickerGrade = null;
     let speechCat = null;
     let presentIdx = 0;
+    let editingSpeechId = null;   // ✏ で なおしている 文の id（あたらしく つくるときは null）
+    let presentAutoToken = 0;     // とおし読みの「いまの回」。とめたら ふえて、のこった よびだしを むしする
+    let presentAutoRate = 0;      // とおし読み中の はやさ（0 = とまっている）
     const SPEECH_MAX_WORDS = 3;
 
     function speechArticle(w){ return /^[aeiou]/i.test(w) ? 'an ' : 'a '; }
@@ -1714,6 +1756,8 @@
 
     // ── メニュー（つくった文の いちらん）──
     function openSpeechMenu(){
+        stopPresentAutoplay();
+        editingSpeechId = null;
         ['grade-select-view','speech-build-view','speech-present-view'].forEach(id=>document.getElementById(id).classList.add('hidden'));
         document.getElementById('speech-menu-view').classList.remove('hidden');
         updateNavButtons();
@@ -1778,6 +1822,12 @@
             const btns = document.createElement('div'); btns.className='speech-row-btns';
             btns.append(play, rec);
             if(s.rec) btns.append(mine, mineDel);
+            // ✏ なおす（えらんだ ことばを そのまま 引きついで つくりなおせる）
+            if(tplById(s.tplId) || s.tplId === 'fixed'){
+                const edit = document.createElement('button'); edit.className='speech-mini-btn edit'; edit.textContent='✏'; edit.title='この文を なおす';
+                edit.onclick=()=>editSpeech(i);
+                btns.append(edit);
+            }
             btns.append(up, down, del);
             row.append(handle, num, img, text, btns);
             cont.appendChild(row);
@@ -1869,6 +1919,8 @@
     // ── ① 文のかたちを えらぶ ──
     function startSpeechBuilder(){
         speechTpl=null; speechWords=[]; speechTail=null;
+        editingSpeechId = null;
+        renderSpeechEditBanner();
         ['grade-select-view','speech-menu-view','speech-present-view'].forEach(id=>document.getElementById(id).classList.add('hidden'));
         document.getElementById('speech-build-view').classList.remove('hidden');
         document.getElementById('speech-step1').classList.remove('hidden');
@@ -2077,6 +2129,7 @@
         renderSpeechChosen();
         renderSpeechTails();
         renderSpeechFix();
+        saveBtn.textContent = editingSpeechId ? '✓ なおす' : '✓ きめる';
         if(speechWords.length){
             img.src=speechWords[0].img; img.style.display='';
             txt.textContent = buildSpeechText(speechTpl, speechWords, speechTail);
@@ -2093,10 +2146,8 @@
     }
     function saveSpeechSentence(){
         if(!speechWords.length || !speechTpl) return;
-        const list = getSpeech();
         const text = buildSpeechText(speechTpl, speechWords, speechTail);
-        list.push({
-            id: newSpeechId(),
+        storeSpeechEntry({
             text: text,
             tplId: speechTpl.id,
             words: speechWords.map(w=>({ word:w.word, img:w.img })),
@@ -2104,10 +2155,37 @@
             word: speechWords[0].word,
             img: speechWords[0].img
         });
-        setSpeech(list);
+        // openSpeechMenu が 読み上げを とめるので、そのあとで 読む
         speak(text);
-        showOverlay("✓","ついか したよ！");
-        openSpeechMenu();
+    }
+
+    // ✏ つくった文を なおす: かたち・ことば・そえことばを 引きついで ②の画面を ひらく
+    function editSpeech(i){
+        const s = getSpeech()[i];
+        if(!s) return;
+        const tpl = tplById(s.tplId);
+        startSpeechBuilder();
+        editingSpeechId = s.id;
+        if(!tpl){ renderSpeechEditBanner(); return; }   // あいさつ文などは ①で えらびなおす
+        selectSpeechTemplate(tpl);
+        speechWords = (s.words || []).map(w=>{
+            const c = findSpeechCard(w.word);
+            return { word:w.word, img:w.img, cat:c ? c.cat : null, grade:c ? c.grade : null };
+        });
+        speechTail = s.tail || null;
+        const first = speechWords[0];
+        if(first && first.grade && allData[first.grade][first.cat]){ speechPickerGrade = first.grade; speechCat = first.cat; }
+        renderSpeechGradeChips(); renderSpeechCatChips(); updateSpeechPreview();
+        renderSpeechEditBanner();
+    }
+    function renderSpeechEditBanner(){
+        const box = document.getElementById('speech-edit-banner');
+        const s = editingSpeechId ? getSpeech().find(x=>x.id===editingSpeechId) : null;
+        if(!s){ box.style.display='none'; return; }
+        box.innerHTML = '';
+        box.append('✏ なおしているよ：', Object.assign(document.createElement('b'), { textContent: s.text }));
+        box.append(document.createElement('br'), 'かたちを かえたいときは「もどる」で ①に もどってね');
+        box.style.display='block';
     }
 
     // ── ③ はっぴょうする（じどうで 読み上げない。おてほんは 🔊 を おしたときだけ）──
@@ -2146,10 +2224,65 @@
         recBtn.classList.toggle('recording', isSpeechRecording() && speechRecId===s.id);
         recBtn.textContent = (isSpeechRecording() && speechRecId===s.id) ? '■ とめる' : '🎙 ろくおん';
         mineBtn.style.display = s.rec ? '' : 'none';
+        refreshPresentAutoBtns();
     }
-    function presentMove(dir){ presentIdx+=dir; showPresent(); }
-    function playPresent(){ const list=getSpeech(); if(list[presentIdx]) speak(list[presentIdx].text); }
+    function presentMove(dir){ stopPresentAutoplay(); presentIdx+=dir; showPresent(); }
+    function playPresent(){ stopPresentAutoplay(); const list=getSpeech(); if(list[presentIdx]) speak(list[presentIdx].text); }
+
+    // ── とおしで きく: 1文ずつ 読んで、おわったら つぎへ すすむ（おしたときだけ うごく）──
+    function togglePresentAutoplay(rate){
+        if(presentAutoRate){ const same = presentAutoRate === rate; stopPresentAutoplay(); if(same) return; }
+        const list = getSpeech();
+        if(!list.length || isSpeechRecording()) return;
+        if(presentIdx >= list.length - 1) presentIdx = 0;   // さいごに いたら はじめから
+        presentAutoRate = rate;
+        const token = ++presentAutoToken;
+        refreshPresentAutoBtns();
+        const step = ()=>{
+            if(token !== presentAutoToken) return;
+            const view = document.getElementById('speech-present-view');
+            const l = getSpeech();
+            if(view.classList.contains('hidden') || presentIdx >= l.length){ stopPresentAutoplay(); return; }
+            showPresent();
+            const text = l[presentIdx].text;
+            let done = false;
+            const next = ()=>{
+                if(done || token !== presentAutoToken) return;
+                done = true;
+                setTimeout(()=>{
+                    if(token !== presentAutoToken) return;
+                    if(presentIdx < getSpeech().length - 1){ presentIdx++; step(); }
+                    else stopPresentAutoplay();
+                }, 1200);   // 文と文の あいだの「間」
+            };
+            speak(text, rate, next);
+            // 読みおわりの しらせが こない ブラウザが あるので、ながさから 見こんだ時間でも すすむ
+            setTimeout(next, (2500 + text.length * 110) / rate);
+        };
+        step();
+    }
+    function stopPresentAutoplay(){
+        if(!presentAutoRate) return;
+        presentAutoToken++;
+        presentAutoRate = 0;
+        speechSynthesis.cancel();
+        refreshPresentAutoBtns();
+    }
+    function refreshPresentAutoBtns(){
+        const normal = document.getElementById('present-auto');
+        const slow = document.getElementById('present-auto-slow');
+        if(!normal || !slow) return;
+        normal.classList.toggle('playing', presentAutoRate === 1.0);
+        slow.classList.toggle('playing', presentAutoRate === 0.6);
+        normal.textContent = presentAutoRate === 1.0 ? '■ とめる' : '⏵ とおしで きく';
+        slow.textContent = presentAutoRate === 0.6 ? '■ とめる' : '🐢 ゆっくり とおす';
+        const recOn = isSpeechRecording();
+        normal.disabled = recOn; slow.disabled = recOn;
+        document.querySelector('.present-stage').classList.toggle('autoplaying', !!presentAutoRate);
+    }
+
     function presentToggleRec(){
+        stopPresentAutoplay();
         const list=getSpeech(); const s=list[presentIdx]; if(!s) return;
         const btn=document.getElementById('present-rec');
         toggleSpeechRec(s.id, null).then(()=>refreshPresentRecBtns());
